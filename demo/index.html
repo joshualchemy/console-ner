@@ -13,7 +13,11 @@
       (() => {
         try {
           const savedTheme = localStorage.getItem("console-ner-theme");
-          const theme = savedTheme || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+          const theme =
+            savedTheme ||
+            (window.matchMedia("(prefers-color-scheme: dark)").matches
+              ? "dark"
+              : "light");
           document.documentElement.classList.add(theme);
         } catch {
           document.documentElement.classList.add("dark");
@@ -53,24 +57,48 @@
         --accent-strong: #2563eb;
       }
 
-      * { box-sizing: border-box; }
+      * {
+        box-sizing: border-box;
+      }
 
-      html, body { height: 100%; }
+      html,
+      body {
+        height: 100%;
+      }
 
       body {
         margin: 0;
         overflow: hidden;
         background:
-          radial-gradient(circle at 48% -20%, rgba(54, 104, 180, 0.13), transparent 35%),
+          radial-gradient(
+            circle at 48% -20%,
+            rgba(54, 104, 180, 0.13),
+            transparent 35%
+          ),
           var(--canvas);
         color: var(--text);
-        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        font-family:
+          Inter,
+          ui-sans-serif,
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
         -webkit-font-smoothing: antialiased;
       }
 
-      button, input, textarea { font: inherit; }
-      button { cursor: pointer; }
-      button:disabled { cursor: not-allowed; }
+      button,
+      input,
+      textarea {
+        font: inherit;
+      }
+      button {
+        cursor: pointer;
+      }
+      button:disabled {
+        cursor: not-allowed;
+      }
 
       .app-shell {
         display: grid;
@@ -82,13 +110,19 @@
         --left-width: 240px;
         --right-width: 352px;
         display: grid;
-        grid-template-columns: var(--left-width) minmax(420px, 1fr) var(--right-width);
+        grid-template-columns: var(--left-width) minmax(420px, 1fr) var(
+            --right-width
+          );
         min-height: 0;
         transition: grid-template-columns 180ms ease;
       }
 
-      .app-grid.left-collapsed { --left-width: 0px; }
-      .app-grid.right-collapsed { --right-width: 0px; }
+      .app-grid.left-collapsed {
+        --left-width: 0px;
+      }
+      .app-grid.right-collapsed {
+        --right-width: 0px;
+      }
       .app-grid.left-collapsed .left-column,
       .app-grid.right-collapsed .right-column {
         visibility: hidden;
@@ -97,7 +131,9 @@
         opacity: 0;
         pointer-events: none;
       }
-      .app-grid.left-collapsed .center-column { border-left: 0; }
+      .app-grid.left-collapsed .center-column {
+        border-left: 0;
+      }
 
       .column {
         min-width: 0;
@@ -106,10 +142,16 @@
         transition: opacity 140ms ease;
       }
 
-      .column + .column { border-left: 1px solid var(--line); }
+      .column + .column {
+        border-left: 1px solid var(--line);
+      }
 
-      header { background: #090d14; }
-      footer { background: #080c12; }
+      header {
+        background: #090d14;
+      }
+      footer {
+        background: #080c12;
+      }
       .left-column {
         display: flex;
         flex-direction: column;
@@ -168,7 +210,7 @@
         z-index: 2;
         width: 48px;
         border-right: 1px solid var(--line);
-        background: rgba(7, 10, 15, .55);
+        background: rgba(7, 10, 15, 0.55);
         pointer-events: none;
       }
 
@@ -183,7 +225,11 @@
         white-space: pre-wrap;
         overflow-wrap: break-word;
         tab-size: 2;
-        font: 15px/1.75 "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+        font:
+          15px/1.75 "SFMono-Regular",
+          Consolas,
+          "Liberation Mono",
+          monospace;
         letter-spacing: -0.015em;
       }
 
@@ -238,16 +284,32 @@
         pointer-events: auto;
       }
 
-      .confidence-high { color: #9af0cf; background: rgba(16, 185, 129, 0.20); }
-      .confidence-medium { color: #ffe18a; background: rgba(245, 158, 11, 0.20); }
-      .confidence-low { color: #ffafbd; background: rgba(244, 63, 94, 0.20); }
+      .confidence-high {
+        color: #9af0cf;
+        background: rgba(16, 185, 129, 0.2);
+      }
+      .confidence-medium {
+        color: #ffe18a;
+        background: rgba(245, 158, 11, 0.2);
+      }
+      .confidence-low {
+        color: #ffafbd;
+        background: rgba(244, 63, 94, 0.2);
+      }
 
       .entity-mark.active {
-        box-shadow: 0 0 0 1px currentColor, 0 0 16px color-mix(in srgb, currentColor 18%, transparent);
+        box-shadow:
+          0 0 0 1px currentColor,
+          0 0 16px color-mix(in srgb, currentColor 18%, transparent);
       }
 
       .entity-mark.server-assisted {
         border-bottom-color: transparent;
+      }
+
+      .entity-mark.server-assisted-enter {
+        animation: assisted-mark-enter 420ms cubic-bezier(0.22, 0.8, 0.24, 1)
+          both;
       }
 
       .entity-mark.server-assisted::after {
@@ -264,18 +326,45 @@
 
       .entity-mark.server-assisted-enter::after {
         transform-origin: left bottom;
-        animation: assisted-underline-enter 620ms cubic-bezier(.22, .8, .24, 1) both;
+        animation: assisted-underline-enter 620ms
+          cubic-bezier(0.22, 0.8, 0.24, 1) both;
       }
 
       @keyframes assisted-underline-enter {
-        0% { opacity: .45; transform: scaleX(0) scaleY(1); }
-        72% { opacity: 1; transform: scaleX(1) scaleY(1); }
-        86% { transform: scaleX(1.018) scaleY(2.35); }
-        100% { transform: scaleX(1) scaleY(1); }
+        0% {
+          opacity: 0.45;
+          transform: scaleX(0) scaleY(1);
+        }
+        72% {
+          opacity: 1;
+          transform: scaleX(1) scaleY(1);
+        }
+        86% {
+          transform: scaleX(1.018) scaleY(2.35);
+        }
+        100% {
+          transform: scaleX(1) scaleY(1);
+        }
+      }
+
+      @keyframes assisted-mark-enter {
+        0% {
+          box-shadow: 0 0 0 0 transparent;
+        }
+        52% {
+          box-shadow: 0 0 0 2px
+            color-mix(in srgb, currentColor 22%, transparent);
+        }
+        100% {
+          box-shadow: 0 0 0 0 transparent;
+        }
       }
 
       @media (prefers-reduced-motion: reduce) {
-        .entity-mark.server-assisted-enter::after { animation: none; }
+        .entity-mark.server-assisted-enter,
+        .entity-mark.server-assisted-enter::after {
+          animation: none;
+        }
       }
 
       .pattern-input {
@@ -290,13 +379,17 @@
         border: 1px solid #334155;
         border-radius: 8px;
         background: #080c12;
-        box-shadow: inset 0 1px 2px rgba(0, 0, 0, .22);
+        box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.22);
       }
 
-      .pattern-field:hover { border-color: #475569; }
+      .pattern-field:hover {
+        border-color: #475569;
+      }
       .pattern-field:focus-within {
         border-color: #3b82f6;
-        box-shadow: 0 0 0 1px #3b82f6, inset 0 1px 2px rgba(0, 0, 0, .18);
+        box-shadow:
+          0 0 0 1px #3b82f6,
+          inset 0 1px 2px rgba(0, 0, 0, 0.18);
       }
 
       .pattern-delimiter {
@@ -305,12 +398,21 @@
         flex: none;
         align-items: center;
         color: #64748b;
-        font: 12px/1 "SFMono-Regular", Consolas, monospace;
+        font:
+          12px/1 "SFMono-Regular",
+          Consolas,
+          monospace;
         user-select: none;
       }
 
-      .pattern-prefix { padding-left: 2px; padding-right: 2px; }
-      .pattern-suffix { padding-left: 2px; padding-right: 11px; }
+      .pattern-prefix {
+        padding-left: 2px;
+        padding-right: 2px;
+      }
+      .pattern-suffix {
+        padding-left: 2px;
+        padding-right: 11px;
+      }
 
       .pattern-field #patternInput {
         min-width: 0;
@@ -328,7 +430,9 @@
         box-shadow: none;
       }
 
-      .pattern-field:has(#patternInput[aria-invalid="true"]) { border-color: #f43f5e; }
+      .pattern-field:has(#patternInput[aria-invalid="true"]) {
+        border-color: #f43f5e;
+      }
 
       #customPatternName,
       #customTag {
@@ -336,21 +440,27 @@
         background: #080c12;
         color: #f1f5f9;
         caret-color: #f8fafc;
-        box-shadow: inset 0 1px 2px rgba(0, 0, 0, .22);
+        box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.22);
       }
 
       #customPatternName:hover,
-      #customTag:hover { border-color: #475569; }
+      #customTag:hover {
+        border-color: #475569;
+      }
 
       #customPatternName:focus,
       #customTag:focus {
         border-color: #3b82f6;
         outline: none;
-        box-shadow: 0 0 0 1px #3b82f6, inset 0 1px 2px rgba(0, 0, 0, .18);
+        box-shadow:
+          0 0 0 1px #3b82f6,
+          inset 0 1px 2px rgba(0, 0, 0, 0.18);
       }
 
       #customPatternName[aria-invalid="true"],
-      #customTag[aria-invalid="true"] { border-color: #f43f5e; }
+      #customTag[aria-invalid="true"] {
+        border-color: #f43f5e;
+      }
 
       #patternInput:-webkit-autofill,
       #customPatternName:-webkit-autofill,
@@ -364,14 +474,14 @@
         min-height: 38px;
         flex: 0 0 38px;
         padding: 0;
-        border-color: rgba(167, 139, 250, .3);
-        background: rgba(139, 92, 246, .1);
+        border-color: rgba(167, 139, 250, 0.3);
+        background: rgba(139, 92, 246, 0.1);
         color: #c4b5fd;
       }
 
       #registerPattern:hover {
-        border-color: rgba(167, 139, 250, .55);
-        background: rgba(139, 92, 246, .2);
+        border-color: rgba(167, 139, 250, 0.55);
+        background: rgba(139, 92, 246, 0.2);
       }
 
       #confidenceSlider {
@@ -381,7 +491,11 @@
         appearance: none;
         border-radius: 999px;
         outline: none;
-        background: linear-gradient(to right, #3b82f6 0 var(--slider-progress), #334155 var(--slider-progress) 100%);
+        background: linear-gradient(
+          to right,
+          #3b82f6 0 var(--slider-progress),
+          #334155 var(--slider-progress) 100%
+        );
       }
 
       #confidenceSlider::-webkit-slider-runnable-track {
@@ -398,7 +512,9 @@
         border: 3px solid #3b82f6;
         border-radius: 50%;
         background: #f8fafc;
-        box-shadow: 0 0 0 2px #0a0f17, 0 2px 5px rgba(0, 0, 0, .4);
+        box-shadow:
+          0 0 0 2px #0a0f17,
+          0 2px 5px rgba(0, 0, 0, 0.4);
         cursor: grab;
       }
 
@@ -421,17 +537,31 @@
         border: 3px solid #3b82f6;
         border-radius: 50%;
         background: #f8fafc;
-        box-shadow: 0 0 0 2px #0a0f17, 0 2px 5px rgba(0, 0, 0, .4);
+        box-shadow:
+          0 0 0 2px #0a0f17,
+          0 2px 5px rgba(0, 0, 0, 0.4);
         cursor: grab;
       }
 
-      #confidenceSlider:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 2px #0a0f17, 0 0 0 5px rgba(59, 130, 246, .35); }
-      #confidenceSlider:focus-visible::-moz-range-thumb { box-shadow: 0 0 0 2px #0a0f17, 0 0 0 5px rgba(59, 130, 246, .35); }
+      #confidenceSlider:focus-visible::-webkit-slider-thumb {
+        box-shadow:
+          0 0 0 2px #0a0f17,
+          0 0 0 5px rgba(59, 130, 246, 0.35);
+      }
+      #confidenceSlider:focus-visible::-moz-range-thumb {
+        box-shadow:
+          0 0 0 2px #0a0f17,
+          0 0 0 5px rgba(59, 130, 246, 0.35);
+      }
 
       .subtle-grid {
         background-image:
-          linear-gradient(rgba(255,255,255,.018) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(255,255,255,.018) 1px, transparent 1px);
+          linear-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px),
+          linear-gradient(
+            90deg,
+            rgba(255, 255, 255, 0.018) 1px,
+            transparent 1px
+          );
         background-size: 24px 24px;
       }
 
@@ -444,9 +574,12 @@
         transition: background 140ms ease;
       }
 
-      .result-card:last-child { border-bottom: 0; }
+      .result-card:last-child {
+        border-bottom: 0;
+      }
 
-      .result-card:hover, .result-card.active {
+      .result-card:hover,
+      .result-card.active {
         background: #111925;
       }
 
@@ -455,9 +588,15 @@
         box-shadow: none;
       }
 
-      .assist-confidence-high { --assist-color: var(--high) !important; }
-      .assist-confidence-medium { --assist-color: var(--medium) !important; }
-      .assist-confidence-low { --assist-color: var(--low) !important; }
+      .assist-confidence-high {
+        --assist-color: var(--high) !important;
+      }
+      .assist-confidence-medium {
+        --assist-color: var(--medium) !important;
+      }
+      .assist-confidence-low {
+        --assist-color: var(--low) !important;
+      }
 
       .result-card.server-assisted::before {
         position: absolute;
@@ -473,26 +612,43 @@
       .server-assisted-badge {
         display: inline-flex;
         align-items: center;
-        gap: .25rem;
-        border: 1px solid color-mix(in srgb, var(--assist-color, #8997b7) 32%, transparent);
-        border-radius: .25rem;
-        background: color-mix(in srgb, var(--assist-color, #8997b7) 8%, transparent);
-        padding: .125rem .375rem;
+        gap: 0.25rem;
+        border: 1px solid
+          color-mix(in srgb, var(--assist-color, #8997b7) 32%, transparent);
+        border-radius: 0.25rem;
+        background: color-mix(
+          in srgb,
+          var(--assist-color, #8997b7) 8%,
+          transparent
+        );
+        padding: 0.125rem 0.375rem;
         color: color-mix(in srgb, var(--assist-color, #8997b7) 70%, #e2e8f0);
         font-size: 8px;
         font-weight: 700;
-        letter-spacing: .05em;
+        letter-spacing: 0.05em;
         line-height: 1rem;
         text-transform: uppercase;
       }
 
-      #serverStatusDot.checking { background: #60a5fa; animation: server-pulse 1s ease-in-out infinite; }
-      #serverStatusDot.online { background: #34d399; }
-      #serverStatusDot.offline { background: #fb7185; }
-      #serverStatusDot.disabled { background: #64748b; }
+      #serverStatusDot.checking {
+        background: #60a5fa;
+        animation: server-pulse 1s ease-in-out infinite;
+      }
+      #serverStatusDot.online {
+        background: #34d399;
+      }
+      #serverStatusDot.offline {
+        background: #fb7185;
+      }
+      #serverStatusDot.disabled {
+        background: #64748b;
+      }
 
       @keyframes server-pulse {
-        50% { opacity: .35; transform: scale(.72); }
+        50% {
+          opacity: 0.35;
+          transform: scale(0.72);
+        }
       }
 
       .result-summary {
@@ -506,15 +662,17 @@
 
       .result-details {
         margin: 0 11px 10px 25px;
-        padding: 8px 0 0;
+        padding: 10px 0 2px;
         border-top: 1px solid var(--line);
+        font-size: 10px;
+        line-height: 1.55;
       }
 
       #resultsList:not(:empty) {
         overflow: hidden;
         border: 1px solid var(--line);
         border-radius: 10px;
-        background: rgba(12, 18, 28, .72);
+        background: rgba(12, 18, 28, 0.72);
       }
 
       .result-confidence-dot {
@@ -522,14 +680,14 @@
         height: 7px;
         flex: 0 0 7px;
         border-radius: 999px;
-        box-shadow: 0 0 0 3px rgba(148, 163, 184, .06);
+        box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.06);
       }
 
       .results-overview {
         overflow: hidden;
         border: 1px solid var(--line);
         border-radius: 10px;
-        background: rgba(15, 22, 33, .72);
+        background: rgba(15, 22, 33, 0.72);
       }
 
       .results-stat-grid {
@@ -542,7 +700,9 @@
         padding: 10px 11px;
       }
 
-      .results-stat + .results-stat { border-left: 1px solid var(--line); }
+      .results-stat + .results-stat {
+        border-left: 1px solid var(--line);
+      }
 
       .server-summary {
         display: flex;
@@ -551,7 +711,7 @@
         min-height: 34px;
         border-top: 1px solid var(--line);
         padding: 7px 10px;
-        background: rgba(120, 169, 255, .035);
+        background: rgba(120, 169, 255, 0.035);
       }
 
       .results-toolbar {
@@ -561,8 +721,12 @@
         align-items: center;
       }
 
-      .result-chevron { transition: transform 140ms ease; }
-      [aria-expanded="true"] .result-chevron { transform: rotate(180deg); }
+      .result-chevron {
+        transition: transform 140ms ease;
+      }
+      [aria-expanded="true"] .result-chevron {
+        transform: rotate(180deg);
+      }
 
       .filter-chip {
         display: inline-flex;
@@ -577,14 +741,14 @@
         color: #8492a8;
         font-size: 9px;
         font-weight: 700;
-        letter-spacing: .035em;
+        letter-spacing: 0.035em;
         text-transform: uppercase;
       }
 
       .filter-chip:hover,
       .filter-chip.active {
         border-color: #4f8fff;
-        background: rgba(59, 130, 246, .12);
+        background: rgba(59, 130, 246, 0.12);
         color: #bfdbfe;
       }
 
@@ -599,21 +763,25 @@
         outline: none;
       }
 
-      .result-select:focus { border-color: #4f8fff; }
+      .result-select:focus {
+        border-color: #4f8fff;
+      }
 
       #reviewMode[aria-pressed="true"] {
-        border-color: rgba(251, 191, 36, .55);
-        background: rgba(251, 191, 36, .12);
+        border-color: rgba(251, 191, 36, 0.55);
+        background: rgba(251, 191, 36, 0.12);
       }
 
       #copyResults:disabled,
-      #exportResults:disabled { opacity: .4; }
+      #exportResults:disabled {
+        opacity: 0.4;
+      }
 
       .micro-label {
         font-size: 10px;
         font-weight: 700;
         line-height: 1;
-        letter-spacing: .11em;
+        letter-spacing: 0.11em;
         text-transform: uppercase;
       }
 
@@ -622,19 +790,32 @@
         border-color: var(--accent-strong);
       }
 
-      .toggle-checkbox:checked + .toggle-track { background: var(--accent-strong); }
+      .toggle-checkbox:checked + .toggle-track {
+        background: var(--accent-strong);
+      }
 
-      .confidence-bar > span { transition: width 220ms ease; }
+      .confidence-bar > span {
+        transition: width 220ms ease;
+      }
 
-      .thin-scrollbar { scrollbar-width: thin; scrollbar-color: #334155 transparent; }
-      .thin-scrollbar::-webkit-scrollbar { width: 7px; height: 7px; }
-      .thin-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 8px; }
+      .thin-scrollbar {
+        scrollbar-width: thin;
+        scrollbar-color: #334155 transparent;
+      }
+      .thin-scrollbar::-webkit-scrollbar {
+        width: 7px;
+        height: 7px;
+      }
+      .thin-scrollbar::-webkit-scrollbar-thumb {
+        background: #334155;
+        border-radius: 8px;
+      }
 
       .kbd {
         border: 1px solid #344155;
         border-bottom-color: #475569;
         background: #151d2a;
-        box-shadow: inset 0 -1px rgba(255,255,255,.04);
+        box-shadow: inset 0 -1px rgba(255, 255, 255, 0.04);
       }
 
       #entityTooltip {
@@ -645,15 +826,21 @@
         border: 1px solid #334155;
         border-radius: 8px;
         background: #111827;
-        padding: 9px 10px;
+        padding: 11px 12px;
         color: #e2e8f0;
-        box-shadow: 0 12px 32px rgba(0, 0, 0, .38);
-        font-size: 10px;
-        line-height: 1.45;
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.38);
+        font-size: 11px;
+        line-height: 1.55;
         pointer-events: none;
       }
 
-      #entityTooltip[hidden] { display: none; }
+      #entityTooltip code {
+        font-size: 10px;
+      }
+
+      #entityTooltip[hidden] {
+        display: none;
+      }
 
       .workbench-dialog {
         width: min(360px, calc(100vw - 32px));
@@ -662,10 +849,13 @@
         background: #111827;
         padding: 16px;
         color: #e2e8f0;
-        box-shadow: 0 24px 70px rgba(0, 0, 0, .48);
+        box-shadow: 0 24px 70px rgba(0, 0, 0, 0.48);
       }
 
-      .workbench-dialog::backdrop { background: rgba(2, 6, 23, .68); backdrop-filter: blur(2px); }
+      .workbench-dialog::backdrop {
+        background: rgba(2, 6, 23, 0.68);
+        backdrop-filter: blur(2px);
+      }
 
       .dialog-input {
         width: 100%;
@@ -678,9 +868,16 @@
         outline: none;
       }
 
-      .dialog-input:focus { border-color: #3b82f6; box-shadow: 0 0 0 1px #3b82f6; }
-      .panel-toggle svg { transition: transform 160ms ease; }
-      .panel-toggle.is-collapsed svg { transform: scaleX(-1); }
+      .dialog-input:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 1px #3b82f6;
+      }
+      .panel-toggle svg {
+        transition: transform 160ms ease;
+      }
+      .panel-toggle.is-collapsed svg {
+        transform: scaleX(-1);
+      }
 
       .settings-section {
         padding: 12px;
@@ -700,10 +897,12 @@
         overflow: hidden;
         border: 1px solid var(--line);
         border-radius: 10px;
-        background: rgba(12, 18, 28, .72);
+        background: rgba(12, 18, 28, 0.72);
       }
 
-      #recognizerList > * + * { border-top: 1px solid var(--line); }
+      #recognizerList > * + * {
+        border-top: 1px solid var(--line);
+      }
 
       .recognizer-row {
         position: relative;
@@ -716,8 +915,12 @@
         transition: background 120ms ease;
       }
 
-      .recognizer-row:hover { background: rgba(30, 41, 59, .42); }
-      .recognizer-row.has-actions { padding-right: 62px; }
+      .recognizer-row:hover {
+        background: rgba(30, 41, 59, 0.42);
+      }
+      .recognizer-row.has-actions {
+        padding-right: 62px;
+      }
 
       .recognizer-checkbox {
         width: 14px;
@@ -728,7 +931,7 @@
 
       .recognizer-children {
         border-top: 1px solid var(--line);
-        background: rgba(7, 10, 15, .24);
+        background: rgba(7, 10, 15, 0.24);
       }
 
       .recognizer-children .recognizer-row {
@@ -736,9 +939,15 @@
         padding-left: 24px;
       }
 
-      .recognizer-children .recognizer-row + .recognizer-row { border-top: 1px solid rgba(32, 42, 56, .7); }
-      .recognizer-group-chevron { transition: transform 140ms ease; }
-      [aria-expanded="true"] > .recognizer-group-chevron { transform: rotate(90deg); }
+      .recognizer-children .recognizer-row + .recognizer-row {
+        border-top: 1px solid rgba(32, 42, 56, 0.7);
+      }
+      .recognizer-group-chevron {
+        transition: transform 140ms ease;
+      }
+      [aria-expanded="true"] > .recognizer-group-chevron {
+        transform: rotate(90deg);
+      }
 
       .recognizer-actions {
         position: absolute;
@@ -767,8 +976,12 @@
         cursor: pointer;
       }
 
-      .setting-row + .setting-row { border-top: 1px solid var(--line); }
-      .setting-row:hover { background: rgba(30, 41, 59, .34); }
+      .setting-row + .setting-row {
+        border-top: 1px solid var(--line);
+      }
+      .setting-row:hover {
+        background: rgba(30, 41, 59, 0.34);
+      }
 
       .setting-icon {
         display: inline-flex;
@@ -776,16 +989,16 @@
         height: 28px;
         align-items: center;
         justify-content: center;
-        border: 1px solid rgba(100, 116, 139, .22);
+        border: 1px solid rgba(100, 116, 139, 0.22);
         border-radius: 7px;
-        background: rgba(30, 41, 59, .4);
+        background: rgba(30, 41, 59, 0.4);
         color: #8492a8;
       }
 
       .confidence-key {
         border: 1px solid var(--line);
         border-radius: 10px;
-        background: rgba(12, 18, 28, .72);
+        background: rgba(12, 18, 28, 0.72);
         padding: 9px 10px;
       }
 
@@ -807,7 +1020,10 @@
       .confidence-key-item small {
         grid-column: 2;
         color: #556277;
-        font: 8px/1.2 "SFMono-Regular", Consolas, monospace;
+        font:
+          8px/1.2 "SFMono-Regular",
+          Consolas,
+          monospace;
       }
 
       .header-action {
@@ -832,7 +1048,11 @@
 
       html.light body {
         background:
-          radial-gradient(circle at 48% -20%, rgba(59, 130, 246, 0.12), transparent 38%),
+          radial-gradient(
+            circle at 48% -20%,
+            rgba(59, 130, 246, 0.12),
+            transparent 38%
+          ),
           var(--canvas);
       }
 
@@ -847,7 +1067,9 @@
         background: #f8fafc !important;
       }
 
-      html.light .center-column { background: rgba(255, 255, 255, 0.68); }
+      html.light .center-column {
+        background: rgba(255, 255, 255, 0.68);
+      }
 
       html.light .center-column > div:not(.editor-wrap),
       html.light .results-header {
@@ -855,19 +1077,31 @@
         background: rgba(255, 255, 255, 0.94) !important;
       }
 
-      html.light .results-scroll { background: #f8fafc; }
-
-      html.light .editor-wrap { background: #ffffff; }
-      html.light .editor-wrap::before { background: rgba(241, 245, 249, .86); }
-      html.light .editor-line::before { color: #94a3b8; }
-      html.light .subtle-grid {
-        background-image:
-          linear-gradient(rgba(15,23,42,.035) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(15,23,42,.035) 1px, transparent 1px);
+      html.light .results-scroll {
+        background: #f8fafc;
       }
 
-      html.light #highlightLayer { color: #334155; }
-      html.light #sourceText { caret-color: #0f172a; }
+      html.light .editor-wrap {
+        background: #ffffff;
+      }
+      html.light .editor-wrap::before {
+        background: rgba(241, 245, 249, 0.86);
+      }
+      html.light .editor-line::before {
+        color: #94a3b8;
+      }
+      html.light .subtle-grid {
+        background-image:
+          linear-gradient(rgba(15, 23, 42, 0.035) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(15, 23, 42, 0.035) 1px, transparent 1px);
+      }
+
+      html.light #highlightLayer {
+        color: #334155;
+      }
+      html.light #sourceText {
+        caret-color: #0f172a;
+      }
       html.light .pattern-field,
       html.light #customPatternName,
       html.light #customTag {
@@ -875,23 +1109,29 @@
         background: #ffffff !important;
         color: #0f172a !important;
         caret-color: #0f172a;
-        box-shadow: inset 0 1px 2px rgba(15, 23, 42, .05);
+        box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.05);
       }
 
       html.light .pattern-field:hover,
       html.light #customPatternName:hover,
-      html.light #customTag:hover { border-color: #94a3b8 !important; }
+      html.light #customTag:hover {
+        border-color: #94a3b8 !important;
+      }
 
       html.light .pattern-field:focus-within,
       html.light #customPatternName:focus,
       html.light #customTag:focus {
         border-color: #2563eb !important;
-        box-shadow: 0 0 0 1px #2563eb, inset 0 1px 2px rgba(15, 23, 42, .04);
+        box-shadow:
+          0 0 0 1px #2563eb,
+          inset 0 1px 2px rgba(15, 23, 42, 0.04);
       }
 
       html.light .pattern-field:has(#patternInput[aria-invalid="true"]),
       html.light #customPatternName[aria-invalid="true"],
-      html.light #customTag[aria-invalid="true"] { border-color: #e11d48 !important; }
+      html.light #customTag[aria-invalid="true"] {
+        border-color: #e11d48 !important;
+      }
 
       html.light .pattern-field #patternInput {
         border: 0 !important;
@@ -906,51 +1146,86 @@
         border-color: #cbd5e1;
         background: #ffffff;
         color: #1e293b;
-        box-shadow: 0 12px 32px rgba(15, 23, 42, .16);
+        box-shadow: 0 12px 32px rgba(15, 23, 42, 0.16);
       }
 
       html.light .workbench-dialog {
         border-color: #cbd5e1;
         background: #ffffff;
         color: #1e293b;
-        box-shadow: 0 24px 70px rgba(15, 23, 42, .2);
+        box-shadow: 0 24px 70px rgba(15, 23, 42, 0.2);
       }
 
-      html.light .workbench-dialog::backdrop { background: rgba(15, 23, 42, .35); }
-      html.light .dialog-input { border-color: #cbd5e1; background: #ffffff; color: #0f172a; }
+      html.light .workbench-dialog::backdrop {
+        background: rgba(15, 23, 42, 0.35);
+      }
+      html.light .dialog-input {
+        border-color: #cbd5e1;
+        background: #ffffff;
+        color: #0f172a;
+      }
       html.light .settings-surface,
-      html.light .confidence-key { background: rgba(255, 255, 255, .78); }
+      html.light .confidence-key {
+        background: rgba(255, 255, 255, 0.78);
+      }
       html.light .recognizer-row:hover,
-      html.light .setting-row:hover { background: rgba(226, 232, 240, .55); }
-      html.light .recognizer-children { background: rgba(241, 245, 249, .72); }
-      html.light .recognizer-children .recognizer-row + .recognizer-row { border-color: var(--line); }
-      html.light .setting-icon { border-color: #dce4ef; background: #f1f5f9; color: #64748b; }
+      html.light .setting-row:hover {
+        background: rgba(226, 232, 240, 0.55);
+      }
+      html.light .recognizer-children {
+        background: rgba(241, 245, 249, 0.72);
+      }
+      html.light .recognizer-children .recognizer-row + .recognizer-row {
+        border-color: var(--line);
+      }
+      html.light .setting-icon {
+        border-color: #dce4ef;
+        background: #f1f5f9;
+        color: #64748b;
+      }
       html.light .filter-chip,
-      html.light .result-select { border-color: #cbd5e1; background: #ffffff; color: #64748b; }
+      html.light .result-select {
+        border-color: #cbd5e1;
+        background: #ffffff;
+        color: #64748b;
+      }
       html.light .filter-chip:hover,
-      html.light .filter-chip.active { border-color: #2563eb; background: #eff6ff; color: #1d4ed8; }
-      html.light #reviewMode[aria-pressed="true"] { border-color: #d97706 !important; background: #fffbeb !important; }
+      html.light .filter-chip.active {
+        border-color: #2563eb;
+        background: #eff6ff;
+        color: #1d4ed8;
+      }
+      html.light #reviewMode[aria-pressed="true"] {
+        border-color: #d97706 !important;
+        background: #fffbeb !important;
+      }
 
       html.light #confidenceSlider {
-        background: linear-gradient(to right, #2563eb 0 var(--slider-progress), #cbd5e1 var(--slider-progress) 100%);
+        background: linear-gradient(
+          to right,
+          #2563eb 0 var(--slider-progress),
+          #cbd5e1 var(--slider-progress) 100%
+        );
       }
 
       html.light #confidenceSlider::-webkit-slider-thumb,
       html.light #confidenceSlider::-moz-range-thumb {
         border-color: #2563eb;
         background: #ffffff;
-        box-shadow: 0 0 0 2px #f8fafc, 0 2px 5px rgba(15, 23, 42, .22);
+        box-shadow:
+          0 0 0 2px #f8fafc,
+          0 2px 5px rgba(15, 23, 42, 0.22);
       }
 
       html.light #registerPattern {
-        border-color: rgba(109, 40, 217, .25);
-        background: rgba(124, 58, 237, .08);
+        border-color: rgba(109, 40, 217, 0.25);
+        background: rgba(124, 58, 237, 0.08);
         color: #6d28d9;
       }
 
       html.light #registerPattern:hover {
-        border-color: rgba(109, 40, 217, .45);
-        background: rgba(124, 58, 237, .14);
+        border-color: rgba(109, 40, 217, 0.45);
+        background: rgba(124, 58, 237, 0.14);
       }
 
       html.light .result-card {
@@ -977,100 +1252,296 @@
       }
 
       html.light #resultsList:not(:empty),
-      html.light .results-overview { background: rgba(255, 255, 255, .78); }
+      html.light .results-overview {
+        background: rgba(255, 255, 255, 0.78);
+      }
 
-      html.light .server-summary { background: rgba(37, 99, 235, .025); }
+      html.light .server-summary {
+        background: rgba(37, 99, 235, 0.025);
+      }
 
-      html.light .assist-confidence-high { --assist-color: #059669 !important; }
-      html.light .assist-confidence-medium { --assist-color: #d97706 !important; }
-      html.light .assist-confidence-low { --assist-color: #e11d48 !important; }
+      html.light .assist-confidence-high {
+        --assist-color: #059669 !important;
+      }
+      html.light .assist-confidence-medium {
+        --assist-color: #d97706 !important;
+      }
+      html.light .assist-confidence-low {
+        --assist-color: #e11d48 !important;
+      }
 
-      html.light .confidence-high { color: #047857; background: rgba(16, 185, 129, .15); }
-      html.light .confidence-medium { color: #a16207; background: rgba(245, 158, 11, .16); }
-      html.light .confidence-low { color: #be123c; background: rgba(244, 63, 94, .14); }
-      html.light .kbd { border-color: #cbd5e1; background: #f1f5f9; box-shadow: inset 0 -1px rgba(15,23,42,.06); }
-      html.light .thin-scrollbar { scrollbar-color: #cbd5e1 transparent; }
-      html.light .thin-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; }
+      html.light .confidence-high {
+        color: #047857;
+        background: rgba(16, 185, 129, 0.15);
+      }
+      html.light .confidence-medium {
+        color: #a16207;
+        background: rgba(245, 158, 11, 0.16);
+      }
+      html.light .confidence-low {
+        color: #be123c;
+        background: rgba(244, 63, 94, 0.14);
+      }
+      html.light .kbd {
+        border-color: #cbd5e1;
+        background: #f1f5f9;
+        box-shadow: inset 0 -1px rgba(15, 23, 42, 0.06);
+      }
+      html.light .thin-scrollbar {
+        scrollbar-color: #cbd5e1 transparent;
+      }
+      html.light .thin-scrollbar::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+      }
 
       html.light .text-slate-100,
-      html.light .text-slate-200 { color: #172033 !important; }
-      html.light .text-slate-300 { color: #334155 !important; }
-      html.light .text-slate-400 { color: #475569 !important; }
-      html.light .text-slate-500 { color: #64748b !important; }
-      html.light .text-slate-600 { color: #78869a !important; }
+      html.light .text-slate-200 {
+        color: #172033 !important;
+      }
+      html.light .text-slate-300 {
+        color: #334155 !important;
+      }
+      html.light .text-slate-400 {
+        color: #475569 !important;
+      }
+      html.light .text-slate-500 {
+        color: #64748b !important;
+      }
+      html.light .text-slate-600 {
+        color: #78869a !important;
+      }
       html.light [class*="border-slate-8"],
-      html.light [class*="border-slate-7"] { border-color: #dce4ef !important; }
-      html.light [class*="bg-slate-900"] { background-color: rgba(241, 245, 249, .92) !important; }
-      html.light [class*="bg-slate-800"] { background-color: rgba(226, 232, 240, .8) !important; }
-      html.light [class*="bg-slate-700"] { background-color: #cbd5e1 !important; }
-      html.light .tooltip { background-color: #334155 !important; color: #ffffff !important; }
-      html.light .text-emerald-300 { color: #047857 !important; }
+      html.light [class*="border-slate-7"] {
+        border-color: #dce4ef !important;
+      }
+      html.light [class*="bg-slate-900"] {
+        background-color: rgba(241, 245, 249, 0.92) !important;
+      }
+      html.light [class*="bg-slate-800"] {
+        background-color: rgba(226, 232, 240, 0.8) !important;
+      }
+      html.light [class*="bg-slate-700"] {
+        background-color: #cbd5e1 !important;
+      }
+      html.light .tooltip {
+        background-color: #334155 !important;
+        color: #ffffff !important;
+      }
+      html.light .text-emerald-300 {
+        color: #047857 !important;
+      }
       html.light .text-blue-300,
-      html.light .text-blue-400 { color: #2563eb !important; }
-      html.light .text-amber-300 { color: #a16207 !important; }
-      html.light .text-rose-300 { color: #be123c !important; }
+      html.light .text-blue-400 {
+        color: #2563eb !important;
+      }
+      html.light .text-amber-300 {
+        color: #a16207 !important;
+      }
+      html.light .text-rose-300 {
+        color: #be123c !important;
+      }
 
       @media (max-width: 1080px) {
-        .app-grid { --left-width: 220px; --right-width: 328px; }
-        .app-grid.left-collapsed { --left-width: 0px; }
-        .app-grid.right-collapsed { --right-width: 0px; }
+        .app-grid {
+          --left-width: 220px;
+          --right-width: 328px;
+        }
+        .app-grid.left-collapsed {
+          --left-width: 0px;
+        }
+        .app-grid.right-collapsed {
+          --right-width: 0px;
+        }
       }
 
       @media (max-width: 880px) {
-        body { overflow: auto; }
-        .app-shell { height: auto; min-height: 100dvh; grid-template-rows: 52px auto; }
-        .app-grid { grid-template-columns: 1fr; }
-        .column { overflow: visible; }
-        .column + .column { border-left: 0; border-top: 1px solid var(--line); }
-        .left-column { order: 2; }
-        .center-column { order: 1; min-height: 660px; }
-        .right-column { order: 3; }
-        .results-scroll { overflow: visible; }
+        body {
+          overflow: auto;
+        }
+        .app-shell {
+          height: auto;
+          min-height: 100dvh;
+          grid-template-rows: 52px auto;
+        }
+        .app-grid {
+          grid-template-columns: 1fr;
+        }
+        .column {
+          overflow: visible;
+        }
+        .column + .column {
+          border-left: 0;
+          border-top: 1px solid var(--line);
+        }
+        .left-column {
+          order: 2;
+        }
+        .center-column {
+          order: 1;
+          min-height: 660px;
+        }
+        .right-column {
+          order: 3;
+        }
+        .results-scroll {
+          overflow: visible;
+        }
         .app-grid.left-collapsed .left-column,
-        .app-grid.right-collapsed .right-column { display: none; }
+        .app-grid.right-collapsed .right-column {
+          display: none;
+        }
       }
     </style>
   </head>
   <body>
     <div class="app-shell">
-      <header class="flex items-center justify-between border-b border-slate-800/90 bg-[#090d14]/95 px-4 sm:px-5">
+      <header
+        class="flex items-center justify-between border-b border-slate-800/90 bg-[#090d14]/95 px-4 sm:px-5"
+      >
         <div class="flex min-w-0 items-center gap-3">
-          <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-blue-400/25 bg-blue-500/10 text-blue-300 shadow-[0_0_24px_rgba(59,130,246,.12)]">
-            <svg aria-hidden="true" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-              <path stroke-linecap="round" stroke-linejoin="round" d="m7 8-4 4 4 4m10-8 4 4-4 4m-3-12-4 16"/>
+          <div
+            class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-blue-400/25 bg-blue-500/10 text-blue-300 shadow-[0_0_24px_rgba(59,130,246,.12)]"
+          >
+            <svg
+              aria-hidden="true"
+              class="h-4 w-4"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="m7 8-4 4 4 4m10-8 4 4-4 4m-3-12-4 16"
+              />
             </svg>
           </div>
           <div class="min-w-0">
-            <h1 class="truncate text-sm font-semibold tracking-tight text-slate-100">ConsoleNER</h1>
+            <h1
+              class="truncate text-sm font-semibold tracking-tight text-slate-100"
+            >
+              ConsoleNER
+            </h1>
           </div>
-          <button id="toggleLeftColumn" type="button" class="header-action header-icon-action panel-toggle border border-slate-700/80 bg-slate-900/70 text-slate-400 transition hover:border-slate-600 hover:text-slate-100" aria-label="Collapse settings panel" aria-pressed="false" title="Collapse settings panel">
-            <svg aria-hidden="true" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16m4-10-3 2 3 2"/></svg>
+          <button
+            id="toggleLeftColumn"
+            type="button"
+            class="header-action header-icon-action panel-toggle border border-slate-700/80 bg-slate-900/70 text-slate-400 transition hover:border-slate-600 hover:text-slate-100"
+            aria-label="Collapse settings panel"
+            aria-pressed="false"
+            title="Collapse settings panel"
+          >
+            <svg
+              aria-hidden="true"
+              class="h-3.5 w-3.5"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+            >
+              <rect x="3" y="4" width="18" height="16" rx="2" />
+              <path d="M9 4v16m4-10-3 2 3 2" />
+            </svg>
           </button>
         </div>
         <div class="flex items-center gap-2">
-          <button id="toggleRightColumn" type="button" class="header-action header-icon-action panel-toggle border border-slate-700/80 bg-slate-900/70 text-slate-400 transition hover:border-slate-600 hover:text-slate-100" aria-label="Collapse results panel" aria-pressed="false" title="Collapse results panel">
-            <svg aria-hidden="true" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M15 4v16m-4-10 3 2-3 2"/></svg>
+          <button
+            id="toggleRightColumn"
+            type="button"
+            class="header-action header-icon-action panel-toggle border border-slate-700/80 bg-slate-900/70 text-slate-400 transition hover:border-slate-600 hover:text-slate-100"
+            aria-label="Collapse results panel"
+            aria-pressed="false"
+            title="Collapse results panel"
+          >
+            <svg
+              aria-hidden="true"
+              class="h-3.5 w-3.5"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+            >
+              <rect x="3" y="4" width="18" height="16" rx="2" />
+              <path d="M15 4v16m-4-10 3 2-3 2" />
+            </svg>
           </button>
-          <button id="themeButton" type="button" class="header-action header-icon-action border border-slate-700/80 bg-slate-900/70 text-slate-400 transition hover:border-slate-600 hover:text-slate-100" data-tooltip-target="theme-tooltip" aria-label="Switch to light mode" aria-pressed="false">
-            <svg aria-hidden="true" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8Z"/></svg>
+          <button
+            id="themeButton"
+            type="button"
+            class="header-action header-icon-action border border-slate-700/80 bg-slate-900/70 text-slate-400 transition hover:border-slate-600 hover:text-slate-100"
+            data-tooltip-target="theme-tooltip"
+            aria-label="Switch to light mode"
+            aria-pressed="false"
+          >
+            <svg
+              aria-hidden="true"
+              class="h-4 w-4"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8Z"
+              />
+            </svg>
           </button>
-          <div id="theme-tooltip" role="tooltip" class="tooltip invisible absolute z-50 inline-block rounded-lg bg-slate-700 px-2.5 py-1.5 text-xs font-medium text-white opacity-0 shadow-sm"><span id="themeTooltipText">Switch to light mode</span><div class="tooltip-arrow" data-popper-arrow></div></div>
-          <button id="runButton" type="button" class="header-action gap-2 bg-blue-600 px-3.5 text-xs font-semibold text-white shadow-lg shadow-blue-950/30 transition hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-400/40">
-            <svg aria-hidden="true" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.14v13.72a1 1 0 0 0 1.5.86l11-6.86a1 1 0 0 0 0-1.72l-11-6.86A1 1 0 0 0 8 5.14Z"/></svg>
+          <div
+            id="theme-tooltip"
+            role="tooltip"
+            class="tooltip invisible absolute z-50 inline-block rounded-lg bg-slate-700 px-2.5 py-1.5 text-xs font-medium text-white opacity-0 shadow-sm"
+          >
+            <span id="themeTooltipText">Switch to light mode</span>
+            <div class="tooltip-arrow" data-popper-arrow></div>
+          </div>
+          <button
+            id="runButton"
+            type="button"
+            class="header-action gap-2 bg-blue-600 px-3.5 text-xs font-semibold text-white shadow-lg shadow-blue-950/30 transition hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-400/40"
+          >
+            <svg
+              aria-hidden="true"
+              class="h-3.5 w-3.5"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+            >
+              <path
+                d="M8 5.14v13.72a1 1 0 0 0 1.5.86l11-6.86a1 1 0 0 0 0-1.72l-11-6.86A1 1 0 0 0 8 5.14Z"
+              />
+            </svg>
             Recognize
           </button>
         </div>
       </header>
 
       <main id="appGrid" class="app-grid">
-        <aside class="column left-column thin-scrollbar bg-[#0a0f17]" aria-label="Recognition settings">
+        <aside
+          class="column left-column thin-scrollbar bg-[#0a0f17]"
+          aria-label="Recognition settings"
+        >
           <section class="settings-section">
             <div class="settings-section-header">
               <div>
-                <h2 class="text-xs font-semibold text-slate-200">Recognizers</h2>
-                <p id="recognizerSummary" class="mt-0.5 text-[9px] text-slate-600">All active</p>
+                <h2 class="text-xs font-semibold text-slate-200">
+                  Recognizers
+                </h2>
+                <p
+                  id="recognizerSummary"
+                  class="mt-0.5 text-[9px] text-slate-600"
+                >
+                  All active
+                </p>
               </div>
-              <button id="toggleAll" type="button" class="header-action h-7 border border-slate-700 bg-slate-900/70 px-2 text-[9px] font-semibold text-blue-300 transition hover:border-blue-400/40 hover:bg-blue-400/10">Disable all</button>
+              <button
+                id="toggleAll"
+                type="button"
+                class="header-action h-7 border border-slate-700 bg-slate-900/70 px-2 text-[9px] font-semibold text-blue-300 transition hover:border-blue-400/40 hover:bg-blue-400/10"
+              >
+                Disable all
+              </button>
             </div>
             <div id="recognizerList" class="settings-surface"></div>
           </section>
@@ -1079,141 +1550,422 @@
             <div class="settings-section-header">
               <div>
                 <h2 class="text-xs font-semibold text-slate-200">Processing</h2>
-                <p class="mt-0.5 text-[9px] text-slate-600">Recognition behavior</p>
+                <p class="mt-0.5 text-[9px] text-slate-600">
+                  Recognition behavior
+                </p>
               </div>
             </div>
             <div class="settings-surface">
               <label class="setting-row">
                 <span class="setting-icon">
-                  <svg aria-hidden="true" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="11" height="11" rx="2"/><rect x="9" y="9" width="11" height="11" rx="2"/></svg>
+                  <svg
+                    aria-hidden="true"
+                    class="h-3.5 w-3.5"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                  >
+                    <rect x="4" y="4" width="11" height="11" rx="2" />
+                    <rect x="9" y="9" width="11" height="11" rx="2" />
+                  </svg>
                 </span>
                 <span class="min-w-0">
-                  <span class="block truncate text-[11px] font-medium text-slate-300">Resolve overlaps</span>
-                  <span class="mt-0.5 block truncate text-[9px] text-slate-600">Highest confidence wins</span>
+                  <span
+                    class="block truncate text-[11px] font-medium text-slate-300"
+                    >Resolve overlaps</span
+                  >
+                  <span class="mt-0.5 block truncate text-[9px] text-slate-600"
+                    >Highest confidence wins</span
+                  >
                 </span>
-                <span class="relative inline-flex h-5 w-9 shrink-0 items-center">
-                  <input id="resolveOverlaps" type="checkbox" checked class="toggle-checkbox peer absolute right-4 h-5 w-5 cursor-pointer appearance-none rounded-full border-2 border-slate-500 bg-white transition-all" />
-                  <span class="toggle-track h-4 w-8 rounded-full bg-slate-700 transition-colors"></span>
+                <span
+                  class="relative inline-flex h-5 w-9 shrink-0 items-center"
+                >
+                  <input
+                    id="resolveOverlaps"
+                    type="checkbox"
+                    checked
+                    class="toggle-checkbox peer absolute right-4 h-5 w-5 cursor-pointer appearance-none rounded-full border-2 border-slate-500 bg-white transition-all"
+                  />
+                  <span
+                    class="toggle-track h-4 w-8 rounded-full bg-slate-700 transition-colors"
+                  ></span>
                 </span>
               </label>
               <label class="setting-row">
                 <span class="setting-icon">
-                  <svg aria-hidden="true" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="m13 2-8 12h7l-1 8 8-12h-7l1-8Z"/></svg>
+                  <svg
+                    aria-hidden="true"
+                    class="h-3.5 w-3.5"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="m13 2-8 12h7l-1 8 8-12h-7l1-8Z"
+                    />
+                  </svg>
                 </span>
                 <span class="min-w-0">
-                  <span class="block truncate text-[11px] font-medium text-slate-300">Live recognition</span>
-                  <span class="mt-0.5 block truncate text-[9px] text-slate-600">Update while typing</span>
+                  <span
+                    class="block truncate text-[11px] font-medium text-slate-300"
+                    >Live recognition</span
+                  >
+                  <span class="mt-0.5 block truncate text-[9px] text-slate-600"
+                    >Update while typing</span
+                  >
                 </span>
-                <span class="relative inline-flex h-5 w-9 shrink-0 items-center">
-                  <input id="liveMode" type="checkbox" checked class="toggle-checkbox peer absolute right-4 h-5 w-5 cursor-pointer appearance-none rounded-full border-2 border-slate-500 bg-white transition-all" />
-                  <span class="toggle-track h-4 w-8 rounded-full bg-slate-700 transition-colors"></span>
+                <span
+                  class="relative inline-flex h-5 w-9 shrink-0 items-center"
+                >
+                  <input
+                    id="liveMode"
+                    type="checkbox"
+                    checked
+                    class="toggle-checkbox peer absolute right-4 h-5 w-5 cursor-pointer appearance-none rounded-full border-2 border-slate-500 bg-white transition-all"
+                  />
+                  <span
+                    class="toggle-track h-4 w-8 rounded-full bg-slate-700 transition-colors"
+                  ></span>
                 </span>
               </label>
               <label class="setting-row">
                 <span class="setting-icon">
-                  <svg aria-hidden="true" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><ellipse cx="12" cy="5" rx="7" ry="3"/><path d="M5 5v6c0 1.66 3.13 3 7 3s7-1.34 7-3V5M5 11v6c0 1.66 3.13 3 7 3s7-1.34 7-3v-6"/></svg>
+                  <svg
+                    aria-hidden="true"
+                    class="h-3.5 w-3.5"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                  >
+                    <ellipse cx="12" cy="5" rx="7" ry="3" />
+                    <path
+                      d="M5 5v6c0 1.66 3.13 3 7 3s7-1.34 7-3V5M5 11v6c0 1.66 3.13 3 7 3s7-1.34 7-3v-6"
+                    />
+                  </svg>
                 </span>
                 <span class="min-w-0">
-                  <span class="block truncate text-[11px] font-medium text-slate-300">Server assist</span>
-                  <span id="serverStatus" class="mt-0.5 flex items-center gap-1.5 text-[9px] text-slate-600">
-                    <i id="serverStatusDot" class="h-1.5 w-1.5 shrink-0 rounded-full bg-slate-600"></i>
-                    <span id="serverStatusText" class="truncate">Optional API</span>
+                  <span
+                    class="block truncate text-[11px] font-medium text-slate-300"
+                    >Server assist</span
+                  >
+                  <span
+                    id="serverStatus"
+                    class="mt-0.5 flex items-center gap-1.5 text-[9px] text-slate-600"
+                  >
+                    <i
+                      id="serverStatusDot"
+                      class="h-1.5 w-1.5 shrink-0 rounded-full bg-slate-600"
+                    ></i>
+                    <span id="serverStatusText" class="truncate"
+                      >Optional API</span
+                    >
                   </span>
                 </span>
-                <span class="relative inline-flex h-5 w-9 shrink-0 items-center">
-                  <input id="serverAssist" type="checkbox" checked class="toggle-checkbox peer absolute right-4 h-5 w-5 cursor-pointer appearance-none rounded-full border-2 border-slate-500 bg-white transition-all" />
-                  <span class="toggle-track h-4 w-8 rounded-full bg-slate-700 transition-colors"></span>
+                <span
+                  class="relative inline-flex h-5 w-9 shrink-0 items-center"
+                >
+                  <input
+                    id="serverAssist"
+                    type="checkbox"
+                    checked
+                    class="toggle-checkbox peer absolute right-4 h-5 w-5 cursor-pointer appearance-none rounded-full border-2 border-slate-500 bg-white transition-all"
+                  />
+                  <span
+                    class="toggle-track h-4 w-8 rounded-full bg-slate-700 transition-colors"
+                  ></span>
                 </span>
               </label>
             </div>
           </section>
 
           <section class="settings-section mt-auto border-b-0">
-            <button id="sampleButton" type="button" class="header-action mb-2.5 w-full gap-2 border border-slate-700 bg-slate-900/70 px-3 text-[11px] font-medium text-slate-300 transition hover:border-slate-600 hover:bg-slate-800 hover:text-slate-100">
-              <svg aria-hidden="true" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4 5.5A2.5 2.5 0 0 1 6.5 3H18a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6.5A2.5 2.5 0 0 1 4 18.5v-13Z"/><path stroke-linecap="round" d="M4 18.5A2.5 2.5 0 0 1 6.5 16H20M8 7h8m-8 4h5"/></svg>
+            <button
+              id="sampleButton"
+              type="button"
+              class="header-action mb-2.5 w-full gap-2 border border-slate-700 bg-slate-900/70 px-3 text-[11px] font-medium text-slate-300 transition hover:border-slate-600 hover:bg-slate-800 hover:text-slate-100"
+            >
+              <svg
+                aria-hidden="true"
+                class="h-3.5 w-3.5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M4 5.5A2.5 2.5 0 0 1 6.5 3H18a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6.5A2.5 2.5 0 0 1 4 18.5v-13Z"
+                />
+                <path
+                  stroke-linecap="round"
+                  d="M4 18.5A2.5 2.5 0 0 1 6.5 16H20M8 7h8m-8 4h5"
+                />
+              </svg>
               Load sample
             </button>
 
             <div class="confidence-key">
               <div class="mb-2 flex items-center justify-between">
-                <span class="text-[10px] font-semibold text-slate-400">Confidence</span>
+                <span class="text-[10px] font-semibold text-slate-400"
+                  >Confidence</span
+                >
                 <span class="text-[8px] text-slate-600">Match certainty</span>
               </div>
               <div class="confidence-key-grid">
-                <span class="confidence-key-item"><i class="h-1.5 w-1.5 rounded-full bg-emerald-400"></i><span>High</span><small>90%+</small></span>
-                <span class="confidence-key-item"><i class="h-1.5 w-1.5 rounded-full bg-amber-400"></i><span>Review</span><small>75–89%</small></span>
-                <span class="confidence-key-item"><i class="h-1.5 w-1.5 rounded-full bg-rose-400"></i><span>Low</span><small>&lt;75%</small></span>
+                <span class="confidence-key-item"
+                  ><i class="h-1.5 w-1.5 rounded-full bg-emerald-400"></i
+                  ><span>High</span><small>90%+</small></span
+                >
+                <span class="confidence-key-item"
+                  ><i class="h-1.5 w-1.5 rounded-full bg-amber-400"></i
+                  ><span>Review</span><small>75–89%</small></span
+                >
+                <span class="confidence-key-item"
+                  ><i class="h-1.5 w-1.5 rounded-full bg-rose-400"></i
+                  ><span>Low</span><small>&lt;75%</small></span
+                >
               </div>
             </div>
           </section>
         </aside>
 
-        <section class="column center-column" aria-label="Pattern and source text editor">
+        <section
+          class="column center-column"
+          aria-label="Pattern and source text editor"
+        >
           <div class="border-b border-slate-800 bg-[#0c111a] px-4 py-3 sm:px-5">
             <div class="flex items-stretch gap-2">
               <div class="pattern-field min-w-0 flex-1">
-                <span id="patternStatus" class="ml-3 mr-1 inline-flex h-2 w-2 shrink-0" role="status" aria-label="Valid expression" title="Valid expression">
+                <span
+                  id="patternStatus"
+                  class="ml-3 mr-1 inline-flex h-2 w-2 shrink-0"
+                  role="status"
+                  aria-label="Valid expression"
+                  title="Valid expression"
+                >
                   <i class="h-2 w-2 rounded-full bg-emerald-400"></i>
                 </span>
                 <span class="pattern-delimiter pattern-prefix">/</span>
-                <input id="patternInput" type="text" spellcheck="false" value="\b(?:urgent|review|approved)\b" class="pattern-input block text-sm" aria-label="Pattern tester" />
+                <input
+                  id="patternInput"
+                  type="text"
+                  spellcheck="false"
+                  value="\b(?:urgent|review|approved)\b"
+                  class="pattern-input block text-sm"
+                  aria-label="Pattern tester"
+                />
                 <span class="pattern-delimiter pattern-suffix">/gi</span>
               </div>
-              <button id="registerPattern" type="button" class="inline-flex shrink-0 items-center justify-center rounded-lg border border-violet-400/25 bg-violet-500/10 text-violet-300 transition hover:border-violet-400/50 hover:bg-violet-500/20 focus:outline-none focus:ring-2 focus:ring-violet-500/30" aria-label="Register pattern" title="Register pattern">
-                <svg aria-hidden="true" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" d="M12 5v14M5 12h14"/></svg>
-                <span id="registerPatternLabel" class="sr-only">Register pattern</span>
+              <button
+                id="registerPattern"
+                type="button"
+                class="inline-flex shrink-0 items-center justify-center rounded-lg border border-violet-400/25 bg-violet-500/10 text-violet-300 transition hover:border-violet-400/50 hover:bg-violet-500/20 focus:outline-none focus:ring-2 focus:ring-violet-500/30"
+                aria-label="Register pattern"
+                title="Register pattern"
+              >
+                <svg
+                  aria-hidden="true"
+                  class="h-3.5 w-3.5"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path stroke-linecap="round" d="M12 5v14M5 12h14" />
+                </svg>
+                <span id="registerPatternLabel" class="sr-only"
+                  >Register pattern</span
+                >
               </button>
             </div>
           </div>
 
           <div class="editor-wrap subtle-grid">
-            <pre id="highlightLayer" class="editor-layer thin-scrollbar" aria-hidden="true"></pre>
-            <textarea id="sourceText" class="editor-layer thin-scrollbar" aria-label="Text to recognize" spellcheck="false"></textarea>
-            <div class="editor-shortcut pointer-events-none absolute bottom-3 z-10 flex items-center gap-1.5 rounded-md border border-slate-700/70 bg-slate-900/90 px-2 py-1 text-[9px] font-medium text-slate-500 shadow-lg backdrop-blur">
-              <span class="kbd rounded px-1 py-0.5 text-slate-400">⌘</span><span class="kbd rounded px-1 py-0.5 text-slate-400">↵</span><span>to recognize</span>
+            <pre
+              id="highlightLayer"
+              class="editor-layer thin-scrollbar"
+              aria-hidden="true"
+            ></pre>
+            <textarea
+              id="sourceText"
+              class="editor-layer thin-scrollbar"
+              aria-label="Text to recognize"
+              spellcheck="false"
+            ></textarea>
+            <div
+              class="editor-shortcut pointer-events-none absolute bottom-3 z-10 flex items-center gap-1.5 rounded-md border border-slate-700/70 bg-slate-900/90 px-2 py-1 text-[9px] font-medium text-slate-500 shadow-lg backdrop-blur"
+            >
+              <span class="kbd rounded px-1 py-0.5 text-slate-400">⌘</span
+              ><span class="kbd rounded px-1 py-0.5 text-slate-400">↵</span
+              ><span>to recognize</span>
             </div>
           </div>
         </section>
 
-        <aside class="column right-column bg-[#0a0f17]" aria-label="Recognition results">
+        <aside
+          class="column right-column bg-[#0a0f17]"
+          aria-label="Recognition results"
+        >
           <div class="results-header px-3 pb-2.5 pt-3">
             <div class="mb-2.5 flex items-center justify-between gap-2">
               <div class="min-w-0">
                 <div class="flex items-baseline gap-2">
                   <h2 class="text-xs font-semibold text-slate-200">Results</h2>
-                  <p id="resultTimestamp" class="truncate text-[9px] text-slate-600">Waiting for input</p>
+                  <p
+                    id="resultTimestamp"
+                    class="truncate text-[9px] text-slate-600"
+                  >
+                    Waiting for input
+                  </p>
                 </div>
               </div>
               <div class="flex shrink-0 items-center gap-1">
-                <button id="reviewMode" type="button" class="header-action h-7 border border-slate-700 bg-slate-900/70 px-2 text-[9px] font-bold uppercase tracking-wide text-amber-300 hover:border-amber-400/50 hover:bg-amber-400/10" aria-pressed="false" title="Show matches that need review">Review</button>
-                <button id="copyResults" type="button" class="header-action header-icon-action h-7 w-7 border border-slate-700 bg-slate-900/70 text-slate-400 hover:border-slate-600 hover:text-slate-100" aria-label="Copy filtered results as JSON" title="Copy filtered results as JSON">
-                  <svg aria-hidden="true" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="8" y="8" width="11" height="11" rx="2"/><path stroke-linecap="round" d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>
+                <button
+                  id="reviewMode"
+                  type="button"
+                  class="header-action h-7 border border-slate-700 bg-slate-900/70 px-2 text-[9px] font-bold uppercase tracking-wide text-amber-300 hover:border-amber-400/50 hover:bg-amber-400/10"
+                  aria-pressed="false"
+                  title="Show matches that need review"
+                >
+                  Review
                 </button>
-                <button id="exportResults" type="button" class="header-action header-icon-action h-7 w-7 border border-slate-700 bg-slate-900/70 text-slate-400 hover:border-slate-600 hover:text-slate-100" aria-label="Download filtered results as JSON" title="Download filtered results as JSON">
-                  <svg aria-hidden="true" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v12m0 0 4-4m-4 4-4-4M5 19h14"/></svg>
+                <button
+                  id="copyResults"
+                  type="button"
+                  class="header-action header-icon-action h-7 w-7 border border-slate-700 bg-slate-900/70 text-slate-400 hover:border-slate-600 hover:text-slate-100"
+                  aria-label="Copy filtered results as JSON"
+                  title="Copy filtered results as JSON"
+                >
+                  <svg
+                    aria-hidden="true"
+                    class="h-3.5 w-3.5"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                  >
+                    <rect x="8" y="8" width="11" height="11" rx="2" />
+                    <path
+                      stroke-linecap="round"
+                      d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"
+                    />
+                  </svg>
+                </button>
+                <button
+                  id="exportResults"
+                  type="button"
+                  class="header-action header-icon-action h-7 w-7 border border-slate-700 bg-slate-900/70 text-slate-400 hover:border-slate-600 hover:text-slate-100"
+                  aria-label="Download filtered results as JSON"
+                  title="Download filtered results as JSON"
+                >
+                  <svg
+                    aria-hidden="true"
+                    class="h-3.5 w-3.5"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M12 3v12m0 0 4-4m-4 4-4-4M5 19h14"
+                    />
+                  </svg>
                 </button>
               </div>
             </div>
             <div class="results-overview">
               <div class="results-stat-grid">
-                <div class="results-stat"><strong id="foundMetric" class="block font-mono text-lg font-semibold leading-none text-slate-100">0</strong><span class="mt-1 block text-[9px] font-medium text-slate-600">Matches</span></div>
-                <div class="results-stat"><strong id="confidenceMetric" class="block font-mono text-lg font-semibold leading-none text-slate-100">—</strong><span class="mt-1 block text-[9px] font-medium text-slate-600">Avg. confidence</span></div>
-                <div class="results-stat"><strong id="runtimeMetric" class="block truncate font-mono text-lg font-semibold leading-none text-slate-100">—</strong><span class="mt-1 block text-[9px] font-medium text-slate-600">Local runtime</span></div>
+                <div class="results-stat">
+                  <strong
+                    id="foundMetric"
+                    class="block font-mono text-lg font-semibold leading-none text-slate-100"
+                    >0</strong
+                  ><span
+                    class="mt-1 block text-[9px] font-medium text-slate-600"
+                    >Matches</span
+                  >
+                </div>
+                <div class="results-stat">
+                  <strong
+                    id="confidenceMetric"
+                    class="block font-mono text-lg font-semibold leading-none text-slate-100"
+                    >—</strong
+                  ><span
+                    class="mt-1 block text-[9px] font-medium text-slate-600"
+                    >Avg. confidence</span
+                  >
+                </div>
+                <div class="results-stat">
+                  <strong
+                    id="runtimeMetric"
+                    class="block truncate font-mono text-lg font-semibold leading-none text-slate-100"
+                    >—</strong
+                  ><span
+                    class="mt-1 block text-[9px] font-medium text-slate-600"
+                    >Local runtime</span
+                  >
+                </div>
               </div>
               <div class="server-summary text-[9px] text-slate-500">
-                <span class="flex min-w-0 flex-1 items-center gap-1.5 font-semibold text-blue-300">
-                  <svg aria-hidden="true" class="h-3 w-3 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="m12 3 1.4 4.1L17.5 8.5l-4.1 1.4L12 14l-1.4-4.1-4.1-1.4 4.1-1.4L12 3Z"/></svg>
-                  <span id="serverMetricStatus" class="truncate">Server optional</span>
+                <span
+                  class="flex min-w-0 flex-1 items-center gap-1.5 font-semibold text-blue-300"
+                >
+                  <svg
+                    aria-hidden="true"
+                    class="h-3 w-3 shrink-0"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="m12 3 1.4 4.1L17.5 8.5l-4.1 1.4L12 14l-1.4-4.1-4.1-1.4 4.1-1.4L12 3Z"
+                    />
+                  </svg>
+                  <span id="serverMetricStatus" class="truncate"
+                    >Server optional</span
+                  >
                 </span>
-                <span><strong id="serverYielded" class="font-mono text-slate-300">0</strong> yielded</span>
+                <span
+                  ><strong id="serverYielded" class="font-mono text-slate-300"
+                    >0</strong
+                  >
+                  yielded</span
+                >
                 <span class="text-slate-700">/</span>
-                <span><strong id="serverChecks" class="font-mono text-slate-300">0</strong> checks</span>
-                <span id="serverLatency" class="font-mono text-slate-600">—</span>
+                <span
+                  ><strong id="serverChecks" class="font-mono text-slate-300"
+                    >0</strong
+                  >
+                  checks</span
+                >
+                <span id="serverLatency" class="font-mono text-slate-600"
+                  >—</span
+                >
               </div>
             </div>
             <div class="results-toolbar mt-2.5">
-              <div id="resultFilterChips" class="thin-scrollbar flex min-w-0 flex-1 gap-1.5 overflow-x-auto pb-0.5" aria-label="Filter results by entity type"></div>
-              <select id="confidenceFilter" class="result-select shrink-0" aria-label="Filter results by confidence">
+              <div
+                id="resultFilterChips"
+                class="thin-scrollbar flex min-w-0 flex-1 gap-1.5 overflow-x-auto pb-0.5"
+                aria-label="Filter results by entity type"
+              ></div>
+              <select
+                id="confidenceFilter"
+                class="result-select shrink-0"
+                aria-label="Filter results by confidence"
+              >
                 <option value="all">All confidence</option>
                 <option value="high">High · 90%+</option>
                 <option value="review">Review · &lt;90%</option>
@@ -1224,18 +1976,43 @@
           </div>
 
           <div class="results-scroll thin-scrollbar px-3 pb-3 pt-2.5">
-            <div id="emptyState" class="flex flex-col items-center justify-center rounded-xl border border-dashed border-slate-800 px-4 py-14 text-center">
-              <div class="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-slate-800/60 text-slate-500">
-                <svg aria-hidden="true" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="11" cy="11" r="7"/><path stroke-linecap="round" d="m16 16 4 4M8 11h6m-3-3v6"/></svg>
+            <div
+              id="emptyState"
+              class="flex flex-col items-center justify-center rounded-xl border border-dashed border-slate-800 px-4 py-14 text-center"
+            >
+              <div
+                class="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-slate-800/60 text-slate-500"
+              >
+                <svg
+                  aria-hidden="true"
+                  class="h-5 w-5"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.7"
+                >
+                  <circle cx="11" cy="11" r="7" />
+                  <path stroke-linecap="round" d="m16 16 4 4M8 11h6m-3-3v6" />
+                </svg>
               </div>
-              <p id="emptyStateTitle" class="text-xs font-medium text-slate-400">No entities found</p>
-              <p id="emptyStateMessage" class="mt-1 max-w-[210px] text-[10px] leading-4 text-slate-600">Try adding a person, email, phone number, date, amount, or a custom pattern match.</p>
+              <p
+                id="emptyStateTitle"
+                class="text-xs font-medium text-slate-400"
+              >
+                No entities found
+              </p>
+              <p
+                id="emptyStateMessage"
+                class="mt-1 max-w-[210px] text-[10px] leading-4 text-slate-600"
+              >
+                Try adding a person, email, phone number, date, amount, or a
+                custom pattern match.
+              </p>
             </div>
             <div id="resultsList" aria-live="polite"></div>
           </div>
         </aside>
       </main>
-
     </div>
 
     <div id="entityTooltip" role="tooltip" hidden></div>
@@ -1243,20 +2020,76 @@
     <dialog id="registerDialog" class="workbench-dialog">
       <form id="registerForm">
         <h2 class="text-sm font-semibold">Register pattern</h2>
-        <p class="mt-1 text-[10px] text-slate-500">Save the pattern currently in the tester as a recognizer.</p>
-        <code id="registerPatternPreview" class="mt-3 block overflow-hidden text-ellipsis whitespace-nowrap rounded-md border border-slate-700 bg-slate-950/70 px-2.5 py-2 font-mono text-[10px] text-violet-300"></code>
-        <label for="customPatternName" class="mt-3 block text-[10px] font-medium text-slate-400">Pattern name</label>
-        <input id="customPatternName" class="dialog-input" type="text" value="Priority keywords" placeholder="e.g. Priority keywords" autocomplete="off" required />
-        <label for="customTag" class="mt-3 block text-[10px] font-medium text-slate-400">Entity tag</label>
-        <input id="customTag" class="dialog-input" type="text" value="keyword" autocomplete="off" required />
+        <p class="mt-1 text-[10px] text-slate-500">
+          Save the pattern currently in the tester as a recognizer.
+        </p>
+        <code
+          id="registerPatternPreview"
+          class="mt-3 block overflow-hidden text-ellipsis whitespace-nowrap rounded-md border border-slate-700 bg-slate-950/70 px-2.5 py-2 font-mono text-[10px] text-violet-300"
+        ></code>
+        <label
+          for="customPatternName"
+          class="mt-3 block text-[10px] font-medium text-slate-400"
+          >Pattern name</label
+        >
+        <input
+          id="customPatternName"
+          class="dialog-input"
+          type="text"
+          value="Priority keywords"
+          placeholder="e.g. Priority keywords"
+          autocomplete="off"
+          required
+        />
+        <label
+          for="customTag"
+          class="mt-3 block text-[10px] font-medium text-slate-400"
+          >Entity tag</label
+        >
+        <input
+          id="customTag"
+          class="dialog-input"
+          type="text"
+          value="keyword"
+          autocomplete="off"
+          required
+        />
         <div class="mt-3 flex items-center justify-between">
-          <label for="confidenceSlider" class="text-[10px] font-medium text-slate-400">Base confidence</label>
-          <output id="confidenceOutput" for="confidenceSlider" class="font-mono text-[11px] text-amber-300">78%</output>
+          <label
+            for="confidenceSlider"
+            class="text-[10px] font-medium text-slate-400"
+            >Base confidence</label
+          >
+          <output
+            id="confidenceOutput"
+            for="confidenceSlider"
+            class="font-mono text-[11px] text-amber-300"
+            >78%</output
+          >
         </div>
-        <input id="confidenceSlider" type="range" min="10" max="100" value="78" class="mt-3 h-1.5 w-full cursor-pointer appearance-none rounded-lg bg-slate-700 accent-blue-500" />
+        <input
+          id="confidenceSlider"
+          type="range"
+          min="10"
+          max="100"
+          value="78"
+          class="mt-3 h-1.5 w-full cursor-pointer appearance-none rounded-lg bg-slate-700 accent-blue-500"
+        />
         <div class="mt-4 flex justify-end gap-2">
-          <button id="cancelRegister" type="button" class="header-action min-w-[72px] border border-slate-700 bg-slate-900/70 px-3 text-xs font-medium text-slate-300 hover:bg-slate-800">Cancel</button>
-          <button id="savePattern" type="submit" class="header-action min-w-[72px] bg-violet-600 px-3 text-xs font-semibold text-white hover:bg-violet-500">Save</button>
+          <button
+            id="cancelRegister"
+            type="button"
+            class="header-action min-w-[72px] border border-slate-700 bg-slate-900/70 px-3 text-xs font-medium text-slate-300 hover:bg-slate-800"
+          >
+            Cancel
+          </button>
+          <button
+            id="savePattern"
+            type="submit"
+            class="header-action min-w-[72px] bg-violet-600 px-3 text-xs font-semibold text-white hover:bg-violet-500"
+          >
+            Save
+          </button>
         </div>
       </form>
     </dialog>
@@ -1264,11 +2097,33 @@
     <dialog id="renameDialog" class="workbench-dialog">
       <form id="renameForm">
         <h2 class="text-sm font-semibold">Rename recognizer</h2>
-        <label for="renamePatternInput" class="mt-3 block text-[10px] font-medium text-slate-400">Recognizer name</label>
-        <input id="renamePatternInput" class="dialog-input" type="text" autocomplete="off" required />
+        <label
+          for="renamePatternInput"
+          class="mt-3 block text-[10px] font-medium text-slate-400"
+          >Recognizer name</label
+        >
+        <input
+          id="renamePatternInput"
+          class="dialog-input"
+          type="text"
+          autocomplete="off"
+          required
+        />
         <div class="mt-4 flex justify-end gap-2">
-          <button id="cancelRename" type="button" class="header-action min-w-[72px] border border-slate-700 bg-slate-900/70 px-3 text-xs font-medium text-slate-300 hover:bg-slate-800">Cancel</button>
-          <button id="saveRename" type="submit" class="header-action min-w-[72px] bg-blue-600 px-3 text-xs font-semibold text-white hover:bg-blue-500">Save</button>
+          <button
+            id="cancelRename"
+            type="button"
+            class="header-action min-w-[72px] border border-slate-700 bg-slate-900/70 px-3 text-xs font-medium text-slate-300 hover:bg-slate-800"
+          >
+            Cancel
+          </button>
+          <button
+            id="saveRename"
+            type="submit"
+            class="header-action min-w-[72px] bg-blue-600 px-3 text-xs font-semibold text-white hover:bg-blue-500"
+          >
+            Save
+          </button>
         </div>
       </form>
     </dialog>
@@ -1291,15 +2146,39 @@ This request was submitted on 2026-09-03. Follow-up is due 9/15/2026, and the ar
 This request is urgent, but approval is pending a final identity review.`;
 
         const nonPersonNameStarts = new Set([
-          "a", "an", "and", "application", "archive", "contact", "date", "email", "follow", "friday",
-          "monday", "please", "request", "review", "saturday", "source", "sunday", "the", "this",
-          "thursday", "tuesday", "wednesday"
+          "a",
+          "an",
+          "and",
+          "application",
+          "archive",
+          "contact",
+          "date",
+          "email",
+          "follow",
+          "friday",
+          "monday",
+          "please",
+          "request",
+          "review",
+          "saturday",
+          "source",
+          "sunday",
+          "the",
+          "this",
+          "thursday",
+          "tuesday",
+          "wednesday",
         ]);
-        const isLikelyFullName = value => {
-          const firstWord = value.trim().split(/\s+/)[0].replace(/[.'’]/g, "").toLocaleLowerCase();
+        const isLikelyFullName = (value) => {
+          const firstWord = value
+            .trim()
+            .split(/\s+/)[0]
+            .replace(/[.'’]/g, "")
+            .toLocaleLowerCase();
           return !nonPersonNameStarts.has(firstWord);
         };
-        const normalizePersonName = value => value.replace(/\s+/g, " ").trim();
+        const normalizePersonName = (value) =>
+          value.replace(/\s+/g, " ").trim();
         const personTitleSource = String.raw`(?:Dr|Mr|Mrs|Ms|Miss|Mx|Prof|Professor|Rev|Judge|President|Senator|Sir|Dame)`;
         const personNameTokenSource = String.raw`(?:\p{Lu}\.|\p{Lu}[\p{L}\p{M}]*(?:[’'][\p{L}\p{M}]+|[-‐‑–]\p{Lu}[\p{L}\p{M}]*)*)`;
         const personParticleSource = String.raw`(?:da|de|del|della|der|di|dos|du|la|le|van|von|bin|ibn|al)`;
@@ -1308,35 +2187,201 @@ This request is urgent, but approval is pending a final identity review.`;
         const personFullNameSource = String.raw`${personNameTokenSource}${personTailSource}{1,3}`;
 
         const recognizers = [
-          { id: "person-honorific", label: "Person · honorific", tag: "person", color: "rose", confidence: .97, patternId: "person-honorific", captureGroup: 1, regex: new RegExp(String.raw`\b${personTitleSource}\.?\s+(${personNameSource})`, "gu"), normalize: normalizePersonName },
-          { id: "person-context", label: "Person · contextual", tag: "person", color: "rose", confidence: .92, patternId: "person-context", captureGroup: 1, regex: new RegExp(String.raw`\b(?:[Aa]sk|[Cc]all|[Cc]alled|[Cc]ontact|[Ee]mail|[Nn]amed|[Rr]each|[Tt]ell)\s+(?:${personTitleSource}\.?\s+)?(${personNameSource})`, "gu"), normalize: normalizePersonName },
-          { id: "person-full-name", label: "Person · full name", tag: "person", color: "rose", confidence: .82, patternId: "person-full-name", regex: new RegExp(String.raw`(?<![\p{L}\p{M}’'‐‑–-])${personFullNameSource}(?![\p{L}\p{M}’'‐‑–-])`, "gu"), validate: isLikelyFullName, normalize: normalizePersonName },
-          { id: "email", label: "Email address", tag: "email", color: "blue", confidence: .99, patternId: "builtin-email", regex: /\b[A-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?(?:\.[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?)+\b/gi, normalize: v => v.toLowerCase() },
-          { id: "phone", label: "Phone number", tag: "phone", color: "cyan", confidence: .92, patternId: "builtin-phone", regex: /(?<!\w)(?:\+?1[ .-]?)?(?:\(\d{3}\)|\d{3})[ .-]\d{3}[ .-]\d{4}(?!\w)/g, normalize: v => `+${v.replace(/\D/g, "").replace(/^([2-9])/, "1$1")}` },
-          { id: "loan", label: "Loan number", tag: "loan_number", color: "violet", confidence: .98, patternId: "loan-number", regex: /\b80[4-9]\d{7}\b/g },
-          { id: "money", label: "Currency", tag: "money", color: "emerald", confidence: .94, patternId: "currency-usd", regex: /(?<!\w)\$\d{1,3}(?:,\d{3})*(?:\.\d{2})?(?!\w)/g, normalize: v => v.replace(/[$,]/g, "") },
-          { id: "date-month-first", label: "Date · month first", tag: "date", color: "amber", confidence: .91, patternId: "date-month-first", regex: /\b(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\s+(?:0?[1-9]|[12]\d|3[01])(?:st|nd|rd|th)?(?:,)?\s+\d{4}\b/gi },
-          { id: "date-day-first", label: "Date · day first", tag: "date", color: "amber", confidence: .91, patternId: "date-day-first", regex: /\b(?:0?[1-9]|[12]\d|3[01])(?:st|nd|rd|th)?\s+(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\s+\d{4}\b/gi },
-          { id: "date-iso", label: "Date · ISO", tag: "date", color: "amber", confidence: .97, patternId: "date-iso", regex: /\b\d{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12]\d|3[01])\b/g },
-          { id: "date-us-numeric", label: "Date · US numeric", tag: "date", color: "amber", confidence: .9, patternId: "date-us-numeric", regex: /\b(?:0?[1-9]|1[0-2])[\/-](?:0?[1-9]|[12]\d|3[01])[\/-](?:\d{2}|\d{4})\b/g },
-          { id: "date-dotted", label: "Date · dotted", tag: "date", color: "amber", confidence: .88, patternId: "date-dotted", regex: /\b(?:0?[1-9]|[12]\d|3[01])\.(?:0?[1-9]|1[0-2])\.\d{4}\b/g },
+          {
+            id: "person-honorific",
+            label: "Person · honorific",
+            tag: "person",
+            color: "rose",
+            confidence: 0.97,
+            patternId: "person-honorific",
+            captureGroup: 1,
+            regex: new RegExp(
+              String.raw`\b${personTitleSource}\.?\s+(${personNameSource})`,
+              "gu",
+            ),
+            normalize: normalizePersonName,
+          },
+          {
+            id: "person-context",
+            label: "Person · contextual",
+            tag: "person",
+            color: "rose",
+            confidence: 0.92,
+            patternId: "person-context",
+            captureGroup: 1,
+            regex: new RegExp(
+              String.raw`\b(?:[Aa]sk|[Cc]all|[Cc]alled|[Cc]ontact|[Ee]mail|[Nn]amed|[Rr]each|[Tt]ell)\s+(?:${personTitleSource}\.?\s+)?(${personNameSource})`,
+              "gu",
+            ),
+            normalize: normalizePersonName,
+          },
+          {
+            id: "person-full-name",
+            label: "Person · full name",
+            tag: "person",
+            color: "rose",
+            confidence: 0.82,
+            patternId: "person-full-name",
+            regex: new RegExp(
+              String.raw`(?<![\p{L}\p{M}’'‐‑–-])${personFullNameSource}(?![\p{L}\p{M}’'‐‑–-])`,
+              "gu",
+            ),
+            validate: isLikelyFullName,
+            normalize: normalizePersonName,
+          },
+          {
+            id: "email",
+            label: "Email address",
+            tag: "email",
+            color: "blue",
+            confidence: 0.99,
+            patternId: "builtin-email",
+            regex:
+              /\b[A-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?(?:\.[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?)+\b/gi,
+            normalize: (v) => v.toLowerCase(),
+          },
+          {
+            id: "phone",
+            label: "Phone number",
+            tag: "phone",
+            color: "cyan",
+            confidence: 0.92,
+            patternId: "builtin-phone",
+            regex:
+              /(?<!\w)(?:\+?1[ .-]?)?(?:\(\d{3}\)|\d{3})[ .-]\d{3}[ .-]\d{4}(?!\w)/g,
+            normalize: (v) =>
+              `+${v.replace(/\D/g, "").replace(/^([2-9])/, "1$1")}`,
+          },
+          {
+            id: "loan",
+            label: "Loan number",
+            tag: "loan_number",
+            color: "violet",
+            confidence: 0.98,
+            patternId: "loan-number",
+            regex: /\b80[4-9]\d{7}\b/g,
+          },
+          {
+            id: "money",
+            label: "Currency",
+            tag: "money",
+            color: "emerald",
+            confidence: 0.94,
+            patternId: "currency-usd",
+            regex: /(?<!\w)\$\d{1,3}(?:,\d{3})*(?:\.\d{2})?(?!\w)/g,
+            normalize: (v) => v.replace(/[$,]/g, ""),
+          },
+          {
+            id: "date-month-first",
+            label: "Date · month first",
+            tag: "date",
+            color: "amber",
+            confidence: 0.91,
+            patternId: "date-month-first",
+            regex:
+              /\b(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\s+(?:0?[1-9]|[12]\d|3[01])(?:st|nd|rd|th)?(?:,)?\s+\d{4}\b/gi,
+          },
+          {
+            id: "date-day-first",
+            label: "Date · day first",
+            tag: "date",
+            color: "amber",
+            confidence: 0.91,
+            patternId: "date-day-first",
+            regex:
+              /\b(?:0?[1-9]|[12]\d|3[01])(?:st|nd|rd|th)?\s+(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\s+\d{4}\b/gi,
+          },
+          {
+            id: "date-iso",
+            label: "Date · ISO",
+            tag: "date",
+            color: "amber",
+            confidence: 0.97,
+            patternId: "date-iso",
+            regex: /\b\d{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12]\d|3[01])\b/g,
+          },
+          {
+            id: "date-us-numeric",
+            label: "Date · US numeric",
+            tag: "date",
+            color: "amber",
+            confidence: 0.9,
+            patternId: "date-us-numeric",
+            regex:
+              /\b(?:0?[1-9]|1[0-2])[\/-](?:0?[1-9]|[12]\d|3[01])[\/-](?:\d{2}|\d{4})\b/g,
+          },
+          {
+            id: "date-dotted",
+            label: "Date · dotted",
+            tag: "date",
+            color: "amber",
+            confidence: 0.88,
+            patternId: "date-dotted",
+            regex: /\b(?:0?[1-9]|[12]\d|3[01])\.(?:0?[1-9]|1[0-2])\.\d{4}\b/g,
+          },
         ];
 
-        const els = Object.fromEntries([
-          "appGrid", "recognizerList", "recognizerSummary", "toggleAll", "customPatternName", "customTag", "confidenceSlider", "confidenceOutput",
-          "resolveOverlaps", "liveMode", "serverAssist", "serverStatus", "serverStatusDot", "serverStatusText",
-          "patternInput", "patternStatus", "registerPattern", "sourceText", "entityTooltip",
-          "registerDialog", "registerForm", "registerPatternPreview", "cancelRegister", "savePattern",
-          "renameDialog", "renameForm", "renamePatternInput", "cancelRename", "saveRename",
-          "highlightLayer", "sampleButton", "runButton",
-          "emptyState", "emptyStateTitle", "emptyStateMessage", "resultsList", "resultTimestamp", "foundMetric",
-          "confidenceMetric", "runtimeMetric", "serverMetricStatus", "serverChecks", "serverYielded", "serverLatency",
-          "resultFilterChips", "confidenceFilter", "reviewMode", "copyResults", "exportResults",
-          "themeButton", "toggleLeftColumn", "toggleRightColumn"
-        ].map(id => [id, document.getElementById(id)]));
+        const els = Object.fromEntries(
+          [
+            "appGrid",
+            "recognizerList",
+            "recognizerSummary",
+            "toggleAll",
+            "customPatternName",
+            "customTag",
+            "confidenceSlider",
+            "confidenceOutput",
+            "resolveOverlaps",
+            "liveMode",
+            "serverAssist",
+            "serverStatus",
+            "serverStatusDot",
+            "serverStatusText",
+            "patternInput",
+            "patternStatus",
+            "registerPattern",
+            "sourceText",
+            "entityTooltip",
+            "registerDialog",
+            "registerForm",
+            "registerPatternPreview",
+            "cancelRegister",
+            "savePattern",
+            "renameDialog",
+            "renameForm",
+            "renamePatternInput",
+            "cancelRename",
+            "saveRename",
+            "highlightLayer",
+            "sampleButton",
+            "runButton",
+            "emptyState",
+            "emptyStateTitle",
+            "emptyStateMessage",
+            "resultsList",
+            "resultTimestamp",
+            "foundMetric",
+            "confidenceMetric",
+            "runtimeMetric",
+            "serverMetricStatus",
+            "serverChecks",
+            "serverYielded",
+            "serverLatency",
+            "resultFilterChips",
+            "confidenceFilter",
+            "reviewMode",
+            "copyResults",
+            "exportResults",
+            "themeButton",
+            "toggleLeftColumn",
+            "toggleRightColumn",
+          ].map((id) => [id, document.getElementById(id)]),
+        );
 
         try {
-          const savedPatterns = JSON.parse(localStorage.getItem("console-ner-patterns") || "[]");
+          const savedPatterns = JSON.parse(
+            localStorage.getItem("console-ner-patterns") || "[]",
+          );
           for (const saved of savedPatterns) {
             if (!saved.id || !saved.source || !saved.tag) continue;
             recognizers.push({
@@ -1344,10 +2389,10 @@ This request is urgent, but approval is pending a final identity review.`;
               label: saved.label || saved.tag,
               tag: saved.tag,
               color: "violet",
-              confidence: Number(saved.confidence) || .5,
+              confidence: Number(saved.confidence) || 0.5,
               patternId: saved.patternId || saved.id,
               regex: new RegExp(saved.source, saved.flags || "g"),
-              registered: true
+              registered: true,
             });
           }
         } catch {}
@@ -1356,23 +2401,57 @@ This request is urgent, but approval is pending a final identity review.`;
         let currentEntities = [];
         let enteringAssistedEntityIds = new Set();
         let activeEntityId = null;
-        let currentTheme = document.documentElement.classList.contains("light") ? "light" : "dark";
+        let currentTheme = document.documentElement.classList.contains("light")
+          ? "light"
+          : "dark";
         let renamingPatternId = null;
         let activeTagFilter = "all";
         let lastRecognition = { duration: 0, textLength: 0, timestamp: null };
         let serverRequestController = null;
         let serverRequestSequence = 0;
-        let serverMetrics = { status: "idle", checks: 0, yielded: 0, latencyMs: null };
-        const enabledRecognizerIds = new Set(recognizers.map(item => item.id));
+        let serverMetrics = {
+          status: "idle",
+          checks: 0,
+          yielded: 0,
+          latencyMs: null,
+        };
+        const enabledRecognizerIds = new Set(
+          recognizers.map((item) => item.id),
+        );
         const collapsedRecognizerGroups = new Set(["person", "date"]);
         const expandedResultIds = new Set();
-        const serverEndpoint = new URLSearchParams(window.location.search).get("api") ||
-          (window.location.protocol === "file:" ? "http://127.0.0.1:4173/api/recognize" : "/api/recognize");
+        const serverEndpoint =
+          new URLSearchParams(window.location.search).get("api") ||
+          (window.location.protocol === "file:"
+            ? "http://127.0.0.1:4173/api/recognize"
+            : "/api/recognize");
 
-        const escapeHTML = value => value.replace(/[&<>"']/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" })[char]);
-        const confidenceLevel = confidence => confidence >= .9 ? "high" : confidence >= .75 ? "medium" : "low";
-        const confidenceColor = confidence => confidence >= .9 ? "text-emerald-300" : confidence >= .75 ? "text-amber-300" : "text-rose-300";
-        const confidenceBar = confidence => confidence >= .9 ? "bg-emerald-400" : confidence >= .75 ? "bg-amber-400" : "bg-rose-400";
+        const escapeHTML = (value) =>
+          value.replace(
+            /[&<>"']/g,
+            (char) =>
+              ({
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#039;",
+              })[char],
+          );
+        const confidenceLevel = (confidence) =>
+          confidence >= 0.9 ? "high" : confidence >= 0.75 ? "medium" : "low";
+        const confidenceColor = (confidence) =>
+          confidence >= 0.9
+            ? "text-emerald-300"
+            : confidence >= 0.75
+              ? "text-amber-300"
+              : "text-rose-300";
+        const confidenceBar = (confidence) =>
+          confidence >= 0.9
+            ? "bg-emerald-400"
+            : confidence >= 0.75
+              ? "bg-amber-400"
+              : "bg-rose-400";
 
         function renderRecognizerControls() {
           const groups = new Map();
@@ -1382,27 +2461,38 @@ This request is urgent, but approval is pending a final identity review.`;
           }
 
           const itemRow = (item, nested = false) => {
-            const shortLabel = nested ? item.label.replace(/^.*?·\s*/, "") : item.label;
+            const shortLabel = nested
+              ? item.label.replace(/^.*?·\s*/, "")
+              : item.label;
             return `
               <div class="recognizer-row ${item.registered ? "has-actions" : ""}">
                 <input id="recognizer-${escapeHTML(item.id)}" data-recognizer="${escapeHTML(item.id)}" type="checkbox" ${enabledRecognizerIds.has(item.id) ? "checked" : ""} class="recognizer-checkbox rounded border-slate-600 bg-slate-800 text-blue-500 focus:ring-1 focus:ring-blue-500 focus:ring-offset-0" />
                 <label class="min-w-0 cursor-pointer" for="recognizer-${escapeHTML(item.id)}">
                   <span class="block truncate text-[11px] font-medium text-slate-300" title="${escapeHTML(item.label)}">${escapeHTML(shortLabel)}</span>
                 </label>
-                ${item.registered ? `<span class="recognizer-actions">
+                ${
+                  item.registered
+                    ? `<span class="recognizer-actions">
                   <button type="button" data-rename-pattern="${escapeHTML(item.id)}" class="inline-flex h-6 w-6 items-center justify-center rounded text-slate-500 transition hover:bg-blue-500/10 hover:text-blue-400" aria-label="Rename ${escapeHTML(item.label)} recognizer" title="Rename recognizer"><svg aria-hidden="true" class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="m14 5 5 5M4 20l4.25-1 10-10a2.12 2.12 0 0 0-3-3l-10 10L4 20Z"/></svg></button>
                   <button type="button" data-remove-pattern="${escapeHTML(item.id)}" class="inline-flex h-6 w-6 items-center justify-center rounded text-slate-500 transition hover:bg-rose-500/10 hover:text-rose-400" aria-label="Remove ${escapeHTML(item.label)} pattern" title="Remove recognizer"><svg aria-hidden="true" class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" d="M6 6l12 12M18 6 6 18"/></svg></button>
-                </span>` : ""}
+                </span>`
+                    : ""
+                }
               </div>`;
           };
 
-          els.recognizerList.innerHTML = [...groups].map(([tag, items]) => {
-            if (items.length === 1) return itemRow(items[0]);
-            const collapsed = collapsedRecognizerGroups.has(tag);
-            const safeGroupId = `recognizer-group-${tag.replace(/[^a-z0-9_-]/gi, "-")}`;
-            const enabledCount = items.filter(item => enabledRecognizerIds.has(item.id)).length;
-            const groupLabel = tag.replace(/_/g, " ").replace(/\b\w/g, letter => letter.toUpperCase());
-            return `
+          els.recognizerList.innerHTML = [...groups]
+            .map(([tag, items]) => {
+              if (items.length === 1) return itemRow(items[0]);
+              const collapsed = collapsedRecognizerGroups.has(tag);
+              const safeGroupId = `recognizer-group-${tag.replace(/[^a-z0-9_-]/gi, "-")}`;
+              const enabledCount = items.filter((item) =>
+                enabledRecognizerIds.has(item.id),
+              ).length;
+              const groupLabel = tag
+                .replace(/_/g, " ")
+                .replace(/\b\w/g, (letter) => letter.toUpperCase());
+              return `
               <section class="recognizer-group">
                 <div class="recognizer-row recognizer-group-row">
                   <input id="${escapeHTML(safeGroupId)}-toggle" data-recognizer-group="${escapeHTML(tag)}" type="checkbox" ${enabledCount === items.length ? "checked" : ""} class="recognizer-checkbox rounded border-slate-600 bg-slate-800 text-blue-500 focus:ring-1 focus:ring-blue-500 focus:ring-offset-0" />
@@ -1414,32 +2504,44 @@ This request is urgent, but approval is pending a final identity review.`;
                     <svg aria-hidden="true" class="recognizer-group-chevron h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="m9 5 7 7-7 7"/></svg>
                   </button>
                 </div>
-                <div id="${escapeHTML(safeGroupId)}" class="recognizer-children" ${collapsed ? "hidden" : ""}>${items.map(item => itemRow(item, true)).join("")}</div>
+                <div id="${escapeHTML(safeGroupId)}" class="recognizer-children" ${collapsed ? "hidden" : ""}>${items.map((item) => itemRow(item, true)).join("")}</div>
               </section>`;
-          }).join("");
+            })
+            .join("");
 
-          document.querySelectorAll("[data-recognizer-group]").forEach(input => {
-            const items = groups.get(input.dataset.recognizerGroup) || [];
-            const enabledCount = items.filter(item => enabledRecognizerIds.has(item.id)).length;
-            input.indeterminate = enabledCount > 0 && enabledCount < items.length;
-          });
+          document
+            .querySelectorAll("[data-recognizer-group]")
+            .forEach((input) => {
+              const items = groups.get(input.dataset.recognizerGroup) || [];
+              const enabledCount = items.filter((item) =>
+                enabledRecognizerIds.has(item.id),
+              ).length;
+              input.indeterminate =
+                enabledCount > 0 && enabledCount < items.length;
+            });
         }
 
         function persistRegisteredPatterns() {
-          const saved = recognizers.filter(item => item.registered).map(item => ({
-            id: item.id,
-            label: item.label,
-            tag: item.tag,
-            confidence: item.confidence,
-            patternId: item.patternId,
-            source: item.regex.source,
-            flags: item.regex.flags
-          }));
-          try { localStorage.setItem("console-ner-patterns", JSON.stringify(saved)); } catch {}
+          const saved = recognizers
+            .filter((item) => item.registered)
+            .map((item) => ({
+              id: item.id,
+              label: item.label,
+              tag: item.tag,
+              confidence: item.confidence,
+              patternId: item.patternId,
+              source: item.regex.source,
+              flags: item.regex.flags,
+            }));
+          try {
+            localStorage.setItem("console-ner-patterns", JSON.stringify(saved));
+          } catch {}
         }
 
         function renameRegisteredPattern(id) {
-          const pattern = recognizers.find(item => item.id === id && item.registered);
+          const pattern = recognizers.find(
+            (item) => item.id === id && item.registered,
+          );
           if (!pattern) return;
           renamingPatternId = id;
           els.renamePatternInput.value = pattern.label;
@@ -1451,7 +2553,9 @@ This request is urgent, but approval is pending a final identity review.`;
         }
 
         function saveRenamedPattern() {
-          const pattern = recognizers.find(item => item.id === renamingPatternId && item.registered);
+          const pattern = recognizers.find(
+            (item) => item.id === renamingPatternId && item.registered,
+          );
           const nextName = els.renamePatternInput.value.trim();
           if (!pattern || !nextName) return;
           pattern.label = nextName;
@@ -1494,16 +2598,36 @@ This request is urgent, but approval is pending a final identity review.`;
           els.customPatternName.removeAttribute("aria-invalid");
           els.customTag.removeAttribute("aria-invalid");
           const confidence = Number(els.confidenceSlider.value) / 100;
-          const existing = recognizers.find(item => item.registered && item.tag === tag && item.regex.source === regex.source && item.regex.flags === regex.flags);
+          const existing = recognizers.find(
+            (item) =>
+              item.registered &&
+              item.tag === tag &&
+              item.regex.source === regex.source &&
+              item.regex.flags === regex.flags,
+          );
           let registeredId;
           if (existing) {
             existing.confidence = confidence;
             existing.label = patternName;
             registeredId = existing.id;
           } else {
-            const slug = patternName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 28) || "pattern";
+            const slug =
+              patternName
+                .toLowerCase()
+                .replace(/[^a-z0-9]+/g, "-")
+                .replace(/^-|-$/g, "")
+                .slice(0, 28) || "pattern";
             const id = `${slug}-${Date.now().toString(36)}`;
-            recognizers.push({ id, label: patternName, tag, color: "violet", confidence, patternId: id, regex, registered: true });
+            recognizers.push({
+              id,
+              label: patternName,
+              tag,
+              color: "violet",
+              confidence,
+              patternId: id,
+              regex,
+              registered: true,
+            });
             registeredId = id;
           }
 
@@ -1557,7 +2681,8 @@ This request is urgent, but approval is pending a final identity review.`;
             }
             const captureGroup = definition.captureGroup || 0;
             const value = match[captureGroup] || match[0];
-            if (definition.validate && !definition.validate(value, match, text)) continue;
+            if (definition.validate && !definition.validate(value, match, text))
+              continue;
             const captureOffset = captureGroup ? match[0].indexOf(value) : 0;
             const start = match.index + Math.max(0, captureOffset);
             const end = start + value.length;
@@ -1565,22 +2690,36 @@ This request is urgent, but approval is pending a final identity review.`;
               id: `${definition.tag}:${start}:${end}:${definition.patternId}`,
               tag: definition.tag,
               value,
-              normalizedValue: definition.normalize ? definition.normalize(value) : value,
+              normalizedValue: definition.normalize
+                ? definition.normalize(value)
+                : value,
               start,
               end,
               confidence: definition.confidence,
-              source: definition.source || (definition.registered ? "registered" : "built-in"),
-              patternId: definition.patternId
+              source:
+                definition.source ||
+                (definition.registered ? "registered" : "built-in"),
+              patternId: definition.patternId,
             });
           }
           return matches;
         }
 
         function resolveEntities(entities) {
-          const ranked = [...entities].sort((a, b) => b.confidence - a.confidence || (b.end - b.start) - (a.end - a.start) || a.start - b.start);
+          const ranked = [...entities].sort(
+            (a, b) =>
+              b.confidence - a.confidence ||
+              b.end - b.start - (a.end - a.start) ||
+              a.start - b.start,
+          );
           const kept = [];
           for (const entity of ranked) {
-            if (!kept.some(other => entity.start < other.end && entity.end > other.start)) kept.push(entity);
+            if (
+              !kept.some(
+                (other) => entity.start < other.end && entity.end > other.start,
+              )
+            )
+              kept.push(entity);
           }
           return kept.sort((a, b) => a.start - b.start || a.end - b.end);
         }
@@ -1590,31 +2729,48 @@ This request is urgent, but approval is pending a final identity review.`;
           const start = Number(raw.start);
           const end = Number(raw.end);
           const value = typeof raw.value === "string" ? raw.value : "";
-          if (!Number.isInteger(start) || !Number.isInteger(end) || start < 0 || end <= start || end > text.length) return null;
-          if (text.slice(start, end) !== value || typeof raw.tag !== "string") return null;
+          if (
+            !Number.isInteger(start) ||
+            !Number.isInteger(end) ||
+            start < 0 ||
+            end <= start ||
+            end > text.length
+          )
+            return null;
+          if (text.slice(start, end) !== value || typeof raw.tag !== "string")
+            return null;
           return {
             id: `server:${raw.tag}:${start}:${end}:${raw.patternId || "validated"}`,
             tag: raw.tag,
             value,
-            normalizedValue: typeof raw.normalizedValue === "string" ? raw.normalizedValue : value,
+            normalizedValue:
+              typeof raw.normalizedValue === "string"
+                ? raw.normalizedValue
+                : value,
             start,
             end,
             confidence: Math.max(0, Math.min(1, Number(raw.confidence) || 0)),
             source: "server-assisted",
-            patternId: typeof raw.patternId === "string" ? raw.patternId : "server-validator",
+            patternId:
+              typeof raw.patternId === "string"
+                ? raw.patternId
+                : "server-validator",
             validation: raw.validation,
             metadata: raw.metadata,
-            assisted: true
+            assisted: true,
           };
         }
 
         function mergeServerEntities(baseEntities, rawServerEntities, text) {
-          const merged = baseEntities.map(entity => ({ ...entity }));
+          const merged = baseEntities.map((entity) => ({ ...entity }));
           for (const raw of rawServerEntities) {
             const serverEntity = serverEntityFrom(raw, text);
             if (!serverEntity) continue;
-            const existingIndex = merged.findIndex(entity =>
-              entity.tag === serverEntity.tag && entity.start === serverEntity.start && entity.end === serverEntity.end
+            const existingIndex = merged.findIndex(
+              (entity) =>
+                entity.tag === serverEntity.tag &&
+                entity.start === serverEntity.start &&
+                entity.end === serverEntity.end,
             );
             if (existingIndex >= 0) {
               const local = merged[existingIndex];
@@ -1626,7 +2782,7 @@ This request is urgent, but approval is pending a final identity review.`;
                 patternId: serverEntity.patternId,
                 validation: serverEntity.validation,
                 metadata: serverEntity.metadata,
-                assisted: true
+                assisted: true,
               };
             } else {
               merged.push(serverEntity);
@@ -1642,15 +2798,25 @@ This request is urgent, but approval is pending a final identity review.`;
             checking: ["Checking candidates…", "Server checking…"],
             online: ["Connected", "Server assisted"],
             offline: ["API unavailable", "Server offline"],
-            disabled: ["Disabled", "Server disabled"]
+            disabled: ["Disabled", "Server disabled"],
           };
-          const [panelLabel, metricLabel] = labels[serverMetrics.status] || labels.idle;
+          const [panelLabel, metricLabel] =
+            labels[serverMetrics.status] || labels.idle;
           els.serverStatusDot.className = `h-1.5 w-1.5 shrink-0 rounded-full ${serverMetrics.status}`;
           els.serverStatusText.textContent = panelLabel;
           els.serverMetricStatus.textContent = metricLabel;
-          els.serverChecks.textContent = serverMetrics.status === "checking" ? "…" : String(serverMetrics.checks);
-          els.serverYielded.textContent = serverMetrics.status === "checking" ? "…" : String(serverMetrics.yielded);
-          els.serverLatency.textContent = typeof serverMetrics.latencyMs === "number" ? `${serverMetrics.latencyMs.toFixed(1)}ms` : "—";
+          els.serverChecks.textContent =
+            serverMetrics.status === "checking"
+              ? "…"
+              : String(serverMetrics.checks);
+          els.serverYielded.textContent =
+            serverMetrics.status === "checking"
+              ? "…"
+              : String(serverMetrics.yielded);
+          els.serverLatency.textContent =
+            typeof serverMetrics.latencyMs === "number"
+              ? `${serverMetrics.latencyMs.toFixed(1)}ms`
+              : "—";
         }
 
         async function requestServerAssist(text, sequence) {
@@ -1660,27 +2826,49 @@ This request is urgent, but approval is pending a final identity review.`;
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ text }),
-              signal: serverRequestController.signal
+              signal: serverRequestController.signal,
             });
-            if (!response.ok) throw new Error(`Server returned ${response.status}`);
+            if (!response.ok)
+              throw new Error(`Server returned ${response.status}`);
             const payload = await response.json();
-            if (sequence !== serverRequestSequence || !els.serverAssist.checked) return;
-            const stats = payload && typeof payload.stats === "object" ? payload.stats : {};
+            if (sequence !== serverRequestSequence || !els.serverAssist.checked)
+              return;
+            const stats =
+              payload && typeof payload.stats === "object" ? payload.stats : {};
             serverMetrics = {
               status: "online",
               checks: Math.max(0, Number(stats.checks) || 0),
               yielded: Math.max(0, Number(stats.yielded) || 0),
-              latencyMs: Number.isFinite(Number(stats.latencyMs)) ? Number(stats.latencyMs) : null
+              latencyMs: Number.isFinite(Number(stats.latencyMs))
+                ? Number(stats.latencyMs)
+                : null,
             };
-            currentEntities = mergeServerEntities(localEntities, Array.isArray(payload.entities) ? payload.entities : [], text);
-            enteringAssistedEntityIds = new Set(currentEntities.filter(entity => entity.assisted).map(entity => entity.id));
-            activeEntityId = currentEntities.some(entity => entity.id === activeEntityId) ? activeEntityId : null;
+            currentEntities = mergeServerEntities(
+              localEntities,
+              Array.isArray(payload.entities) ? payload.entities : [],
+              text,
+            );
+            enteringAssistedEntityIds = new Set(
+              currentEntities
+                .filter((entity) => entity.assisted)
+                .map((entity) => entity.id),
+            );
+            activeEntityId = currentEntities.some(
+              (entity) => entity.id === activeEntityId,
+            )
+              ? activeEntityId
+              : null;
             renderHighlights(text, currentEntities);
             renderResults();
           } catch (error) {
             if (error && error.name === "AbortError") return;
             if (sequence !== serverRequestSequence) return;
-            serverMetrics = { status: "offline", checks: 0, yielded: 0, latencyMs: null };
+            serverMetrics = {
+              status: "offline",
+              checks: 0,
+              yielded: 0,
+              latencyMs: null,
+            };
             currentEntities = localEntities;
             renderHighlights(text, currentEntities);
             renderResults();
@@ -1692,20 +2880,38 @@ This request is urgent, but approval is pending a final identity review.`;
           serverRequestController?.abort();
           const sequence = ++serverRequestSequence;
           if (!els.serverAssist.checked) {
-            serverMetrics = { status: "disabled", checks: 0, yielded: 0, latencyMs: null };
+            serverMetrics = {
+              status: "disabled",
+              checks: 0,
+              yielded: 0,
+              latencyMs: null,
+            };
             currentEntities = localEntities;
             renderHighlights(text, currentEntities);
             renderResults();
             return;
           }
           if (!text) {
-            serverMetrics = { status: "idle", checks: 0, yielded: 0, latencyMs: null };
+            serverMetrics = {
+              status: "idle",
+              checks: 0,
+              yielded: 0,
+              latencyMs: null,
+            };
             renderServerMetrics();
             return;
           }
-          serverMetrics = { status: "checking", checks: 0, yielded: 0, latencyMs: null };
+          serverMetrics = {
+            status: "checking",
+            checks: 0,
+            yielded: 0,
+            latencyMs: null,
+          };
           renderServerMetrics();
-          scheduleServerAssist.timer = window.setTimeout(() => requestServerAssist(text, sequence), 160);
+          scheduleServerAssist.timer = window.setTimeout(
+            () => requestServerAssist(text, sequence),
+            160,
+          );
         }
 
         function recognize() {
@@ -1713,29 +2919,47 @@ This request is urgent, but approval is pending a final identity review.`;
           const started = performance.now();
           const text = els.sourceText.value;
           const enabledIds = enabledRecognizerIds;
-          let entities = recognizers.filter(item => enabledIds.has(item.id)).flatMap(item => scanRegex(text, item));
+          let entities = recognizers
+            .filter((item) => enabledIds.has(item.id))
+            .flatMap((item) => scanRegex(text, item));
           const customRegex = parseCustomPattern();
           const draftTag = els.customTag.value.trim() || "custom";
-          const matchesRegisteredPattern = customRegex && recognizers.some(item =>
-            item.registered && enabledIds.has(item.id) && item.tag === draftTag &&
-            item.regex.source === customRegex.source && item.regex.flags === customRegex.flags
-          );
+          const matchesRegisteredPattern =
+            customRegex &&
+            recognizers.some(
+              (item) =>
+                item.registered &&
+                enabledIds.has(item.id) &&
+                item.tag === draftTag &&
+                item.regex.source === customRegex.source &&
+                item.regex.flags === customRegex.flags,
+            );
           if (customRegex && !matchesRegisteredPattern) {
-            entities.push(...scanRegex(text, {
-              tag: draftTag,
-              confidence: Number(els.confidenceSlider.value) / 100,
-              patternId: "custom-pattern",
-              source: "draft",
-              regex: customRegex
-            }));
+            entities.push(
+              ...scanRegex(text, {
+                tag: draftTag,
+                confidence: Number(els.confidenceSlider.value) / 100,
+                patternId: "custom-pattern",
+                source: "draft",
+                regex: customRegex,
+              }),
+            );
           }
           if (els.resolveOverlaps.checked) entities = resolveEntities(entities);
           else entities.sort((a, b) => a.start - b.start || a.end - b.end);
 
           localEntities = entities;
           currentEntities = entities;
-          lastRecognition = { duration: performance.now() - started, textLength: text.length, timestamp: new Date() };
-          activeEntityId = entities.some(entity => entity.id === activeEntityId) ? activeEntityId : null;
+          lastRecognition = {
+            duration: performance.now() - started,
+            textLength: text.length,
+            timestamp: new Date(),
+          };
+          activeEntityId = entities.some(
+            (entity) => entity.id === activeEntityId,
+          )
+            ? activeEntityId
+            : null;
           renderHighlights(text, entities);
           renderResults();
           scheduleServerAssist(text);
@@ -1743,44 +2967,55 @@ This request is urgent, but approval is pending a final identity review.`;
 
         function renderHighlights(text, entities) {
           if (!text) {
-            els.highlightLayer.innerHTML = '<span class="editor-line"><span class="text-slate-600">Paste or type text here to begin recognizing entities…</span></span>';
+            els.highlightLayer.innerHTML =
+              '<span class="editor-line"><span class="text-slate-600">Paste or type text here to begin recognizing entities…</span></span>';
             return;
           }
           const nonOverlapping = resolveEntities(entities);
           const enteringIds = new Set(enteringAssistedEntityIds);
           enteringAssistedEntityIds.clear();
           let lineStart = 0;
-          els.highlightLayer.innerHTML = text.split("\n").map(line => {
-            const lineEnd = lineStart + line.length;
-            let cursor = lineStart;
-            let html = "";
-            for (const entity of nonOverlapping) {
-              const segmentStart = Math.max(entity.start, lineStart);
-              const segmentEnd = Math.min(entity.end, lineEnd);
-              if (segmentStart >= segmentEnd) continue;
-              html += escapeHTML(text.slice(cursor, segmentStart));
-              html += `<mark class="entity-mark confidence-${confidenceLevel(entity.confidence)} ${entity.assisted ? "server-assisted" : ""} ${enteringIds.has(entity.id) ? "server-assisted-enter" : ""} ${entity.id === activeEntityId ? "active" : ""}" data-highlight-id="${escapeHTML(entity.id)}">${escapeHTML(text.slice(segmentStart, segmentEnd))}</mark>`;
-              cursor = segmentEnd;
-            }
-            html += escapeHTML(text.slice(cursor, lineEnd));
-            lineStart = lineEnd + 1;
-            return `<span class="editor-line">${html || " "}</span>`;
-          }).join("");
+          els.highlightLayer.innerHTML = text
+            .split("\n")
+            .map((line) => {
+              const lineEnd = lineStart + line.length;
+              let cursor = lineStart;
+              let html = "";
+              for (const entity of nonOverlapping) {
+                const segmentStart = Math.max(entity.start, lineStart);
+                const segmentEnd = Math.min(entity.end, lineEnd);
+                if (segmentStart >= segmentEnd) continue;
+                html += escapeHTML(text.slice(cursor, segmentStart));
+                html += `<mark class="entity-mark confidence-${confidenceLevel(entity.confidence)} ${entity.assisted ? "server-assisted" : ""} ${enteringIds.has(entity.id) ? "server-assisted-enter" : ""} ${entity.id === activeEntityId ? "active" : ""}" data-highlight-id="${escapeHTML(entity.id)}">${escapeHTML(text.slice(segmentStart, segmentEnd))}</mark>`;
+                cursor = segmentEnd;
+              }
+              html += escapeHTML(text.slice(cursor, lineEnd));
+              lineStart = lineEnd + 1;
+              return `<span class="editor-line">${html || " "}</span>`;
+            })
+            .join("");
         }
 
         function matchesConfidenceFilter(entity) {
           switch (els.confidenceFilter.value) {
-            case "high": return entity.confidence >= .9;
-            case "review": return entity.confidence < .9;
-            case "medium": return entity.confidence >= .75 && entity.confidence < .9;
-            case "low": return entity.confidence < .75;
-            default: return true;
+            case "high":
+              return entity.confidence >= 0.9;
+            case "review":
+              return entity.confidence < 0.9;
+            case "medium":
+              return entity.confidence >= 0.75 && entity.confidence < 0.9;
+            case "low":
+              return entity.confidence < 0.75;
+            default:
+              return true;
           }
         }
 
         function getVisibleEntities() {
-          return currentEntities.filter(entity =>
-            (activeTagFilter === "all" || entity.tag === activeTagFilter) && matchesConfidenceFilter(entity)
+          return currentEntities.filter(
+            (entity) =>
+              (activeTagFilter === "all" || entity.tag === activeTagFilter) &&
+              matchesConfidenceFilter(entity),
           );
         }
 
@@ -1789,12 +3024,24 @@ This request is urgent, but approval is pending a final identity review.`;
             counts.set(entity.tag, (counts.get(entity.tag) || 0) + 1);
             return counts;
           }, new Map());
-          if (activeTagFilter !== "all" && !tagCounts.has(activeTagFilter)) activeTagFilter = "all";
-          const filters = [["all", "All", currentEntities.length], ...[...tagCounts].map(([tag, count]) => [tag, tag.replace(/_/g, " "), count])];
-          els.resultFilterChips.innerHTML = filters.map(([tag, label, count]) => `
+          if (activeTagFilter !== "all" && !tagCounts.has(activeTagFilter))
+            activeTagFilter = "all";
+          const filters = [
+            ["all", "All", currentEntities.length],
+            ...[...tagCounts].map(([tag, count]) => [
+              tag,
+              tag.replace(/_/g, " "),
+              count,
+            ]),
+          ];
+          els.resultFilterChips.innerHTML = filters
+            .map(
+              ([tag, label, count]) => `
             <button type="button" data-result-tag="${escapeHTML(tag)}" class="filter-chip ${activeTagFilter === tag ? "active" : ""}" aria-pressed="${String(activeTagFilter === tag)}">
               <span>${escapeHTML(label)}</span><span class="font-mono opacity-60">${count}</span>
-            </button>`).join("");
+            </button>`,
+            )
+            .join("");
           const reviewing = els.confidenceFilter.value === "review";
           els.reviewMode.classList.toggle("bg-amber-400/10", reviewing);
           els.reviewMode.classList.toggle("border-amber-400/50", reviewing);
@@ -1807,24 +3054,42 @@ This request is urgent, but approval is pending a final identity review.`;
           const entities = getVisibleEntities();
           const totalCount = currentEntities.length;
           const count = entities.length;
-          const average = totalCount ? currentEntities.reduce((total, entity) => total + entity.confidence, 0) / totalCount : 0;
+          const average = totalCount
+            ? currentEntities.reduce(
+                (total, entity) => total + entity.confidence,
+                0,
+              ) / totalCount
+            : 0;
           els.emptyState.classList.toggle("hidden", count > 0);
-          els.emptyStateTitle.textContent = totalCount ? "No results match these filters" : "No entities found";
-          els.emptyStateMessage.textContent = totalCount ? "Choose another entity type or confidence level." : "Try adding a person, email, phone number, date, amount, or a custom pattern match.";
+          els.emptyStateTitle.textContent = totalCount
+            ? "No results match these filters"
+            : "No entities found";
+          els.emptyStateMessage.textContent = totalCount
+            ? "Choose another entity type or confidence level."
+            : "Try adding a person, email, phone number, date, amount, or a custom pattern match.";
           els.copyResults.disabled = count === 0;
           els.exportResults.disabled = count === 0;
-          els.foundMetric.textContent = count === totalCount ? String(totalCount) : `${count}/${totalCount}`;
-          els.confidenceMetric.textContent = totalCount ? `${Math.round(average * 100)}%` : "—";
-          els.runtimeMetric.textContent = lastRecognition.textLength ? `${lastRecognition.duration.toFixed(1)}ms` : "—";
-          els.resultTimestamp.textContent = lastRecognition.textLength && lastRecognition.timestamp
-            ? `Updated ${lastRecognition.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" })}`
-            : "Waiting for input";
+          els.foundMetric.textContent =
+            count === totalCount
+              ? String(totalCount)
+              : `${count}/${totalCount}`;
+          els.confidenceMetric.textContent = totalCount
+            ? `${Math.round(average * 100)}%`
+            : "—";
+          els.runtimeMetric.textContent = lastRecognition.textLength
+            ? `${lastRecognition.duration.toFixed(1)}ms`
+            : "—";
+          els.resultTimestamp.textContent =
+            lastRecognition.textLength && lastRecognition.timestamp
+              ? `Updated ${lastRecognition.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" })}`
+              : "Waiting for input";
 
-          els.resultsList.innerHTML = entities.map((entity, index) => {
-            const percent = Math.round(entity.confidence * 100);
-            const expanded = expandedResultIds.has(entity.id);
-            const detailId = `result-detail-${index}`;
-            return `
+          els.resultsList.innerHTML = entities
+            .map((entity, index) => {
+              const percent = Math.round(entity.confidence * 100);
+              const expanded = expandedResultIds.has(entity.id);
+              const detailId = `result-detail-${index}`;
+              return `
               <article class="result-card ${entity.assisted ? `server-assisted assist-confidence-${confidenceLevel(entity.confidence)}` : ""} ${entity.id === activeEntityId ? "active" : ""}" data-entity-id="${escapeHTML(entity.id)}">
                 <button type="button" class="result-summary" data-result-toggle="${escapeHTML(entity.id)}" aria-expanded="${String(expanded)}" aria-controls="${detailId}" aria-label="${escapeHTML(entity.tag)}: ${escapeHTML(entity.value)}, ${percent}% confidence. ${expanded ? "Collapse" : "Expand"} details">
                   <span class="result-confidence-dot ${confidenceBar(entity.confidence)}" title="${percent}% confidence"></span>
@@ -1843,16 +3108,17 @@ This request is urgent, but approval is pending a final identity review.`;
                   <div class="confidence-bar mb-2 h-0.5 overflow-hidden rounded-full bg-slate-700">
                   <span class="block h-full rounded-full ${confidenceBar(entity.confidence)}" style="width:${percent}%"></span>
                   </div>
-                  <dl class="grid grid-cols-[68px_1fr] gap-x-2 gap-y-1 font-mono text-[9px] leading-4">
-                    <dt class="text-slate-600">range</dt><dd class="text-slate-400">[${entity.start}, ${entity.end})</dd>
-                    <dt class="text-slate-600">normalized</dt><dd class="truncate text-slate-400" title="${escapeHTML(entity.normalizedValue)}">${escapeHTML(entity.normalizedValue)}</dd>
-                    <dt class="text-slate-600">pattern</dt><dd class="truncate text-slate-500" title="${escapeHTML(entity.patternId)}">${escapeHTML(entity.patternId)}</dd>
-                    <dt class="text-slate-600">source</dt><dd class="text-slate-500">${escapeHTML(entity.source)}</dd>
-                    ${entity.assisted && entity.metadata?.evidence ? `<dt class="text-slate-600">evidence</dt><dd class="text-slate-400">${escapeHTML(String(entity.metadata.evidence))}</dd>` : ""}
+                  <dl class="grid grid-cols-[76px_1fr] gap-x-2 gap-y-1 font-mono text-[10px] leading-5">
+                    <dt class="font-medium text-slate-600">range</dt><dd class="text-slate-400">[${entity.start}, ${entity.end})</dd>
+                    <dt class="font-medium text-slate-600">normalized</dt><dd class="truncate text-slate-400" title="${escapeHTML(entity.normalizedValue)}">${escapeHTML(entity.normalizedValue)}</dd>
+                    <dt class="font-medium text-slate-600">pattern</dt><dd class="truncate text-slate-500" title="${escapeHTML(entity.patternId)}">${escapeHTML(entity.patternId)}</dd>
+                    <dt class="font-medium text-slate-600">source</dt><dd class="text-slate-500">${escapeHTML(entity.source)}</dd>
+                    ${entity.assisted && entity.metadata?.evidence ? `<dt class="font-medium text-slate-600">evidence</dt><dd class="text-slate-400">${escapeHTML(String(entity.metadata.evidence))}</dd>` : ""}
                   </dl>
                 </div>
               </article>`;
-          }).join("");
+            })
+            .join("");
         }
 
         function scheduleRecognition() {
@@ -1871,7 +3137,9 @@ This request is urgent, but approval is pending a final identity review.`;
         }
 
         function showEntityTooltip(mark) {
-          const entity = currentEntities.find(item => item.id === mark.dataset.highlightId);
+          const entity = currentEntities.find(
+            (item) => item.id === mark.dataset.highlightId,
+          );
           if (!entity) return;
           const percent = Math.round(entity.confidence * 100);
           els.entityTooltip.innerHTML = `
@@ -1880,17 +3148,23 @@ This request is urgent, but approval is pending a final identity review.`;
               <strong class="font-mono ${confidenceColor(entity.confidence)}">${percent}% confidence</strong>
             </div>
             <div class="mt-1.5 max-w-[250px] truncate font-mono text-[11px]" title="${escapeHTML(entity.value)}">${escapeHTML(entity.value)}</div>
-            <div class="mt-1.5 grid grid-cols-[52px_1fr] gap-x-2 text-slate-400">
-              <span>range</span><code>[${entity.start}, ${entity.end})</code>
-              <span>pattern</span><code class="truncate">${escapeHTML(entity.patternId)}</code>
-              <span>source</span><code class="truncate">${escapeHTML(entity.source)}</code>
-              <span>normalized</span><code class="truncate">${escapeHTML(entity.normalizedValue)}</code>
-              ${entity.assisted && entity.metadata?.evidence ? `<span>evidence</span><code class="max-w-[190px] whitespace-normal">${escapeHTML(String(entity.metadata.evidence))}</code>` : ""}
+            <div class="mt-2 grid grid-cols-[58px_1fr] gap-x-2 gap-y-0.5 text-slate-400">
+              <span class="font-medium text-slate-500">range</span><code>[${entity.start}, ${entity.end})</code>
+              <span class="font-medium text-slate-500">pattern</span><code class="truncate">${escapeHTML(entity.patternId)}</code>
+              <span class="font-medium text-slate-500">source</span><code class="truncate">${escapeHTML(entity.source)}</code>
+              <span class="font-medium text-slate-500">normalized</span><code class="truncate">${escapeHTML(entity.normalizedValue)}</code>
+              ${entity.assisted && entity.metadata?.evidence ? `<span class="font-medium text-slate-500">evidence</span><code class="max-w-[190px] whitespace-normal">${escapeHTML(String(entity.metadata.evidence))}</code>` : ""}
             </div>`;
           els.entityTooltip.hidden = false;
           const markRect = mark.getBoundingClientRect();
           const tooltipRect = els.entityTooltip.getBoundingClientRect();
-          const left = Math.min(Math.max(8, markRect.left + markRect.width / 2 - tooltipRect.width / 2), window.innerWidth - tooltipRect.width - 8);
+          const left = Math.min(
+            Math.max(
+              8,
+              markRect.left + markRect.width / 2 - tooltipRect.width / 2,
+            ),
+            window.innerWidth - tooltipRect.width - 8,
+          );
           let top = markRect.top - tooltipRect.height - 8;
           if (top < 8) top = markRect.bottom + 8;
           els.entityTooltip.style.left = `${left}px`;
@@ -1904,12 +3178,16 @@ This request is urgent, but approval is pending a final identity review.`;
         function togglePanel(side) {
           const className = `${side}-collapsed`;
           const collapsed = els.appGrid.classList.toggle(className);
-          const button = side === "left" ? els.toggleLeftColumn : els.toggleRightColumn;
+          const button =
+            side === "left" ? els.toggleLeftColumn : els.toggleRightColumn;
           const panelName = side === "left" ? "settings" : "results";
           button.classList.toggle("is-collapsed", collapsed);
           button.classList.toggle("text-blue-300", collapsed);
           button.setAttribute("aria-pressed", String(collapsed));
-          button.setAttribute("aria-label", `${collapsed ? "Expand" : "Collapse"} ${panelName} panel`);
+          button.setAttribute(
+            "aria-label",
+            `${collapsed ? "Expand" : "Collapse"} ${panelName} panel`,
+          );
           button.title = `${collapsed ? "Expand" : "Collapse"} ${panelName} panel`;
           hideEntityTooltip();
         }
@@ -1917,8 +3195,17 @@ This request is urgent, but approval is pending a final identity review.`;
         function selectEntity(id, focusEditor = true) {
           activeEntityId = activeEntityId === id ? null : id;
           renderHighlights(els.sourceText.value, currentEntities);
-          document.querySelectorAll("[data-entity-id]").forEach(card => card.classList.toggle("active", card.dataset.entityId === activeEntityId));
-          const entity = currentEntities.find(item => item.id === activeEntityId);
+          document
+            .querySelectorAll("[data-entity-id]")
+            .forEach((card) =>
+              card.classList.toggle(
+                "active",
+                card.dataset.entityId === activeEntityId,
+              ),
+            );
+          const entity = currentEntities.find(
+            (item) => item.id === activeEntityId,
+          );
           if (entity && focusEditor) {
             els.sourceText.focus();
             els.sourceText.setSelectionRange(entity.start, entity.end);
@@ -1926,16 +3213,38 @@ This request is urgent, but approval is pending a final identity review.`;
         }
 
         function syncToggleAllLabel() {
-          const allEnabled = recognizers.length > 0 && recognizers.every(item => enabledRecognizerIds.has(item.id));
-          const enabledCount = recognizers.filter(item => enabledRecognizerIds.has(item.id)).length;
+          const allEnabled =
+            recognizers.length > 0 &&
+            recognizers.every((item) => enabledRecognizerIds.has(item.id));
+          const enabledCount = recognizers.filter((item) =>
+            enabledRecognizerIds.has(item.id),
+          ).length;
           els.toggleAll.textContent = allEnabled ? "Disable all" : "Enable all";
           els.recognizerSummary.textContent = `${enabledCount} of ${recognizers.length} active`;
         }
 
         function exportableResults() {
-          return getVisibleEntities().map(({ tag, value, normalizedValue, start, end, confidence, source, patternId }) => ({
-            tag, value, normalizedValue, start, end, confidence, source, patternId
-          }));
+          return getVisibleEntities().map(
+            ({
+              tag,
+              value,
+              normalizedValue,
+              start,
+              end,
+              confidence,
+              source,
+              patternId,
+            }) => ({
+              tag,
+              value,
+              normalizedValue,
+              start,
+              end,
+              confidence,
+              source,
+              patternId,
+            }),
+          );
         }
 
         async function copyVisibleResults() {
@@ -1957,12 +3266,18 @@ This request is urgent, but approval is pending a final identity review.`;
           window.clearTimeout(copyVisibleResults.timer);
           copyVisibleResults.timer = window.setTimeout(() => {
             els.copyResults.title = "Copy filtered results as JSON";
-            els.copyResults.setAttribute("aria-label", "Copy filtered results as JSON");
+            els.copyResults.setAttribute(
+              "aria-label",
+              "Copy filtered results as JSON",
+            );
           }, 1400);
         }
 
         function downloadVisibleResults() {
-          const blob = new Blob([JSON.stringify(exportableResults(), null, 2)], { type: "application/json" });
+          const blob = new Blob(
+            [JSON.stringify(exportableResults(), null, 2)],
+            { type: "application/json" },
+          );
           const url = URL.createObjectURL(blob);
           const link = document.createElement("a");
           link.href = url;
@@ -1977,31 +3292,40 @@ This request is urgent, but approval is pending a final identity review.`;
         syncToggleAllLabel();
         els.sourceText.value = sampleText;
 
-        document.addEventListener("change", event => {
+        document.addEventListener("change", (event) => {
           if (event.target.matches("[data-recognizer]")) {
-            if (event.target.checked) enabledRecognizerIds.add(event.target.dataset.recognizer);
+            if (event.target.checked)
+              enabledRecognizerIds.add(event.target.dataset.recognizer);
             else enabledRecognizerIds.delete(event.target.dataset.recognizer);
             renderRecognizerControls();
             syncToggleAllLabel();
             scheduleRecognition();
           }
           if (event.target.matches("[data-recognizer-group]")) {
-            recognizers.filter(item => item.tag === event.target.dataset.recognizerGroup).forEach(item => {
-              if (event.target.checked) enabledRecognizerIds.add(item.id);
-              else enabledRecognizerIds.delete(item.id);
-            });
+            recognizers
+              .filter(
+                (item) => item.tag === event.target.dataset.recognizerGroup,
+              )
+              .forEach((item) => {
+                if (event.target.checked) enabledRecognizerIds.add(item.id);
+                else enabledRecognizerIds.delete(item.id);
+              });
             renderRecognizerControls();
             syncToggleAllLabel();
             scheduleRecognition();
           }
           if (event.target.matches("#resolveOverlaps")) scheduleRecognition();
-          if (event.target.matches("#serverAssist")) scheduleServerAssist(els.sourceText.value);
+          if (event.target.matches("#serverAssist"))
+            scheduleServerAssist(els.sourceText.value);
         });
-        els.recognizerList.addEventListener("click", event => {
-          const groupButton = event.target.closest("[data-toggle-recognizer-group]");
+        els.recognizerList.addEventListener("click", (event) => {
+          const groupButton = event.target.closest(
+            "[data-toggle-recognizer-group]",
+          );
           if (groupButton) {
             const tag = groupButton.dataset.toggleRecognizerGroup;
-            if (collapsedRecognizerGroups.has(tag)) collapsedRecognizerGroups.delete(tag);
+            if (collapsedRecognizerGroups.has(tag))
+              collapsedRecognizerGroups.delete(tag);
             else collapsedRecognizerGroups.add(tag);
             renderRecognizerControls();
             return;
@@ -2013,7 +3337,10 @@ This request is urgent, but approval is pending a final identity review.`;
           }
           const removeButton = event.target.closest("[data-remove-pattern]");
           if (!removeButton) return;
-          const index = recognizers.findIndex(item => item.id === removeButton.dataset.removePattern && item.registered);
+          const index = recognizers.findIndex(
+            (item) =>
+              item.id === removeButton.dataset.removePattern && item.registered,
+          );
           if (index >= 0) {
             enabledRecognizerIds.delete(recognizers[index].id);
             recognizers.splice(index, 1);
@@ -2025,15 +3352,15 @@ This request is urgent, but approval is pending a final identity review.`;
         });
         els.sourceText.addEventListener("input", scheduleRecognition);
         els.sourceText.addEventListener("scroll", syncEditorScroll);
-        els.highlightLayer.addEventListener("mouseover", event => {
+        els.highlightLayer.addEventListener("mouseover", (event) => {
           const mark = event.target.closest(".entity-mark");
           if (mark) showEntityTooltip(mark);
         });
-        els.highlightLayer.addEventListener("mouseout", event => {
+        els.highlightLayer.addEventListener("mouseout", (event) => {
           const mark = event.target.closest(".entity-mark");
           if (mark && !mark.contains(event.relatedTarget)) hideEntityTooltip();
         });
-        els.highlightLayer.addEventListener("pointerdown", event => {
+        els.highlightLayer.addEventListener("pointerdown", (event) => {
           const mark = event.target.closest(".entity-mark");
           if (!mark) return;
           event.preventDefault();
@@ -2042,29 +3369,41 @@ This request is urgent, but approval is pending a final identity review.`;
         });
         els.patternInput.addEventListener("input", scheduleRecognition);
         els.customPatternName.addEventListener("input", () => {
-          if (els.customPatternName.value.trim()) els.customPatternName.removeAttribute("aria-invalid");
+          if (els.customPatternName.value.trim())
+            els.customPatternName.removeAttribute("aria-invalid");
         });
         els.customTag.addEventListener("input", () => {
-          if (els.customTag.value.trim()) els.customTag.removeAttribute("aria-invalid");
+          if (els.customTag.value.trim())
+            els.customTag.removeAttribute("aria-invalid");
           scheduleRecognition();
         });
         els.confidenceSlider.addEventListener("input", () => {
           els.confidenceOutput.textContent = `${els.confidenceSlider.value}%`;
-          els.confidenceSlider.style.setProperty("--slider-progress", `${els.confidenceSlider.value}%`);
+          els.confidenceSlider.style.setProperty(
+            "--slider-progress",
+            `${els.confidenceSlider.value}%`,
+          );
           scheduleRecognition();
         });
         els.runButton.addEventListener("click", recognize);
         els.registerPattern.addEventListener("click", openRegisterDialog);
-        els.sampleButton.addEventListener("click", () => { els.sourceText.value = sampleText; recognize(); els.sourceText.focus(); });
+        els.sampleButton.addEventListener("click", () => {
+          els.sourceText.value = sampleText;
+          recognize();
+          els.sourceText.focus();
+        });
         els.toggleAll.addEventListener("click", () => {
-          const shouldEnable = recognizers.some(item => !enabledRecognizerIds.has(item.id));
+          const shouldEnable = recognizers.some(
+            (item) => !enabledRecognizerIds.has(item.id),
+          );
           enabledRecognizerIds.clear();
-          if (shouldEnable) recognizers.forEach(item => enabledRecognizerIds.add(item.id));
+          if (shouldEnable)
+            recognizers.forEach((item) => enabledRecognizerIds.add(item.id));
           renderRecognizerControls();
           syncToggleAllLabel();
           scheduleRecognition();
         });
-        els.resultsList.addEventListener("click", event => {
+        els.resultsList.addEventListener("click", (event) => {
           const toggle = event.target.closest("[data-result-toggle]");
           if (!toggle) return;
           const id = toggle.dataset.resultToggle;
@@ -2073,7 +3412,7 @@ This request is urgent, but approval is pending a final identity review.`;
           selectEntity(id, false);
           renderResults();
         });
-        els.resultFilterChips.addEventListener("click", event => {
+        els.resultFilterChips.addEventListener("click", (event) => {
           const filter = event.target.closest("[data-result-tag]");
           if (!filter) return;
           activeTagFilter = filter.dataset.resultTag;
@@ -2081,20 +3420,23 @@ This request is urgent, but approval is pending a final identity review.`;
         });
         els.confidenceFilter.addEventListener("change", renderResults);
         els.reviewMode.addEventListener("click", () => {
-          els.confidenceFilter.value = els.confidenceFilter.value === "review" ? "all" : "review";
+          els.confidenceFilter.value =
+            els.confidenceFilter.value === "review" ? "all" : "review";
           renderResults();
         });
         els.copyResults.addEventListener("click", copyVisibleResults);
         els.exportResults.addEventListener("click", downloadVisibleResults);
-        els.registerForm.addEventListener("submit", event => {
+        els.registerForm.addEventListener("submit", (event) => {
           event.preventDefault();
           if (registerCurrentPattern()) els.registerDialog.close();
         });
-        els.cancelRegister.addEventListener("click", () => els.registerDialog.close());
-        els.registerDialog.addEventListener("click", event => {
+        els.cancelRegister.addEventListener("click", () =>
+          els.registerDialog.close(),
+        );
+        els.registerDialog.addEventListener("click", (event) => {
           if (event.target === els.registerDialog) els.registerDialog.close();
         });
-        els.renameForm.addEventListener("submit", event => {
+        els.renameForm.addEventListener("submit", (event) => {
           event.preventDefault();
           saveRenamedPattern();
         });
@@ -2102,14 +3444,17 @@ This request is urgent, but approval is pending a final identity review.`;
           renamingPatternId = null;
           els.renameDialog.close();
         });
-        els.renameDialog.addEventListener("click", event => {
+        els.renameDialog.addEventListener("click", (event) => {
           if (event.target === els.renameDialog) {
             renamingPatternId = null;
             els.renameDialog.close();
           }
         });
-        document.addEventListener("keydown", event => {
-          if ((event.metaKey || event.ctrlKey) && event.key === "Enter") { event.preventDefault(); recognize(); }
+        document.addEventListener("keydown", (event) => {
+          if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
+            event.preventDefault();
+            recognize();
+          }
         });
         function applyTheme(theme, persist = true) {
           currentTheme = theme;
@@ -2117,26 +3462,40 @@ This request is urgent, but approval is pending a final identity review.`;
           document.documentElement.classList.toggle("light", isLight);
           document.documentElement.classList.toggle("dark", !isLight);
           els.themeButton.setAttribute("aria-pressed", String(isLight));
-          els.themeButton.setAttribute("aria-label", `Switch to ${isLight ? "dark" : "light"} mode`);
+          els.themeButton.setAttribute(
+            "aria-label",
+            `Switch to ${isLight ? "dark" : "light"} mode`,
+          );
           els.themeButton.innerHTML = isLight
             ? '<svg aria-hidden="true" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8Z"/></svg>'
             : '<svg aria-hidden="true" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="4"/><path stroke-linecap="round" d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/></svg>';
-          document.getElementById("themeTooltipText").textContent = `Switch to ${isLight ? "dark" : "light"} mode`;
+          document.getElementById("themeTooltipText").textContent =
+            `Switch to ${isLight ? "dark" : "light"} mode`;
           if (persist) {
-            try { localStorage.setItem("console-ner-theme", theme); } catch {}
+            try {
+              localStorage.setItem("console-ner-theme", theme);
+            } catch {}
           }
         }
 
-        els.themeButton.addEventListener("click", () => applyTheme(currentTheme === "dark" ? "light" : "dark"));
-        els.toggleLeftColumn.addEventListener("click", () => togglePanel("left"));
-        els.toggleRightColumn.addEventListener("click", () => togglePanel("right"));
+        els.themeButton.addEventListener("click", () =>
+          applyTheme(currentTheme === "dark" ? "light" : "dark"),
+        );
+        els.toggleLeftColumn.addEventListener("click", () =>
+          togglePanel("left"),
+        );
+        els.toggleRightColumn.addEventListener("click", () =>
+          togglePanel("right"),
+        );
 
         applyTheme(currentTheme, false);
         recognize();
 
         async function checkForDemoUpdate(previousVersion) {
           try {
-            const response = await fetch("/__demo_version", { cache: "no-store" });
+            const response = await fetch("/__demo_version", {
+              cache: "no-store",
+            });
             if (!response.ok) return;
             const state = await response.json();
             if (!state.enabled) return;
@@ -2150,7 +3509,10 @@ This request is urgent, but approval is pending a final identity review.`;
           }
         }
 
-        if (window.location.protocol === "http:" || window.location.protocol === "https:") {
+        if (
+          window.location.protocol === "http:" ||
+          window.location.protocol === "https:"
+        ) {
           checkForDemoUpdate(null);
         }
       })();
