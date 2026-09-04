@@ -79,7 +79,7 @@
       }
 
       .app-grid {
-        --left-width: 224px;
+        --left-width: 240px;
         --right-width: 352px;
         display: grid;
         grid-template-columns: var(--left-width) minmax(420px, 1fr) var(--right-width);
@@ -110,7 +110,11 @@
 
       header { background: #090d14; }
       footer { background: #080c12; }
-      .left-column { background: #0a0f17; }
+      .left-column {
+        display: flex;
+        flex-direction: column;
+        background: #0a0f17;
+      }
 
       .right-column {
         display: flex;
@@ -678,27 +682,67 @@
       .panel-toggle svg { transition: transform 160ms ease; }
       .panel-toggle.is-collapsed svg { transform: scaleX(-1); }
 
-      .recognizer-group-row {
-        display: flex;
-        align-items: center;
-        min-height: 32px;
-        border-radius: 7px;
-        padding: 0 4px 0 6px;
-        background: rgba(30, 41, 59, .28);
+      .settings-section {
+        padding: 12px;
+        border-bottom: 1px solid var(--line);
       }
 
-      .recognizer-group-row:hover { background: rgba(30, 41, 59, .5); }
+      .settings-section-header {
+        display: flex;
+        min-height: 28px;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        margin-bottom: 8px;
+      }
+
+      .settings-surface {
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: rgba(12, 18, 28, .72);
+      }
+
+      #recognizerList > * + * { border-top: 1px solid var(--line); }
+
+      .recognizer-row {
+        position: relative;
+        display: grid;
+        grid-template-columns: 15px minmax(0, 1fr) auto;
+        min-height: 36px;
+        align-items: center;
+        column-gap: 8px;
+        padding: 0 8px 0 10px;
+        transition: background 120ms ease;
+      }
+
+      .recognizer-row:hover { background: rgba(30, 41, 59, .42); }
+      .recognizer-row.has-actions { padding-right: 62px; }
+
+      .recognizer-checkbox {
+        width: 14px;
+        height: 14px;
+        margin: 0;
+        flex: none;
+      }
+
+      .recognizer-children {
+        border-top: 1px solid var(--line);
+        background: rgba(7, 10, 15, .24);
+      }
+
+      .recognizer-children .recognizer-row {
+        min-height: 34px;
+        padding-left: 24px;
+      }
+
+      .recognizer-children .recognizer-row + .recognizer-row { border-top: 1px solid rgba(32, 42, 56, .7); }
       .recognizer-group-chevron { transition: transform 140ms ease; }
       [aria-expanded="true"] > .recognizer-group-chevron { transform: rotate(90deg); }
 
-      .recognizer-actions,
-      .recognizer-actions-spacer {
-        width: 52px;
-        flex: 0 0 52px;
-        margin-left: 4px;
-      }
-
       .recognizer-actions {
+        position: absolute;
+        right: 6px;
         display: flex;
         align-items: center;
         gap: 4px;
@@ -707,10 +751,63 @@
         transition: opacity 120ms ease;
       }
 
-      .group:hover > .recognizer-actions,
-      .group:focus-within > .recognizer-actions {
+      .recognizer-row:hover > .recognizer-actions,
+      .recognizer-row:focus-within > .recognizer-actions {
         opacity: 1;
         pointer-events: auto;
+      }
+
+      .setting-row {
+        display: grid;
+        grid-template-columns: 28px minmax(0, 1fr) 34px;
+        min-height: 52px;
+        align-items: center;
+        gap: 9px;
+        padding: 7px 9px;
+        cursor: pointer;
+      }
+
+      .setting-row + .setting-row { border-top: 1px solid var(--line); }
+      .setting-row:hover { background: rgba(30, 41, 59, .34); }
+
+      .setting-icon {
+        display: inline-flex;
+        width: 28px;
+        height: 28px;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid rgba(100, 116, 139, .22);
+        border-radius: 7px;
+        background: rgba(30, 41, 59, .4);
+        color: #8492a8;
+      }
+
+      .confidence-key {
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: rgba(12, 18, 28, .72);
+        padding: 9px 10px;
+      }
+
+      .confidence-key-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 6px;
+      }
+
+      .confidence-key-item {
+        display: grid;
+        grid-template-columns: 6px minmax(0, 1fr);
+        align-items: center;
+        column-gap: 5px;
+        font-size: 9px;
+        color: #94a3b8;
+      }
+
+      .confidence-key-item small {
+        grid-column: 2;
+        color: #556277;
+        font: 8px/1.2 "SFMono-Regular", Consolas, monospace;
       }
 
       .header-action {
@@ -821,8 +918,13 @@
 
       html.light .workbench-dialog::backdrop { background: rgba(15, 23, 42, .35); }
       html.light .dialog-input { border-color: #cbd5e1; background: #ffffff; color: #0f172a; }
-      html.light .recognizer-group-row { background: rgba(226, 232, 240, .55); }
-      html.light .recognizer-group-row:hover { background: rgba(226, 232, 240, .85); }
+      html.light .settings-surface,
+      html.light .confidence-key { background: rgba(255, 255, 255, .78); }
+      html.light .recognizer-row:hover,
+      html.light .setting-row:hover { background: rgba(226, 232, 240, .55); }
+      html.light .recognizer-children { background: rgba(241, 245, 249, .72); }
+      html.light .recognizer-children .recognizer-row + .recognizer-row { border-color: var(--line); }
+      html.light .setting-icon { border-color: #dce4ef; background: #f1f5f9; color: #64748b; }
       html.light .filter-chip,
       html.light .result-select { border-color: #cbd5e1; background: #ffffff; color: #64748b; }
       html.light .filter-chip:hover,
@@ -909,7 +1011,7 @@
       html.light .text-rose-300 { color: #be123c !important; }
 
       @media (max-width: 1080px) {
-        .app-grid { --left-width: 208px; --right-width: 328px; }
+        .app-grid { --left-width: 220px; --right-width: 328px; }
         .app-grid.left-collapsed { --left-width: 0px; }
         .app-grid.right-collapsed { --right-width: 0px; }
       }
@@ -961,70 +1063,89 @@
       </header>
 
       <main id="appGrid" class="app-grid">
-        <aside class="column left-column thin-scrollbar bg-[#0a0f17] p-3" aria-label="Recognition settings">
-          <section>
-            <div class="mb-2.5 flex items-center justify-between">
-              <h2 class="micro-label text-slate-400">Recognizers</h2>
-              <button id="toggleAll" type="button" class="text-[11px] font-medium text-blue-400 hover:text-blue-300">Disable all</button>
+        <aside class="column left-column thin-scrollbar bg-[#0a0f17]" aria-label="Recognition settings">
+          <section class="settings-section">
+            <div class="settings-section-header">
+              <div>
+                <h2 class="text-xs font-semibold text-slate-200">Recognizers</h2>
+                <p id="recognizerSummary" class="mt-0.5 text-[9px] text-slate-600">All active</p>
+              </div>
+              <button id="toggleAll" type="button" class="header-action h-7 border border-slate-700 bg-slate-900/70 px-2 text-[9px] font-semibold text-blue-300 transition hover:border-blue-400/40 hover:bg-blue-400/10">Disable all</button>
             </div>
-            <div id="recognizerList" class="space-y-1"></div>
+            <div id="recognizerList" class="settings-surface"></div>
           </section>
 
-          <hr class="my-4 border-slate-800" />
-
-          <section class="space-y-3">
-            <h2 class="micro-label text-slate-400">Resolution</h2>
-            <label class="flex cursor-pointer items-start justify-between gap-3 rounded-lg px-1 py-1.5">
-              <span>
-                <span class="block text-xs font-medium text-slate-300">Resolve overlaps</span>
-                <span class="mt-0.5 block text-[10px] leading-4 text-slate-500">Keep the highest-confidence span</span>
-              </span>
-              <span class="relative mt-0.5 inline-flex h-5 w-9 shrink-0 items-center">
-                <input id="resolveOverlaps" type="checkbox" checked class="toggle-checkbox peer absolute right-4 h-5 w-5 cursor-pointer appearance-none rounded-full border-2 border-slate-500 bg-white transition-all" />
-                <span class="toggle-track h-4 w-8 rounded-full bg-slate-700 transition-colors"></span>
-              </span>
-            </label>
-            <label class="flex cursor-pointer items-start justify-between gap-3 rounded-lg px-1 py-1.5">
-              <span>
-                <span class="block text-xs font-medium text-slate-300">Recognize as you type</span>
-                <span class="mt-0.5 block text-[10px] leading-4 text-slate-500">Update results without running manually</span>
-              </span>
-              <span class="relative mt-0.5 inline-flex h-5 w-9 shrink-0 items-center">
-                <input id="liveMode" type="checkbox" checked class="toggle-checkbox peer absolute right-4 h-5 w-5 cursor-pointer appearance-none rounded-full border-2 border-slate-500 bg-white transition-all" />
-                <span class="toggle-track h-4 w-8 rounded-full bg-slate-700 transition-colors"></span>
-              </span>
-            </label>
-            <label class="flex cursor-pointer items-start justify-between gap-3 rounded-lg px-1 py-1.5">
-              <span class="min-w-0">
-                <span class="block text-xs font-medium text-slate-300">Server assist</span>
-                <span id="serverStatus" class="mt-0.5 flex items-center gap-1.5 text-[10px] leading-4 text-slate-500">
-                  <i id="serverStatusDot" class="h-1.5 w-1.5 shrink-0 rounded-full bg-slate-600"></i>
-                  <span id="serverStatusText" class="truncate">Optional API</span>
+          <section class="settings-section">
+            <div class="settings-section-header">
+              <div>
+                <h2 class="text-xs font-semibold text-slate-200">Processing</h2>
+                <p class="mt-0.5 text-[9px] text-slate-600">Recognition behavior</p>
+              </div>
+            </div>
+            <div class="settings-surface">
+              <label class="setting-row">
+                <span class="setting-icon">
+                  <svg aria-hidden="true" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="11" height="11" rx="2"/><rect x="9" y="9" width="11" height="11" rx="2"/></svg>
                 </span>
-              </span>
-              <span class="relative mt-0.5 inline-flex h-5 w-9 shrink-0 items-center">
-                <input id="serverAssist" type="checkbox" checked class="toggle-checkbox peer absolute right-4 h-5 w-5 cursor-pointer appearance-none rounded-full border-2 border-slate-500 bg-white transition-all" />
-                <span class="toggle-track h-4 w-8 rounded-full bg-slate-700 transition-colors"></span>
-              </span>
-            </label>
+                <span class="min-w-0">
+                  <span class="block truncate text-[11px] font-medium text-slate-300">Resolve overlaps</span>
+                  <span class="mt-0.5 block truncate text-[9px] text-slate-600">Highest confidence wins</span>
+                </span>
+                <span class="relative inline-flex h-5 w-9 shrink-0 items-center">
+                  <input id="resolveOverlaps" type="checkbox" checked class="toggle-checkbox peer absolute right-4 h-5 w-5 cursor-pointer appearance-none rounded-full border-2 border-slate-500 bg-white transition-all" />
+                  <span class="toggle-track h-4 w-8 rounded-full bg-slate-700 transition-colors"></span>
+                </span>
+              </label>
+              <label class="setting-row">
+                <span class="setting-icon">
+                  <svg aria-hidden="true" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="m13 2-8 12h7l-1 8 8-12h-7l1-8Z"/></svg>
+                </span>
+                <span class="min-w-0">
+                  <span class="block truncate text-[11px] font-medium text-slate-300">Live recognition</span>
+                  <span class="mt-0.5 block truncate text-[9px] text-slate-600">Update while typing</span>
+                </span>
+                <span class="relative inline-flex h-5 w-9 shrink-0 items-center">
+                  <input id="liveMode" type="checkbox" checked class="toggle-checkbox peer absolute right-4 h-5 w-5 cursor-pointer appearance-none rounded-full border-2 border-slate-500 bg-white transition-all" />
+                  <span class="toggle-track h-4 w-8 rounded-full bg-slate-700 transition-colors"></span>
+                </span>
+              </label>
+              <label class="setting-row">
+                <span class="setting-icon">
+                  <svg aria-hidden="true" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><ellipse cx="12" cy="5" rx="7" ry="3"/><path d="M5 5v6c0 1.66 3.13 3 7 3s7-1.34 7-3V5M5 11v6c0 1.66 3.13 3 7 3s7-1.34 7-3v-6"/></svg>
+                </span>
+                <span class="min-w-0">
+                  <span class="block truncate text-[11px] font-medium text-slate-300">Server assist</span>
+                  <span id="serverStatus" class="mt-0.5 flex items-center gap-1.5 text-[9px] text-slate-600">
+                    <i id="serverStatusDot" class="h-1.5 w-1.5 shrink-0 rounded-full bg-slate-600"></i>
+                    <span id="serverStatusText" class="truncate">Optional API</span>
+                  </span>
+                </span>
+                <span class="relative inline-flex h-5 w-9 shrink-0 items-center">
+                  <input id="serverAssist" type="checkbox" checked class="toggle-checkbox peer absolute right-4 h-5 w-5 cursor-pointer appearance-none rounded-full border-2 border-slate-500 bg-white transition-all" />
+                  <span class="toggle-track h-4 w-8 rounded-full bg-slate-700 transition-colors"></span>
+                </span>
+              </label>
+            </div>
           </section>
 
-          <button id="sampleButton" type="button" class="header-action mt-4 w-full gap-2 border border-slate-700 bg-slate-900/70 px-3 text-xs font-medium text-slate-300 transition hover:border-slate-600 hover:bg-slate-800 hover:text-slate-100">
-            <svg aria-hidden="true" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4 5.5A2.5 2.5 0 0 1 6.5 3H18a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6.5A2.5 2.5 0 0 1 4 18.5v-13Z"/><path stroke-linecap="round" d="M4 18.5A2.5 2.5 0 0 1 6.5 16H20M8 7h8m-8 4h5"/></svg>
-            Load sample
-          </button>
+          <section class="settings-section mt-auto border-b-0">
+            <button id="sampleButton" type="button" class="header-action mb-2.5 w-full gap-2 border border-slate-700 bg-slate-900/70 px-3 text-[11px] font-medium text-slate-300 transition hover:border-slate-600 hover:bg-slate-800 hover:text-slate-100">
+              <svg aria-hidden="true" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4 5.5A2.5 2.5 0 0 1 6.5 3H18a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6.5A2.5 2.5 0 0 1 4 18.5v-13Z"/><path stroke-linecap="round" d="M4 18.5A2.5 2.5 0 0 1 6.5 16H20M8 7h8m-8 4h5"/></svg>
+              Load sample
+            </button>
 
-          <div class="mt-2 rounded-lg border border-blue-400/10 bg-blue-400/[0.045] p-2.5">
-            <div class="mb-1.5 flex items-center gap-2 text-[11px] font-semibold text-blue-200">
-              <svg aria-hidden="true" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path stroke-linecap="round" d="M12 11v5m0-8h.01"/></svg>
-              Confidence colors
+            <div class="confidence-key">
+              <div class="mb-2 flex items-center justify-between">
+                <span class="text-[10px] font-semibold text-slate-400">Confidence</span>
+                <span class="text-[8px] text-slate-600">Match certainty</span>
+              </div>
+              <div class="confidence-key-grid">
+                <span class="confidence-key-item"><i class="h-1.5 w-1.5 rounded-full bg-emerald-400"></i><span>High</span><small>90%+</small></span>
+                <span class="confidence-key-item"><i class="h-1.5 w-1.5 rounded-full bg-amber-400"></i><span>Review</span><small>75–89%</small></span>
+                <span class="confidence-key-item"><i class="h-1.5 w-1.5 rounded-full bg-rose-400"></i><span>Low</span><small>&lt;75%</small></span>
+              </div>
             </div>
-            <div class="space-y-1.5 text-[10px] text-slate-500">
-              <div class="flex items-center justify-between"><span class="flex items-center gap-2"><i class="h-1.5 w-1.5 rounded-full bg-emerald-400"></i>High</span><span>90–100%</span></div>
-              <div class="flex items-center justify-between"><span class="flex items-center gap-2"><i class="h-1.5 w-1.5 rounded-full bg-amber-400"></i>Review</span><span>75–89%</span></div>
-              <div class="flex items-center justify-between"><span class="flex items-center gap-2"><i class="h-1.5 w-1.5 rounded-full bg-rose-400"></i>Low</span><span>&lt; 75%</span></div>
-            </div>
-          </div>
+          </section>
         </aside>
 
         <section class="column center-column" aria-label="Pattern and source text editor">
@@ -1202,7 +1323,7 @@ This request is urgent, but approval is pending a final identity review.`;
         ];
 
         const els = Object.fromEntries([
-          "appGrid", "recognizerList", "toggleAll", "customPatternName", "customTag", "confidenceSlider", "confidenceOutput",
+          "appGrid", "recognizerList", "recognizerSummary", "toggleAll", "customPatternName", "customTag", "confidenceSlider", "confidenceOutput",
           "resolveOverlaps", "liveMode", "serverAssist", "serverStatus", "serverStatusDot", "serverStatusText",
           "patternInput", "patternStatus", "registerPattern", "sourceText", "entityTooltip",
           "registerDialog", "registerForm", "registerPatternPreview", "cancelRegister", "savePattern",
@@ -1263,15 +1384,15 @@ This request is urgent, but approval is pending a final identity review.`;
           const itemRow = (item, nested = false) => {
             const shortLabel = nested ? item.label.replace(/^.*?·\s*/, "") : item.label;
             return `
-              <div class="group flex items-center rounded-md py-1.5 ${nested ? "pl-5 pr-1" : "px-1.5"} transition hover:bg-slate-800/50">
-                <label class="flex min-w-0 flex-1 cursor-pointer items-center" for="recognizer-${escapeHTML(item.id)}">
-                  <input id="recognizer-${escapeHTML(item.id)}" data-recognizer="${escapeHTML(item.id)}" type="checkbox" ${enabledRecognizerIds.has(item.id) ? "checked" : ""} class="mr-2 h-3.5 w-3.5 shrink-0 rounded border-slate-600 bg-slate-800 text-blue-500 focus:ring-1 focus:ring-blue-500 focus:ring-offset-0" />
-                  <span class="block min-w-0 truncate text-xs font-medium text-slate-300 group-hover:text-slate-100" title="${escapeHTML(item.label)}">${escapeHTML(shortLabel)}</span>
+              <div class="recognizer-row ${item.registered ? "has-actions" : ""}">
+                <input id="recognizer-${escapeHTML(item.id)}" data-recognizer="${escapeHTML(item.id)}" type="checkbox" ${enabledRecognizerIds.has(item.id) ? "checked" : ""} class="recognizer-checkbox rounded border-slate-600 bg-slate-800 text-blue-500 focus:ring-1 focus:ring-blue-500 focus:ring-offset-0" />
+                <label class="min-w-0 cursor-pointer" for="recognizer-${escapeHTML(item.id)}">
+                  <span class="block truncate text-[11px] font-medium text-slate-300" title="${escapeHTML(item.label)}">${escapeHTML(shortLabel)}</span>
                 </label>
                 ${item.registered ? `<span class="recognizer-actions">
                   <button type="button" data-rename-pattern="${escapeHTML(item.id)}" class="inline-flex h-6 w-6 items-center justify-center rounded text-slate-500 transition hover:bg-blue-500/10 hover:text-blue-400" aria-label="Rename ${escapeHTML(item.label)} recognizer" title="Rename recognizer"><svg aria-hidden="true" class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="m14 5 5 5M4 20l4.25-1 10-10a2.12 2.12 0 0 0-3-3l-10 10L4 20Z"/></svg></button>
                   <button type="button" data-remove-pattern="${escapeHTML(item.id)}" class="inline-flex h-6 w-6 items-center justify-center rounded text-slate-500 transition hover:bg-rose-500/10 hover:text-rose-400" aria-label="Remove ${escapeHTML(item.label)} pattern" title="Remove recognizer"><svg aria-hidden="true" class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" d="M6 6l12 12M18 6 6 18"/></svg></button>
-                </span>` : '<span class="recognizer-actions-spacer" aria-hidden="true"></span>'}
+                </span>` : ""}
               </div>`;
           };
 
@@ -1282,18 +1403,18 @@ This request is urgent, but approval is pending a final identity review.`;
             const enabledCount = items.filter(item => enabledRecognizerIds.has(item.id)).length;
             const groupLabel = tag.replace(/_/g, " ").replace(/\b\w/g, letter => letter.toUpperCase());
             return `
-              <section>
-                <div class="recognizer-group-row">
-                  <label class="flex min-w-0 flex-1 cursor-pointer items-center" for="${escapeHTML(safeGroupId)}-toggle">
-                    <input id="${escapeHTML(safeGroupId)}-toggle" data-recognizer-group="${escapeHTML(tag)}" type="checkbox" ${enabledCount === items.length ? "checked" : ""} class="mr-2 h-3.5 w-3.5 shrink-0 rounded border-slate-600 bg-slate-800 text-blue-500 focus:ring-1 focus:ring-blue-500 focus:ring-offset-0" />
-                    <span class="truncate text-xs font-semibold text-slate-300">${escapeHTML(groupLabel)}</span>
-                    <span class="ml-1.5 rounded bg-slate-800 px-1.5 py-0.5 font-mono text-[9px] text-slate-500">${enabledCount}/${items.length}</span>
+              <section class="recognizer-group">
+                <div class="recognizer-row recognizer-group-row">
+                  <input id="${escapeHTML(safeGroupId)}-toggle" data-recognizer-group="${escapeHTML(tag)}" type="checkbox" ${enabledCount === items.length ? "checked" : ""} class="recognizer-checkbox rounded border-slate-600 bg-slate-800 text-blue-500 focus:ring-1 focus:ring-blue-500 focus:ring-offset-0" />
+                  <label class="flex min-w-0 cursor-pointer items-center" for="${escapeHTML(safeGroupId)}-toggle">
+                    <span class="truncate text-[11px] font-semibold text-slate-300">${escapeHTML(groupLabel)}</span>
+                    <span class="ml-1.5 font-mono text-[8px] text-slate-600">${enabledCount}/${items.length}</span>
                   </label>
                   <button type="button" data-toggle-recognizer-group="${escapeHTML(tag)}" class="flex h-6 w-6 items-center justify-center rounded text-slate-500 hover:bg-slate-700/60 hover:text-slate-200" aria-expanded="${String(!collapsed)}" aria-controls="${escapeHTML(safeGroupId)}" aria-label="${collapsed ? "Expand" : "Collapse"} ${escapeHTML(groupLabel)} recognizers">
                     <svg aria-hidden="true" class="recognizer-group-chevron h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="m9 5 7 7-7 7"/></svg>
                   </button>
                 </div>
-                <div id="${escapeHTML(safeGroupId)}" ${collapsed ? "hidden" : ""}>${items.map(item => itemRow(item, true)).join("")}</div>
+                <div id="${escapeHTML(safeGroupId)}" class="recognizer-children" ${collapsed ? "hidden" : ""}>${items.map(item => itemRow(item, true)).join("")}</div>
               </section>`;
           }).join("");
 
@@ -1806,7 +1927,9 @@ This request is urgent, but approval is pending a final identity review.`;
 
         function syncToggleAllLabel() {
           const allEnabled = recognizers.length > 0 && recognizers.every(item => enabledRecognizerIds.has(item.id));
+          const enabledCount = recognizers.filter(item => enabledRecognizerIds.has(item.id)).length;
           els.toggleAll.textContent = allEnabled ? "Disable all" : "Enable all";
+          els.recognizerSummary.textContent = `${enabledCount} of ${recognizers.length} active`;
         }
 
         function exportableResults() {
