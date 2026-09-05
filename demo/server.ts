@@ -37,7 +37,7 @@ const knownLoans = new Set(["8041234567", "8058675309"]);
 const knownCases = new Set(["CN-2026-004218", "CN-2026-001337"]);
 const knownOrganizations = new Set([
   "northstar analytics llc",
-  "contoso capital",
+  "navy federal credit union",
   "fabrikam systems inc",
 ]);
 

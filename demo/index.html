@@ -3397,7 +3397,7 @@ Additional deadlines are 12 September 2026, 2026-09-03, 9/15/2026, and 30.09.202
             return;
           }
           window.clearTimeout(scheduleRecognition.timer);
-          scheduleRecognition.timer = window.setTimeout(recognize, 70);
+          scheduleRecognition.timer = window.setTimeout(recognize, 250);
         }
 
         function syncEditorScroll() {
@@ -3642,7 +3642,10 @@ Additional deadlines are 12 September 2026, 2026-09-03, 9/15/2026, and 30.09.202
             recognize();
           }
         });
-        els.sourceText.addEventListener("input", scheduleRecognition);
+        els.sourceText.addEventListener("input", () => {
+          renderHighlights(els.sourceText.value, []);
+          scheduleRecognition();
+        });
         els.sourceText.addEventListener("scroll", syncEditorScroll);
         els.highlightLayer.addEventListener("mouseover", (event) => {
           const mark = event.target.closest(".entity-mark");
