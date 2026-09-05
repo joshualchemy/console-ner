@@ -1,6 +1,17 @@
 export { ConsoleNER } from "./core/ConsoleNER";
 export type { ConsoleNEROptions } from "./core/ConsoleNER";
-export { emailPattern, phonePattern } from "./patterns/builtins";
+export {
+  datePatterns,
+  emailPattern,
+  ipv4Pattern,
+  moneyPattern,
+  organizationPattern,
+  paymentCardPattern,
+  personPatterns,
+  phonePattern,
+  postalAddressPattern,
+  routingNumberPattern,
+} from "./patterns/builtins";
 export type { BuiltInPattern, BuiltInPatternOptions } from "./patterns/builtins";
 export { regexPattern } from "./patterns/regexPattern";
 export type { Entity } from "./types/Entity";

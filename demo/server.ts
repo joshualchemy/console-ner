@@ -1,4 +1,14 @@
-import { ConsoleNER, regexPattern } from "../src/index";
+import {
+  ConsoleNER,
+  ipv4Pattern,
+  organizationPattern,
+  paymentCardPattern,
+  postalAddressPattern,
+  regexPattern,
+  routingNumberPattern,
+  type BuiltInPattern,
+  type EntityPattern,
+} from "../src/index";
 
 type DemoTag =
   | "case_reference"
@@ -127,7 +137,29 @@ function assistedPattern(options: {
   });
 }
 
-serverNER.register([
+function assistedBuiltIn(
+  pattern: BuiltInPattern<DemoTag>,
+  evidence: string,
+): EntityPattern<DemoTag, DemoMetadata, MockServices> {
+  return {
+    ...pattern,
+    metadata: () => ({ assistance: "mock-server", evidence }),
+    validator: {
+      id: `${pattern.id}:mock-validator`,
+      runBelowConfidence: 1,
+      async validate(entity, context) {
+        const valid = await context.services.verify(pattern.tag, entity.normalizedValue);
+        return {
+          valid,
+          confidence: valid ? Math.max(.96, entity.confidence) : .05,
+          metadata: { evidence: valid ? evidence : "Mock validation rejected the candidate" },
+        };
+      },
+    },
+  };
+}
+
+const serverPatterns = [
   assistedPattern({
     id: "server-loan-directory",
     tag: "loan_number",
@@ -144,46 +176,32 @@ serverNER.register([
     normalize: (value) => value.toUpperCase(),
     evidence: "Matched the mock case directory",
   }),
-  assistedPattern({
-    id: "server-organization-directory",
-    tag: "organization",
-    regex: /\b(?:[A-Z][\p{L}\d&'.-]*\s+){1,4}(?:Analytics|Bank|Capital|Company|Corp\.?|Corporation|Holdings|Labs?|LLC|Systems|Inc\.?)\b/gu,
-    confidence: .64,
-    normalize: (value) => value.replace(/\.$/, ""),
-    evidence: "Matched the mock organization directory",
-  }),
-  assistedPattern({
-    id: "server-payment-luhn",
-    tag: "payment_card",
-    regex: /(?<!\d)(?:\d[ -]?){12,18}\d(?!\d)/g,
-    confidence: .58,
-    normalize: digits,
-    evidence: "Passed the Luhn checksum",
-  }),
-  assistedPattern({
-    id: "server-routing-checksum",
-    tag: "routing_number",
-    regex: /(?<!\d)\d{9}(?!\d)/g,
-    confidence: .6,
-    normalize: digits,
-    evidence: "Passed the ABA routing checksum",
-  }),
-  assistedPattern({
-    id: "server-ip-octets",
-    tag: "ip_address",
-    regex: /\b(?:\d{1,3}\.){3}\d{1,3}\b/g,
-    confidence: .66,
-    evidence: "All IPv4 octets are in range",
-  }),
-  assistedPattern({
-    id: "server-us-address",
-    tag: "postal_address",
-    regex: /\b\d{1,6}\s+(?:[NSEW]\.?(?:\s+|$))?(?:[A-Z][\p{L}'-]*\s+){1,4}(?:St(?:reet)?|Ave(?:nue)?|Blvd|Boulevard|Rd|Road|Dr|Drive|Ln|Lane)\.?,?\s+[A-Z][\p{L}'-]*(?:\s+[A-Z][\p{L}'-]*)*,\s*[A-Z]{2}\s+\d{5}(?:-\d{4})?\b/gu,
-    confidence: .62,
-    normalize: (value) => value.replace(/\s+/g, " ").trim(),
-    evidence: "State and ZIP combination passed mock address validation",
-  }),
-]);
+  assistedBuiltIn(
+    organizationPattern({ id: "server-organization-directory", tag: "organization" }),
+    "Matched the mock organization directory",
+  ),
+  assistedBuiltIn(
+    paymentCardPattern({ id: "server-payment-luhn", tag: "payment_card" }),
+    "Passed the Luhn checksum",
+  ),
+  assistedBuiltIn(
+    routingNumberPattern({ id: "server-routing-checksum", tag: "routing_number" }),
+    "Passed the ABA routing checksum",
+  ),
+  assistedBuiltIn(
+    ipv4Pattern({ id: "server-ip-octets", tag: "ip_address" }),
+    "All IPv4 octets are in range",
+  ),
+  assistedBuiltIn(
+    postalAddressPattern({ id: "server-us-address", tag: "postal_address" }),
+    "State and ZIP combination passed mock address validation",
+  ),
+] as const;
+
+serverNER.register(serverPatterns);
+const serverPatternIds = new Set(
+  serverPatterns.map((pattern) => pattern.id),
+);
 
 const corsHeaders = {
   "Access-Control-Allow-Headers": "Content-Type",
@@ -195,6 +213,15 @@ const corsHeaders = {
 const liveReloadEnabled = Bun.argv.includes("--live-reload");
 const liveReloadInstance = crypto.randomUUID();
 const demoFileUrl = new URL("./index.html", import.meta.url);
+const browserBuild = await Bun.build({
+  entrypoints: [new URL("../src/index.ts", import.meta.url).pathname],
+  format: "esm",
+  target: "browser",
+});
+if (!browserBuild.success || !browserBuild.outputs[0]) {
+  throw new Error("Unable to build the ConsoleNER browser bundle");
+}
+const browserBundle = await browserBuild.outputs[0].text();
 
 function json(data: unknown, status = 200): Response {
   return Response.json(data, { status, headers: corsHeaders });
@@ -219,15 +246,42 @@ const server = Bun.serve({
     if (request.method === "GET" && url.pathname === "/api/health") {
       return json({ ok: true, service: "console-ner-demo", mode: "mock" });
     }
+    if (request.method === "GET" && url.pathname === "/dist/index.js") {
+      return new Response(browserBundle, {
+        headers: {
+          "Cache-Control": liveReloadEnabled ? "no-store" : "no-cache",
+          "Content-Type": "text/javascript; charset=utf-8",
+        },
+      });
+    }
     if (request.method === "POST" && url.pathname === "/api/recognize") {
       const started = performance.now();
       try {
-        const body = await request.json() as { text?: unknown };
+        const body = await request.json() as { text?: unknown; recognizerIds?: unknown };
         if (typeof body.text !== "string") return json({ error: "Expected a text string" }, 400);
         if (body.text.length > 100_000) return json({ error: "Text is limited to 100,000 characters" }, 413);
+        if (
+          body.recognizerIds !== undefined &&
+          (!Array.isArray(body.recognizerIds) ||
+            !body.recognizerIds.every((id) => typeof id === "string"))
+        ) {
+          return json({ error: "Expected recognizerIds to be an array of strings" }, 400);
+        }
+
+        const recognizerIds = body.recognizerIds === undefined
+          ? [...serverPatternIds]
+          : [...new Set(body.recognizerIds as string[])];
+        const unknownRecognizerIds = recognizerIds.filter((id) => !serverPatternIds.has(id));
+        if (unknownRecognizerIds.length > 0) {
+          return json({
+            error: "Unknown backend recognizer",
+            recognizerIds: unknownRecognizerIds,
+          }, 400);
+        }
 
         const stats: RequestStats = { checks: 0 };
-        const result = await serverNER.recognizeAsync(body.text, { services: createServices(stats) });
+        const recognition = serverNER.recognize(body.text, { patternIds: recognizerIds });
+        const result = await serverNER.validate(recognition, { services: createServices(stats) });
         const entities = result.entities
           .filter((entity) => entity.validation?.status === "valid")
           .map((entity) => ({ ...entity, assisted: true, source: "server" }));

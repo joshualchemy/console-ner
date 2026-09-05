@@ -42,6 +42,22 @@ describe("registration and recognition", () => {
     expect(ner.recognize("abc 123", { excludeTags: ["alpha"] }).entities).toHaveLength(1);
   });
 
+  it("includes and excludes individual pattern IDs", () => {
+    const ner = new ConsoleNER<"word">().register([
+      { id: "first", tag: "word", pattern: /one/g },
+      { id: "second", tag: "word", pattern: /two/g },
+      { id: "third", tag: "word", pattern: /three/g },
+    ]);
+
+    const included = ner.recognize("one two three", { patternIds: ["first", "third"] });
+    expect(included.entities.map((entity) => entity.value)).toEqual(["one", "three"]);
+    expect(included.recognitionOptions?.patternIds).toEqual(["first", "third"]);
+
+    const excluded = ner.recognize("one two three", { excludePatternIds: ["second"] });
+    expect(excluded.entities.map((entity) => entity.value)).toEqual(["one", "three"]);
+    expect(excluded.recognitionOptions?.excludePatternIds).toEqual(["second"]);
+  });
+
   it("handles global, non-global, insensitive regexes and never mutates lastIndex", () => {
     const regex = /hello/gi;
     regex.lastIndex = 2;

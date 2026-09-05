@@ -4,6 +4,8 @@ import type { ResultValidationState } from "./Validation";
 export interface RecognitionOptions<TTag extends string = string> {
   readonly tags?: readonly TTag[];
   readonly excludeTags?: readonly TTag[];
+  readonly patternIds?: readonly string[];
+  readonly excludePatternIds?: readonly string[];
 }
 
 export interface RecognitionResult<
@@ -17,4 +19,3 @@ export interface RecognitionResult<
   readonly recognitionOptions?: Readonly<RecognitionOptions<TTag>>;
   readonly validation?: ResultValidationState;
 }
-

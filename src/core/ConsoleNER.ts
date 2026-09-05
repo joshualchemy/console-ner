@@ -98,12 +98,18 @@ export class ConsoleNER<
   ): RecognitionResult<TTag, TEntityMetadata, TResultMetadata> {
     const included = options.tags === undefined ? undefined : new Set<TTag>(options.tags);
     const excluded = options.excludeTags === undefined ? undefined : new Set<TTag>(options.excludeTags);
+    const includedPatterns =
+      options.patternIds === undefined ? undefined : new Set(options.patternIds);
+    const excludedPatterns =
+      options.excludePatternIds === undefined ? undefined : new Set(options.excludePatternIds);
     const patterns = this.#registry
       .all()
       .filter(
         (pattern) =>
           (included === undefined || included.has(pattern.tag)) &&
-          (excluded === undefined || !excluded.has(pattern.tag)),
+          (excluded === undefined || !excluded.has(pattern.tag)) &&
+          (includedPatterns === undefined || includedPatterns.has(pattern.id)) &&
+          (excludedPatterns === undefined || !excludedPatterns.has(pattern.id)),
       );
     const candidates = scan(text, patterns, this.#contextWindow, this.#defaultConfidence);
     const entities = resolveOverlaps(candidates).map<Entity<TTag, TEntityMetadata>>(
@@ -117,6 +123,10 @@ export class ConsoleNER<
       recognitionOptions: {
         ...(options.tags === undefined ? {} : { tags: [...options.tags] }),
         ...(options.excludeTags === undefined ? {} : { excludeTags: [...options.excludeTags] }),
+        ...(options.patternIds === undefined ? {} : { patternIds: [...options.patternIds] }),
+        ...(options.excludePatternIds === undefined
+          ? {}
+          : { excludePatternIds: [...options.excludePatternIds] }),
       },
       validation: { global: { status: "not_requested" } },
     };

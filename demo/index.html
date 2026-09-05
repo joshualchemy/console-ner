@@ -286,15 +286,15 @@
 
       .confidence-high {
         color: #9af0cf;
-        background: rgba(16, 185, 129, 0.2);
+        background-color: rgba(16, 185, 129, 0.2);
       }
       .confidence-medium {
         color: #ffe18a;
-        background: rgba(245, 158, 11, 0.2);
+        background-color: rgba(245, 158, 11, 0.2);
       }
       .confidence-low {
         color: #ffafbd;
-        background: rgba(244, 63, 94, 0.2);
+        background-color: rgba(244, 63, 94, 0.2);
       }
 
       .entity-mark.active {
@@ -305,64 +305,49 @@
 
       .entity-mark.server-assisted {
         border-bottom-color: transparent;
+        background-image: linear-gradient(currentColor, currentColor);
+        background-position: left bottom;
+        background-repeat: no-repeat;
+        background-size: 100% 2px;
+        -webkit-box-decoration-break: clone;
+        box-decoration-break: clone;
       }
 
       .entity-mark.server-assisted-enter {
-        animation: assisted-mark-enter 420ms cubic-bezier(0.22, 0.8, 0.24, 1)
-          both;
-      }
-
-      .entity-mark.server-assisted::after {
-        position: absolute;
-        right: 1px;
-        bottom: 0;
-        left: 1px;
-        height: 2px;
-        border-radius: 999px;
-        background: currentColor;
-        content: "";
-        pointer-events: none;
-      }
-
-      .entity-mark.server-assisted-enter::after {
-        transform-origin: left bottom;
-        animation: assisted-underline-enter 620ms
-          cubic-bezier(0.22, 0.8, 0.24, 1) both;
+        animation:
+          assisted-highlight-pop 440ms cubic-bezier(0.22, 0.8, 0.24, 1) both,
+          assisted-underline-enter 480ms cubic-bezier(0.22, 0.8, 0.24, 1)
+            both;
       }
 
       @keyframes assisted-underline-enter {
         0% {
-          opacity: 0.45;
-          transform: scaleX(0) scaleY(1);
-        }
-        72% {
-          opacity: 1;
-          transform: scaleX(1) scaleY(1);
-        }
-        86% {
-          transform: scaleX(1.018) scaleY(2.35);
+          background-size: 0% 2px;
         }
         100% {
-          transform: scaleX(1) scaleY(1);
+          background-size: 100% 2px;
         }
       }
 
-      @keyframes assisted-mark-enter {
+      @keyframes assisted-highlight-pop {
         0% {
           box-shadow: 0 0 0 0 transparent;
+          filter: brightness(1);
         }
-        52% {
-          box-shadow: 0 0 0 2px
-            color-mix(in srgb, currentColor 22%, transparent);
+        55% {
+          box-shadow:
+            0 0 0 1px color-mix(in srgb, currentColor 18%, transparent),
+            0 0 10px color-mix(in srgb, currentColor 12%, transparent);
+          filter: brightness(1.07);
         }
         100% {
           box-shadow: 0 0 0 0 transparent;
+          filter: brightness(1);
         }
       }
 
       @media (prefers-reduced-motion: reduce) {
-        .entity-mark.server-assisted-enter,
-        .entity-mark.server-assisted-enter::after {
+        .entity-mark.server-assisted-enter {
           animation: none;
         }
       }
@@ -623,7 +608,7 @@
         );
         padding: 0.125rem 0.375rem;
         color: color-mix(in srgb, var(--assist-color, #8997b7) 70%, #e2e8f0);
-        font-size: 8px;
+        font-size: 9px;
         font-weight: 700;
         letter-spacing: 0.05em;
         line-height: 1rem;
@@ -656,16 +641,45 @@
         width: 100%;
         align-items: center;
         gap: 10px;
-        padding: 10px 11px 10px 13px;
+        padding: 12px 12px 12px 14px;
         text-align: left;
       }
 
       .result-details {
-        margin: 0 11px 10px 25px;
-        padding: 10px 0 2px;
+        margin: 0 12px 12px 31px;
+        padding: 12px 0 3px;
         border-top: 1px solid var(--line);
+        font-size: 12px;
+        line-height: 1.5;
+      }
+
+      .result-details-grid {
+        display: grid;
+        grid-template-columns: 84px minmax(0, 1fr);
+        gap: 7px 12px;
+        font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      }
+
+      .result-details-grid dt {
+        margin: 0;
+        color: #718096;
+        font-family:
+          Inter,
+          ui-sans-serif,
+          system-ui,
+          sans-serif;
         font-size: 10px;
-        line-height: 1.55;
+        font-weight: 700;
+        letter-spacing: 0.055em;
+        line-height: 18px;
+        text-transform: uppercase;
+      }
+
+      .result-details-grid dd {
+        min-width: 0;
+        margin: 0;
+        color: #c3cede;
+        overflow-wrap: anywhere;
       }
 
       #resultsList:not(:empty) {
@@ -822,20 +836,101 @@
         position: fixed;
         z-index: 100;
         width: max-content;
-        max-width: min(280px, calc(100vw - 16px));
+        max-width: min(340px, calc(100vw - 16px));
         border: 1px solid #334155;
         border-radius: 8px;
         background: #111827;
-        padding: 11px 12px;
+        padding: 14px;
         color: #e2e8f0;
         box-shadow: 0 12px 32px rgba(0, 0, 0, 0.38);
-        font-size: 11px;
-        line-height: 1.55;
+        font-size: 12px;
+        line-height: 1.5;
+        pointer-events: auto;
+      }
+
+      #entityTooltip::before {
+        position: absolute;
+        left: var(--tooltip-arrow-left, 50%);
+        width: 10px;
+        height: 10px;
+        background: inherit;
+        content: "";
+        transform: translateX(-50%) rotate(45deg);
         pointer-events: none;
       }
 
+      #entityTooltip[data-placement="above"]::before {
+        bottom: -6px;
+        border-right: 1px solid #334155;
+        border-bottom: 1px solid #334155;
+      }
+
+      #entityTooltip[data-placement="below"]::before {
+        top: -6px;
+        border-top: 1px solid #334155;
+        border-left: 1px solid #334155;
+      }
+
       #entityTooltip code {
+        color: #c3cede;
+        font-size: 11px;
+        overflow-wrap: anywhere;
+      }
+
+      .entity-tooltip-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+      }
+
+      .entity-tooltip-tag {
+        display: flex;
+        align-items: center;
+        gap: 7px;
         font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.07em;
+        text-transform: uppercase;
+      }
+
+      .entity-tooltip-value {
+        max-width: 310px;
+        margin-top: 9px;
+        overflow: hidden;
+        color: #f1f5f9;
+        font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+        font-size: 13px;
+        font-weight: 600;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .entity-tooltip-details {
+        display: grid;
+        grid-template-columns: 82px minmax(0, 1fr);
+        gap: 5px 12px;
+        margin-top: 11px;
+        padding-top: 10px;
+        border-top: 1px solid #263244;
+      }
+
+      .entity-tooltip-details dt {
+        margin: 0;
+        color: #718096;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.055em;
+        text-transform: uppercase;
+      }
+
+      .entity-tooltip-details dd {
+        min-width: 0;
+        margin: 0;
+      }
+
+      .entity-tooltip-details code {
+        display: block;
       }
 
       #entityTooltip[hidden] {
@@ -929,6 +1024,20 @@
         flex: none;
       }
 
+      .recognizer-source-badge {
+        flex: none;
+        border: 1px solid rgba(96, 165, 250, 0.25);
+        border-radius: 999px;
+        background: rgba(59, 130, 246, 0.08);
+        padding: 1px 4px;
+        color: #93c5fd;
+        font-size: 7px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        line-height: 1.2;
+        text-transform: uppercase;
+      }
+
       .recognizer-children {
         border-top: 1px solid var(--line);
         background: rgba(7, 10, 15, 0.24);
@@ -997,31 +1106,97 @@
 
       .confidence-key {
         border: 1px solid var(--line);
-        border-radius: 10px;
-        background: rgba(12, 18, 28, 0.72);
-        padding: 9px 10px;
+        border-radius: 12px;
+        background: linear-gradient(
+          145deg,
+          rgba(18, 27, 40, 0.94),
+          rgba(10, 16, 25, 0.84)
+        );
+        padding: 12px;
+      }
+
+      .confidence-key-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding-bottom: 10px;
+      }
+
+      .confidence-key-icon {
+        display: inline-flex;
+        width: 30px;
+        height: 30px;
+        flex: 0 0 30px;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid rgba(120, 169, 255, 0.22);
+        border-radius: 8px;
+        background: rgba(79, 143, 255, 0.1);
+        color: var(--accent);
+      }
+
+      .confidence-key-title {
+        display: block;
+        color: #dce5f2;
+        font-size: 12px;
+        font-weight: 650;
+        line-height: 1.3;
+      }
+
+      .confidence-key-subtitle {
+        display: block;
+        margin-top: 2px;
+        color: #718096;
+        font-size: 10px;
+        line-height: 1.35;
       }
 
       .confidence-key-grid {
         display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 6px;
+        grid-template-columns: minmax(0, 1fr);
+        border-top: 1px solid var(--line);
       }
 
       .confidence-key-item {
         display: grid;
-        grid-template-columns: 6px minmax(0, 1fr);
+        grid-template-columns: 9px minmax(0, 1fr) auto;
         align-items: center;
-        column-gap: 5px;
+        gap: 10px;
+        min-height: 43px;
+        color: #c5d0df;
+      }
+
+      .confidence-key-item + .confidence-key-item {
+        border-top: 1px solid rgba(32, 42, 56, 0.72);
+      }
+
+      .confidence-key-dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 999px;
+        box-shadow: 0 0 0 4px rgba(148, 163, 184, 0.06);
+      }
+
+      .confidence-key-label strong {
+        display: block;
+        font-size: 11px;
+        font-weight: 650;
+        line-height: 1.3;
+      }
+
+      .confidence-key-label em {
+        display: block;
+        margin-top: 2px;
+        color: #718096;
         font-size: 9px;
-        color: #94a3b8;
+        font-style: normal;
+        line-height: 1.3;
       }
 
       .confidence-key-item small {
-        grid-column: 2;
-        color: #556277;
+        color: #8d9bb0;
         font:
-          8px/1.2 "SFMono-Regular",
+          10px/1.2 "SFMono-Regular",
           Consolas,
           monospace;
       }
@@ -1149,6 +1324,34 @@
         box-shadow: 0 12px 32px rgba(15, 23, 42, 0.16);
       }
 
+      html.light #entityTooltip[data-placement="above"]::before {
+        border-right-color: #cbd5e1;
+        border-bottom-color: #cbd5e1;
+      }
+
+      html.light #entityTooltip[data-placement="below"]::before {
+        border-top-color: #cbd5e1;
+        border-left-color: #cbd5e1;
+      }
+
+      html.light .entity-tooltip-value {
+        color: #0f172a;
+      }
+
+      html.light .entity-tooltip-details {
+        border-top-color: #e2e8f0;
+      }
+
+      html.light #entityTooltip code,
+      html.light .result-details-grid dd {
+        color: #334155;
+      }
+
+      html.light .entity-tooltip-details dt,
+      html.light .result-details-grid dt {
+        color: #64748b;
+      }
+
       html.light .workbench-dialog {
         border-color: #cbd5e1;
         background: #ffffff;
@@ -1168,6 +1371,27 @@
       html.light .confidence-key {
         background: rgba(255, 255, 255, 0.78);
       }
+      html.light .confidence-key-icon {
+        border-color: rgba(37, 99, 235, 0.2);
+        background: rgba(37, 99, 235, 0.07);
+        color: #2563eb;
+      }
+      html.light .confidence-key-title {
+        color: #1e293b;
+      }
+      html.light .confidence-key-subtitle,
+      html.light .confidence-key-label em {
+        color: #64748b;
+      }
+      html.light .confidence-key-item {
+        color: #334155;
+      }
+      html.light .confidence-key-item + .confidence-key-item {
+        border-color: #e2e8f0;
+      }
+      html.light .confidence-key-item small {
+        color: #475569;
+      }
       html.light .recognizer-row:hover,
       html.light .setting-row:hover {
         background: rgba(226, 232, 240, 0.55);
@@ -1177,6 +1401,11 @@
       }
       html.light .recognizer-children .recognizer-row + .recognizer-row {
         border-color: var(--line);
+      }
+      html.light .recognizer-source-badge {
+        border-color: rgba(37, 99, 235, 0.2);
+        background: rgba(37, 99, 235, 0.07);
+        color: #2563eb;
       }
       html.light .setting-icon {
         border-color: #dce4ef;
@@ -1272,15 +1501,15 @@
 
       html.light .confidence-high {
         color: #047857;
-        background: rgba(16, 185, 129, 0.15);
+        background-color: rgba(16, 185, 129, 0.15);
       }
       html.light .confidence-medium {
         color: #a16207;
-        background: rgba(245, 158, 11, 0.16);
+        background-color: rgba(245, 158, 11, 0.16);
       }
       html.light .confidence-low {
         color: #be123c;
-        background: rgba(244, 63, 94, 0.14);
+        background-color: rgba(244, 63, 94, 0.14);
       }
       html.light .kbd {
         border-color: #cbd5e1;
@@ -1712,24 +1941,43 @@
             </button>
 
             <div class="confidence-key">
-              <div class="mb-2 flex items-center justify-between">
-                <span class="text-[10px] font-semibold text-slate-400"
-                  >Confidence</span
-                >
-                <span class="text-[8px] text-slate-600">Match certainty</span>
+              <div class="confidence-key-header">
+                <span class="confidence-key-icon" aria-hidden="true">
+                  <svg
+                    class="h-4 w-4"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                  >
+                    <path stroke-linecap="round" d="M5 17V9m7 8V5m7 12v-5" />
+                  </svg>
+                </span>
+                <span>
+                  <strong class="confidence-key-title">Confidence</strong>
+                  <span class="confidence-key-subtitle"
+                    >How certain each match is</span
+                  >
+                </span>
               </div>
               <div class="confidence-key-grid">
                 <span class="confidence-key-item"
-                  ><i class="h-1.5 w-1.5 rounded-full bg-emerald-400"></i
-                  ><span>High</span><small>90%+</small></span
+                  ><i class="confidence-key-dot bg-emerald-400"></i
+                  ><span class="confidence-key-label"
+                    ><strong>High</strong><em>Strong match</em></span
+                  ><small>90–100%</small></span
                 >
                 <span class="confidence-key-item"
-                  ><i class="h-1.5 w-1.5 rounded-full bg-amber-400"></i
-                  ><span>Review</span><small>75–89%</small></span
+                  ><i class="confidence-key-dot bg-amber-400"></i
+                  ><span class="confidence-key-label"
+                    ><strong>Review</strong><em>Worth checking</em></span
+                  ><small>75–89%</small></span
                 >
                 <span class="confidence-key-item"
-                  ><i class="h-1.5 w-1.5 rounded-full bg-rose-400"></i
-                  ><span>Low</span><small>&lt;75%</small></span
+                  ><i class="confidence-key-dot bg-rose-400"></i
+                  ><span class="confidence-key-label"
+                    ><strong>Low</strong><em>Needs attention</em></span
+                  ><small>&lt;75%</small></span
                 >
               </div>
             </div>
@@ -2129,7 +2377,15 @@
     </dialog>
 
     <script src="https://cdn.jsdelivr.net/npm/flowbite@4.0.1/dist/flowbite.min.js"></script>
-    <script>
+    <script type="module">
+      import {
+        datePatterns,
+        emailPattern,
+        moneyPattern,
+        personPatterns,
+        phonePattern,
+      } from "../dist/index.js";
+
       (() => {
         const sampleText = `Please review the application for Maya Chen before Friday, September 12, 2026.
 
@@ -2145,113 +2401,52 @@ This request was submitted on 2026-09-03. Follow-up is due 9/15/2026, and the ar
 
 This request is urgent, but approval is pending a final identity review.`;
 
-        const nonPersonNameStarts = new Set([
-          "a",
-          "an",
-          "and",
-          "application",
-          "archive",
-          "contact",
-          "date",
-          "email",
-          "follow",
-          "friday",
-          "monday",
-          "please",
-          "request",
-          "review",
-          "saturday",
-          "source",
-          "sunday",
-          "the",
-          "this",
-          "thursday",
-          "tuesday",
-          "wednesday",
-        ]);
-        const isLikelyFullName = (value) => {
-          const firstWord = value
-            .trim()
-            .split(/\s+/)[0]
-            .replace(/[.'’]/g, "")
-            .toLocaleLowerCase();
-          return !nonPersonNameStarts.has(firstWord);
-        };
-        const normalizePersonName = (value) =>
-          value.replace(/\s+/g, " ").trim();
-        const personTitleSource = String.raw`(?:Dr|Mr|Mrs|Ms|Miss|Mx|Prof|Professor|Rev|Judge|President|Senator|Sir|Dame)`;
-        const personNameTokenSource = String.raw`(?:\p{Lu}\.|\p{Lu}[\p{L}\p{M}]*(?:[’'][\p{L}\p{M}]+|[-‐‑–]\p{Lu}[\p{L}\p{M}]*)*)`;
-        const personParticleSource = String.raw`(?:da|de|del|della|der|di|dos|du|la|le|van|von|bin|ibn|al)`;
-        const personTailSource = String.raw`(?:\s+(?:${personParticleSource}\s+){0,2}${personNameTokenSource})`;
-        const personNameSource = String.raw`${personNameTokenSource}${personTailSource}{0,3}`;
-        const personFullNameSource = String.raw`${personNameTokenSource}${personTailSource}{1,3}`;
+        const demoBuiltIn = (pattern, label, color) => ({
+          id: pattern.id,
+          label,
+          tag: pattern.tag,
+          color,
+          confidence: pattern.confidence,
+          patternId: pattern.id,
+          ...(pattern.pattern instanceof RegExp
+            ? { regex: pattern.pattern }
+            : { matcher: pattern.pattern }),
+          normalize: pattern.normalize,
+        });
+
+        const personLabels = [
+          "Person · honorific",
+          "Person · contextual",
+          "Person · full name",
+        ];
+        const dateLabels = [
+          "Date · month first",
+          "Date · day first",
+          "Date · ISO",
+          "Date · US numeric",
+          "Date · dotted",
+        ];
+
+        const backendRecognizers = [
+          { id: "server-loan-directory", label: "Loan directory", tag: "loan_number", color: "violet", confidence: 0.76 },
+          { id: "server-case-directory", label: "Case directory", tag: "case_reference", color: "blue", confidence: 0.7 },
+          { id: "server-organization-directory", label: "Organization directory", tag: "organization", color: "cyan", confidence: 0.64 },
+          { id: "server-payment-luhn", label: "Payment card · Luhn", tag: "payment_card", color: "emerald", confidence: 0.58 },
+          { id: "server-routing-checksum", label: "Routing number · checksum", tag: "routing_number", color: "amber", confidence: 0.6 },
+          { id: "server-ip-octets", label: "IPv4 · valid octets", tag: "ip_address", color: "cyan", confidence: 0.66 },
+          { id: "server-us-address", label: "US postal address", tag: "postal_address", color: "rose", confidence: 0.62 },
+        ].map((recognizer) => ({
+          ...recognizer,
+          patternId: recognizer.id,
+          backend: true,
+        }));
 
         const recognizers = [
-          {
-            id: "person-honorific",
-            label: "Person · honorific",
-            tag: "person",
-            color: "rose",
-            confidence: 0.97,
-            patternId: "person-honorific",
-            captureGroup: 1,
-            regex: new RegExp(
-              String.raw`\b${personTitleSource}\.?\s+(${personNameSource})`,
-              "gu",
-            ),
-            normalize: normalizePersonName,
-          },
-          {
-            id: "person-context",
-            label: "Person · contextual",
-            tag: "person",
-            color: "rose",
-            confidence: 0.92,
-            patternId: "person-context",
-            captureGroup: 1,
-            regex: new RegExp(
-              String.raw`\b(?:[Aa]sk|[Cc]all|[Cc]alled|[Cc]ontact|[Ee]mail|[Nn]amed|[Rr]each|[Tt]ell)\s+(?:${personTitleSource}\.?\s+)?(${personNameSource})`,
-              "gu",
-            ),
-            normalize: normalizePersonName,
-          },
-          {
-            id: "person-full-name",
-            label: "Person · full name",
-            tag: "person",
-            color: "rose",
-            confidence: 0.82,
-            patternId: "person-full-name",
-            regex: new RegExp(
-              String.raw`(?<![\p{L}\p{M}’'‐‑–-])${personFullNameSource}(?![\p{L}\p{M}’'‐‑–-])`,
-              "gu",
-            ),
-            validate: isLikelyFullName,
-            normalize: normalizePersonName,
-          },
-          {
-            id: "email",
-            label: "Email address",
-            tag: "email",
-            color: "blue",
-            confidence: 0.99,
-            patternId: "builtin-email",
-            regex:
-              /\b[A-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?(?:\.[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?)+\b/gi,
-            normalize: (v) => v.toLowerCase(),
-          },
-          {
-            id: "phone",
-            label: "Phone number",
-            tag: "phone",
-            color: "cyan",
-            confidence: 0.92,
-            patternId: "builtin-phone",
-            regex:
-              /(?<!\w)(?:\+?1[ .-]?)?(?:\(\d{3}\)|\d{3})[ .-]\d{3}[ .-]\d{4}(?!\w)/g,
-            normalize: (v) =>
-              `+${v.replace(/\D/g, "").replace(/^([2-9])/, "1$1")}`,
-          },
+          ...personPatterns().map((pattern, index) =>
+            demoBuiltIn(pattern, personLabels[index], "rose"),
+          ),
+          demoBuiltIn(emailPattern(), "Email address", "blue"),
+          demoBuiltIn(phonePattern(), "Phone number", "cyan"),
           {
             id: "loan",
             label: "Loan number",
@@ -2261,64 +2456,11 @@ This request is urgent, but approval is pending a final identity review.`;
             patternId: "loan-number",
             regex: /\b80[4-9]\d{7}\b/g,
           },
-          {
-            id: "money",
-            label: "Currency",
-            tag: "money",
-            color: "emerald",
-            confidence: 0.94,
-            patternId: "currency-usd",
-            regex: /(?<!\w)\$\d{1,3}(?:,\d{3})*(?:\.\d{2})?(?!\w)/g,
-            normalize: (v) => v.replace(/[$,]/g, ""),
-          },
-          {
-            id: "date-month-first",
-            label: "Date · month first",
-            tag: "date",
-            color: "amber",
-            confidence: 0.91,
-            patternId: "date-month-first",
-            regex:
-              /\b(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\s+(?:0?[1-9]|[12]\d|3[01])(?:st|nd|rd|th)?(?:,)?\s+\d{4}\b/gi,
-          },
-          {
-            id: "date-day-first",
-            label: "Date · day first",
-            tag: "date",
-            color: "amber",
-            confidence: 0.91,
-            patternId: "date-day-first",
-            regex:
-              /\b(?:0?[1-9]|[12]\d|3[01])(?:st|nd|rd|th)?\s+(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\s+\d{4}\b/gi,
-          },
-          {
-            id: "date-iso",
-            label: "Date · ISO",
-            tag: "date",
-            color: "amber",
-            confidence: 0.97,
-            patternId: "date-iso",
-            regex: /\b\d{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12]\d|3[01])\b/g,
-          },
-          {
-            id: "date-us-numeric",
-            label: "Date · US numeric",
-            tag: "date",
-            color: "amber",
-            confidence: 0.9,
-            patternId: "date-us-numeric",
-            regex:
-              /\b(?:0?[1-9]|1[0-2])[\/-](?:0?[1-9]|[12]\d|3[01])[\/-](?:\d{2}|\d{4})\b/g,
-          },
-          {
-            id: "date-dotted",
-            label: "Date · dotted",
-            tag: "date",
-            color: "amber",
-            confidence: 0.88,
-            patternId: "date-dotted",
-            regex: /\b(?:0?[1-9]|[12]\d|3[01])\.(?:0?[1-9]|1[0-2])\.\d{4}\b/g,
-          },
+          demoBuiltIn(moneyPattern(), "Currency", "emerald"),
+          ...datePatterns().map((pattern, index) =>
+            demoBuiltIn(pattern, dateLabels[index], "amber"),
+          ),
+          ...backendRecognizers,
         ];
 
         const els = Object.fromEntries(
@@ -2401,6 +2543,8 @@ This request is urgent, but approval is pending a final identity review.`;
         let currentEntities = [];
         let enteringAssistedEntityIds = new Set();
         let activeEntityId = null;
+        let activeTooltipMark = null;
+        let tooltipHideTimer = null;
         let currentTheme = document.documentElement.classList.contains("light")
           ? "light"
           : "dark";
@@ -2418,7 +2562,15 @@ This request is urgent, but approval is pending a final identity review.`;
         const enabledRecognizerIds = new Set(
           recognizers.map((item) => item.id),
         );
-        const collapsedRecognizerGroups = new Set(["person", "date"]);
+        const recognizerTagCounts = recognizers.reduce((counts, item) => {
+          counts.set(item.tag, (counts.get(item.tag) || 0) + 1);
+          return counts;
+        }, new Map());
+        const collapsedRecognizerGroups = new Set(
+          [...recognizerTagCounts]
+            .filter(([, count]) => count > 1)
+            .map(([tag]) => tag),
+        );
         const expandedResultIds = new Set();
         const serverEndpoint =
           new URLSearchParams(window.location.search).get("api") ||
@@ -2467,8 +2619,9 @@ This request is urgent, but approval is pending a final identity review.`;
             return `
               <div class="recognizer-row ${item.registered ? "has-actions" : ""}">
                 <input id="recognizer-${escapeHTML(item.id)}" data-recognizer="${escapeHTML(item.id)}" type="checkbox" ${enabledRecognizerIds.has(item.id) ? "checked" : ""} class="recognizer-checkbox rounded border-slate-600 bg-slate-800 text-blue-500 focus:ring-1 focus:ring-blue-500 focus:ring-offset-0" />
-                <label class="min-w-0 cursor-pointer" for="recognizer-${escapeHTML(item.id)}">
-                  <span class="block truncate text-[11px] font-medium text-slate-300" title="${escapeHTML(item.label)}">${escapeHTML(shortLabel)}</span>
+                <label class="flex min-w-0 cursor-pointer items-center gap-1.5" for="recognizer-${escapeHTML(item.id)}">
+                  <span class="truncate text-[11px] font-medium text-slate-300" title="${escapeHTML(item.label)}">${escapeHTML(shortLabel)}</span>
+                  ${item.backend ? '<span class="recognizer-source-badge">API</span>' : ""}
                 </label>
                 ${
                   item.registered
@@ -2670,8 +2823,46 @@ This request is urgent, but approval is pending a final identity review.`;
           els.patternInput.classList.toggle("border-rose-500", !valid);
         }
 
-        function scanRegex(text, definition) {
+        function scanRecognizer(text, definition) {
           const matches = [];
+          if (definition.matcher) {
+            for (const candidate of definition.matcher(text, { text })) {
+              const start = Number(candidate.start);
+              const end = Number(candidate.end);
+              if (
+                !Number.isInteger(start) ||
+                !Number.isInteger(end) ||
+                start < 0 ||
+                end <= start ||
+                end > text.length ||
+                text.slice(start, end) !== candidate.value
+              )
+                continue;
+              const context = {
+                text,
+                before: text.slice(Math.max(0, start - 60), start),
+                after: text.slice(end, end + 60),
+                start,
+                end,
+              };
+              matches.push({
+                id: `${definition.tag}:${start}:${end}:${definition.patternId}`,
+                tag: definition.tag,
+                value: candidate.value,
+                normalizedValue:
+                  candidate.normalizedValue ??
+                  (definition.normalize
+                    ? definition.normalize(candidate.value, context)
+                    : candidate.value),
+                start,
+                end,
+                confidence: candidate.confidence ?? definition.confidence,
+                source: "built-in",
+                patternId: definition.patternId,
+              });
+            }
+            return matches;
+          }
           definition.regex.lastIndex = 0;
           let match;
           while ((match = definition.regex.exec(text)) !== null) {
@@ -2821,11 +3012,16 @@ This request is urgent, but approval is pending a final identity review.`;
 
         async function requestServerAssist(text, sequence) {
           serverRequestController = new AbortController();
+          const recognizerIds = recognizers
+            .filter(
+              (item) => item.backend && enabledRecognizerIds.has(item.id),
+            )
+            .map((item) => item.id);
           try {
             const response = await fetch(serverEndpoint, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ text }),
+              body: JSON.stringify({ text, recognizerIds }),
               signal: serverRequestController.signal,
             });
             if (!response.ok)
@@ -2920,8 +3116,8 @@ This request is urgent, but approval is pending a final identity review.`;
           const text = els.sourceText.value;
           const enabledIds = enabledRecognizerIds;
           let entities = recognizers
-            .filter((item) => enabledIds.has(item.id))
-            .flatMap((item) => scanRegex(text, item));
+            .filter((item) => !item.backend && enabledIds.has(item.id))
+            .flatMap((item) => scanRecognizer(text, item));
           const customRegex = parseCustomPattern();
           const draftTag = els.customTag.value.trim() || "custom";
           const matchesRegisteredPattern =
@@ -2936,7 +3132,7 @@ This request is urgent, but approval is pending a final identity review.`;
             );
           if (customRegex && !matchesRegisteredPattern) {
             entities.push(
-              ...scanRegex(text, {
+              ...scanRecognizer(text, {
                 tag: draftTag,
                 confidence: Number(els.confidenceSlider.value) / 100,
                 patternId: "custom-pattern",
@@ -3094,26 +3290,26 @@ This request is urgent, but approval is pending a final identity review.`;
                 <button type="button" class="result-summary" data-result-toggle="${escapeHTML(entity.id)}" aria-expanded="${String(expanded)}" aria-controls="${detailId}" aria-label="${escapeHTML(entity.tag)}: ${escapeHTML(entity.value)}, ${percent}% confidence. ${expanded ? "Collapse" : "Expand"} details">
                   <span class="result-confidence-dot ${confidenceBar(entity.confidence)}" title="${percent}% confidence"></span>
                   <span class="min-w-0 flex-1">
-                    <span class="block truncate font-mono text-xs font-medium text-slate-100" title="${escapeHTML(entity.value)}">${escapeHTML(entity.value)}</span>
+                    <span class="block truncate font-mono text-[13px] font-medium text-slate-100" title="${escapeHTML(entity.value)}">${escapeHTML(entity.value)}</span>
                     <span class="mt-1 flex items-center gap-1.5">
-                      <span class="text-[8px] font-bold uppercase tracking-[.08em] text-slate-500">${escapeHTML(entity.tag.replace(/_/g, " "))}</span>
-                      ${entity.source === "draft" ? '<span class="rounded border border-violet-400/30 bg-violet-400/10 px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider text-violet-300">Draft</span>' : ""}
+                      <span class="text-[10px] font-bold uppercase tracking-[.07em] text-slate-500">${escapeHTML(entity.tag.replace(/_/g, " "))}</span>
+                      ${entity.source === "draft" ? '<span class="rounded border border-violet-400/30 bg-violet-400/10 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-violet-300">Draft</span>' : ""}
                       ${entity.assisted ? '<span class="server-assisted-badge"><svg aria-hidden="true" class="h-2.5 w-2.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="m12 3 1.4 4.1L17.5 8.5l-4.1 1.4L12 14l-1.4-4.1-4.1-1.4 4.1-1.4L12 3Z"/></svg>Assisted</span>' : ""}
                     </span>
                   </span>
-                  <span class="font-mono text-xs font-semibold ${confidenceColor(entity.confidence)}">${percent}%</span>
+                  <span class="font-mono text-[13px] font-semibold ${confidenceColor(entity.confidence)}">${percent}%</span>
                   <svg aria-hidden="true" class="result-chevron h-3 w-3 shrink-0 text-slate-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="m5 9 7 7 7-7"/></svg>
                 </button>
                 <div id="${detailId}" class="result-details" ${expanded ? "" : "hidden"}>
-                  <div class="confidence-bar mb-2 h-0.5 overflow-hidden rounded-full bg-slate-700">
+                  <div class="confidence-bar mb-3 h-1 overflow-hidden rounded-full bg-slate-700">
                   <span class="block h-full rounded-full ${confidenceBar(entity.confidence)}" style="width:${percent}%"></span>
                   </div>
-                  <dl class="grid grid-cols-[76px_1fr] gap-x-2 gap-y-1 font-mono text-[10px] leading-5">
-                    <dt class="font-medium text-slate-600">range</dt><dd class="text-slate-400">[${entity.start}, ${entity.end})</dd>
-                    <dt class="font-medium text-slate-600">normalized</dt><dd class="truncate text-slate-400" title="${escapeHTML(entity.normalizedValue)}">${escapeHTML(entity.normalizedValue)}</dd>
-                    <dt class="font-medium text-slate-600">pattern</dt><dd class="truncate text-slate-500" title="${escapeHTML(entity.patternId)}">${escapeHTML(entity.patternId)}</dd>
-                    <dt class="font-medium text-slate-600">source</dt><dd class="text-slate-500">${escapeHTML(entity.source)}</dd>
-                    ${entity.assisted && entity.metadata?.evidence ? `<dt class="font-medium text-slate-600">evidence</dt><dd class="text-slate-400">${escapeHTML(String(entity.metadata.evidence))}</dd>` : ""}
+                  <dl class="result-details-grid">
+                    <dt>Range</dt><dd>[${entity.start}, ${entity.end})</dd>
+                    <dt>Normalized</dt><dd title="${escapeHTML(entity.normalizedValue)}">${escapeHTML(entity.normalizedValue)}</dd>
+                    <dt>Pattern</dt><dd title="${escapeHTML(entity.patternId)}">${escapeHTML(entity.patternId)}</dd>
+                    <dt>Source</dt><dd>${escapeHTML(entity.source)}</dd>
+                    ${entity.assisted && entity.metadata?.evidence ? `<dt>Evidence</dt><dd>${escapeHTML(String(entity.metadata.evidence))}</dd>` : ""}
                   </dl>
                 </div>
               </article>`;
@@ -3137,24 +3333,26 @@ This request is urgent, but approval is pending a final identity review.`;
         }
 
         function showEntityTooltip(mark) {
+          window.clearTimeout(tooltipHideTimer);
+          activeTooltipMark = mark;
           const entity = currentEntities.find(
             (item) => item.id === mark.dataset.highlightId,
           );
           if (!entity) return;
           const percent = Math.round(entity.confidence * 100);
           els.entityTooltip.innerHTML = `
-            <div class="flex items-center justify-between gap-4">
-              <span class="flex items-center gap-1.5 font-semibold uppercase tracking-wider">${escapeHTML(entity.tag)}${entity.assisted ? `<i class="server-assisted-badge assist-confidence-${confidenceLevel(entity.confidence)} not-italic">Assisted</i>` : ""}</span>
+            <div class="entity-tooltip-header">
+              <span class="entity-tooltip-tag">${escapeHTML(entity.tag.replace(/_/g, " "))}${entity.assisted ? `<i class="server-assisted-badge assist-confidence-${confidenceLevel(entity.confidence)} not-italic">Assisted</i>` : ""}</span>
               <strong class="font-mono ${confidenceColor(entity.confidence)}">${percent}% confidence</strong>
             </div>
-            <div class="mt-1.5 max-w-[250px] truncate font-mono text-[11px]" title="${escapeHTML(entity.value)}">${escapeHTML(entity.value)}</div>
-            <div class="mt-2 grid grid-cols-[58px_1fr] gap-x-2 gap-y-0.5 text-slate-400">
-              <span class="font-medium text-slate-500">range</span><code>[${entity.start}, ${entity.end})</code>
-              <span class="font-medium text-slate-500">pattern</span><code class="truncate">${escapeHTML(entity.patternId)}</code>
-              <span class="font-medium text-slate-500">source</span><code class="truncate">${escapeHTML(entity.source)}</code>
-              <span class="font-medium text-slate-500">normalized</span><code class="truncate">${escapeHTML(entity.normalizedValue)}</code>
-              ${entity.assisted && entity.metadata?.evidence ? `<span class="font-medium text-slate-500">evidence</span><code class="max-w-[190px] whitespace-normal">${escapeHTML(String(entity.metadata.evidence))}</code>` : ""}
-            </div>`;
+            <div class="entity-tooltip-value" title="${escapeHTML(entity.value)}">${escapeHTML(entity.value)}</div>
+            <dl class="entity-tooltip-details">
+              <dt>Range</dt><dd><code>[${entity.start}, ${entity.end})</code></dd>
+              <dt>Pattern</dt><dd><code>${escapeHTML(entity.patternId)}</code></dd>
+              <dt>Source</dt><dd><code>${escapeHTML(entity.source)}</code></dd>
+              <dt>Normalized</dt><dd><code>${escapeHTML(entity.normalizedValue)}</code></dd>
+              ${entity.assisted && entity.metadata?.evidence ? `<dt>Evidence</dt><dd><code>${escapeHTML(String(entity.metadata.evidence))}</code></dd>` : ""}
+            </dl>`;
           els.entityTooltip.hidden = false;
           const markRect = mark.getBoundingClientRect();
           const tooltipRect = els.entityTooltip.getBoundingClientRect();
@@ -3165,14 +3363,34 @@ This request is urgent, but approval is pending a final identity review.`;
             ),
             window.innerWidth - tooltipRect.width - 8,
           );
-          let top = markRect.top - tooltipRect.height - 8;
-          if (top < 8) top = markRect.bottom + 8;
+          let placement = "above";
+          let top = markRect.top - tooltipRect.height - 10;
+          if (top < 8) {
+            placement = "below";
+            top = markRect.bottom + 10;
+          }
+          const arrowLeft = Math.min(
+            Math.max(16, markRect.left + markRect.width / 2 - left),
+            tooltipRect.width - 16,
+          );
+          els.entityTooltip.dataset.placement = placement;
+          els.entityTooltip.style.setProperty(
+            "--tooltip-arrow-left",
+            `${arrowLeft}px`,
+          );
           els.entityTooltip.style.left = `${left}px`;
           els.entityTooltip.style.top = `${top}px`;
         }
 
         function hideEntityTooltip() {
+          window.clearTimeout(tooltipHideTimer);
+          activeTooltipMark = null;
           els.entityTooltip.hidden = true;
+        }
+
+        function scheduleEntityTooltipHide() {
+          window.clearTimeout(tooltipHideTimer);
+          tooltipHideTimer = window.setTimeout(hideEntityTooltip, 160);
         }
 
         function togglePanel(side) {
@@ -3358,7 +3576,19 @@ This request is urgent, but approval is pending a final identity review.`;
         });
         els.highlightLayer.addEventListener("mouseout", (event) => {
           const mark = event.target.closest(".entity-mark");
-          if (mark && !mark.contains(event.relatedTarget)) hideEntityTooltip();
+          if (
+            mark &&
+            !mark.contains(event.relatedTarget) &&
+            !els.entityTooltip.contains(event.relatedTarget)
+          )
+            scheduleEntityTooltipHide();
+        });
+        els.entityTooltip.addEventListener("mouseenter", () => {
+          window.clearTimeout(tooltipHideTimer);
+        });
+        els.entityTooltip.addEventListener("mouseleave", (event) => {
+          if (activeTooltipMark?.contains(event.relatedTarget)) return;
+          scheduleEntityTooltipHide();
         });
         els.highlightLayer.addEventListener("pointerdown", (event) => {
           const mark = event.target.closest(".entity-mark");

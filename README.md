@@ -326,18 +326,39 @@ Entity tokens include the full resolved `entity` plus tag, value, normalized val
 
 ## Built-in patterns
 
-Broadly useful email and North American phone patterns are optional exports and are never automatically registered:
+Broadly useful patterns are optional exports and are never automatically registered:
 
 ```ts
-import { emailPattern, phonePattern } from "console-ner";
+import {
+  datePatterns,
+  emailPattern,
+  ipv4Pattern,
+  moneyPattern,
+  organizationPattern,
+  paymentCardPattern,
+  personPatterns,
+  phonePattern,
+  postalAddressPattern,
+  routingNumberPattern,
+} from "console-ner";
 
 ner.register([
+  ...personPatterns(),
+  ...datePatterns(),
   emailPattern(),
   phonePattern({ confidence: 0.9 }),
+  moneyPattern(),
+  organizationPattern(),
+  paymentCardPattern(),
+  routingNumberPattern(),
+  ipv4Pattern(),
+  postalAddressPattern(),
 ]);
 ```
 
-Person, address, loan, employee, and document concepts are intentionally not built in. See [examples/domain.ts](./examples/domain.ts) for:
+`personPatterns()` includes honorific, contextual, and capitalized full-name strategies. `datePatterns()` includes month-name, ISO, US numeric, and dotted day-first formats. Payment cards, routing numbers, and IPv4 addresses are checksum- or range-validated locally. Every helper accepts custom `tag`, `confidence`, `priority`, and ID options; pattern-set helpers treat `id` as a prefix.
+
+Loan, employee, and document concepts remain application-specific. See [examples/domain.ts](./examples/domain.ts) for:
 
 - a company-specific loan number with backend confirmation;
 - an employee identifier with a meaningful five-character base and optional suffix;
@@ -346,12 +367,14 @@ Person, address, loan, employee, and document concepts are intentionally not bui
 
 ## Interactive demo
 
-Open `demo/index.html` directly for the entirely client-side workbench, or launch the optional Bun server:
+Launch the Bun server for the complete workbench and server-assist example:
 
 ```sh
 bun run demo
 # http://127.0.0.1:4173
 ```
+
+To open `demo/index.html` directly for the client-only workbench, run `bun run build` first so the browser can import `dist/index.js`.
 
 The `demo` command hot-reloads the Bun server and refreshes connected browsers when `demo/index.html` or server-side code changes. Use `bun start` to run without development hot reload.
 
