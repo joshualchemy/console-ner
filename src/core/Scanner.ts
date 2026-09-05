@@ -56,13 +56,23 @@ export function scan<TTag extends string, TMetadata, TServices>(
 ): EntityCandidate<TTag, TMetadata>[] {
   const candidates: EntityCandidate<TTag, TMetadata>[] = [];
   const seenIds = new Set<string>();
+  const recognitionCache = new Map<unknown, unknown>();
+  const recognitionContext = {
+    text,
+    memoize<T>(key: unknown, create: () => T): T {
+      if (recognitionCache.has(key)) return recognitionCache.get(key) as T;
+      const value = create();
+      recognitionCache.set(key, value);
+      return value;
+    },
+  };
 
   for (const definition of patterns) {
     if (!definition.enabled) continue;
     const rawMatches =
       definition.pattern instanceof RegExp
         ? regexMatches<TMetadata>(definition.pattern, text)
-        : definition.pattern(text, { text });
+        : definition.pattern(text, recognitionContext);
 
     for (const match of rawMatches) {
       if (!isValidRange(text, match.start, match.end)) continue;
@@ -103,4 +113,3 @@ export function scan<TTag extends string, TMetadata, TServices>(
   }
   return candidates;
 }
-

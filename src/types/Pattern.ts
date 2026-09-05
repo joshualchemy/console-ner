@@ -10,6 +10,7 @@ export interface MatchContext {
 
 export interface RecognitionContext {
   readonly text: string;
+  memoize<T>(key: unknown, create: () => T): T;
 }
 
 export interface PatternMatch<TMetadata = unknown> {
@@ -56,4 +57,3 @@ export interface RegexPatternOptions<
 > extends Omit<EntityPattern<TTag, TMetadata, TServices>, "pattern"> {
   readonly regex: RegExp;
 }
-

@@ -1,5 +1,32 @@
 import { regexPattern } from "../regexPattern";
 import type { BuiltInPattern, BuiltInPatternOptions } from "./types";
+import { compromiseMatcher, type CompromiseBuiltInPatternOptions } from "./compromise";
+
+export function compromiseMoneyPattern(
+  options?: Omit<CompromiseBuiltInPatternOptions<"money">, "tag"> & {
+    readonly tag?: "money";
+  },
+): BuiltInPattern<"money">;
+export function compromiseMoneyPattern<TTag extends string>(
+  options: CompromiseBuiltInPatternOptions<TTag> & { readonly tag: TTag },
+): BuiltInPattern<TTag>;
+export function compromiseMoneyPattern(
+  options: CompromiseBuiltInPatternOptions<string> = {},
+): BuiltInPattern<string> {
+  return {
+    id: options.id ?? "builtin-compromise-money",
+    tag: options.tag ?? "money",
+    pattern: compromiseMatcher({
+      selection: "money",
+      ...(options.lexicon === undefined ? {} : { lexicon: options.lexicon }),
+      select: (document) => document.money(),
+      normalizedValue: (result, value) =>
+        typeof result.money?.num === "number" ? String(result.money.num) : value,
+    }),
+    confidence: options.confidence ?? 0.9,
+    priority: options.priority ?? 1,
+  };
+}
 
 export function moneyPattern(
   options?: Omit<BuiltInPatternOptions<"money">, "tag"> & { readonly tag?: "money" },

@@ -316,8 +316,7 @@
       .entity-mark.server-assisted-enter {
         animation:
           assisted-highlight-pop 440ms cubic-bezier(0.22, 0.8, 0.24, 1) both,
-          assisted-underline-enter 480ms cubic-bezier(0.22, 0.8, 0.24, 1)
-            both;
+          assisted-underline-enter 480ms cubic-bezier(0.22, 0.8, 0.24, 1) both;
       }
 
       @keyframes assisted-underline-enter {
@@ -663,11 +662,7 @@
       .result-details-grid dt {
         margin: 0;
         color: #718096;
-        font-family:
-          Inter,
-          ui-sans-serif,
-          system-ui,
-          sans-serif;
+        font-family: Inter, ui-sans-serif, system-ui, sans-serif;
         font-size: 10px;
         font-weight: 700;
         letter-spacing: 0.055em;
@@ -2379,6 +2374,10 @@
     <script src="https://cdn.jsdelivr.net/npm/flowbite@4.0.1/dist/flowbite.min.js"></script>
     <script type="module">
       import {
+        compromiseMoneyPattern,
+        compromiseOrganizationPattern,
+        compromisePersonPattern,
+        compromisePlacePattern,
         datePatterns,
         emailPattern,
         moneyPattern,
@@ -2387,19 +2386,17 @@
       } from "../dist/index.js";
 
       (() => {
-        const sampleText = `Please review the application for Maya Chen before Friday, September 12, 2026.
+        const sampleText = `Northstar Analytics LLC - identity review case CN-2026-004218
 
-Contact Maya at maya.chen@example.com or call (312) 555-0148. The requested amount is $248,500.00 and the related loan number is 8041234567.
+Maya Chen opened a support request with the Chicago office on September 12, 2026. Dr. José Álvarez approved the initial review, and Jean-Luc Picard is the next person assigned to the case. Please contact Maya at maya.chen@example.com or +1 (312) 555-0148 if more information is needed.
 
-Please ask Dr. José Álvarez and Jean-Luc Picard to complete the final identity review.
+The customer listed the delivery address as 233 S Wacker Dr, Chicago, IL 60606. A follow-up meeting is planned with Google in Paris, while Acme Corporation will handle the records request in New York.
 
-Northstar Analytics LLC opened case CN-2026-004218 for the office at 233 S Wacker Dr, Chicago, IL 60606.
+The approved amount is $248,500.00 and the filing fee is $12.75. The loan number is 8041234567, the payment card is 4111 1111 1111 1111, and the receiving bank routing number is 021000021.
 
-The request came from 192.168.1.42. Use test card 4111 1111 1111 1111 and routing number 021000021. Reject 999.1.1.1 and routing 123456789.
+The request originated from 192.168.1.42 and the backup service is reachable at 10.24.8.7. These values are intentionally invalid and should not be recognized: 999.1.1.1, card 4111 1111 1111 1112, and routing number 123456789.
 
-This request was submitted on 2026-09-03. Follow-up is due 9/15/2026, and the archive closes 30.09.2026.
-
-This request is urgent, but approval is pending a final identity review.`;
+Additional deadlines are 12 September 2026, 2026-09-03, 9/15/2026, and 30.09.2026. Mary O'Connor marked the request urgent, but final approval is still pending.`;
 
         const demoBuiltIn = (pattern, label, color) => ({
           id: pattern.id,
@@ -2428,13 +2425,55 @@ This request is urgent, but approval is pending a final identity review.`;
         ];
 
         const backendRecognizers = [
-          { id: "server-loan-directory", label: "Loan directory", tag: "loan_number", color: "violet", confidence: 0.76 },
-          { id: "server-case-directory", label: "Case directory", tag: "case_reference", color: "blue", confidence: 0.7 },
-          { id: "server-organization-directory", label: "Organization directory", tag: "organization", color: "cyan", confidence: 0.64 },
-          { id: "server-payment-luhn", label: "Payment card · Luhn", tag: "payment_card", color: "emerald", confidence: 0.58 },
-          { id: "server-routing-checksum", label: "Routing number · checksum", tag: "routing_number", color: "amber", confidence: 0.6 },
-          { id: "server-ip-octets", label: "IPv4 · valid octets", tag: "ip_address", color: "cyan", confidence: 0.66 },
-          { id: "server-us-address", label: "US postal address", tag: "postal_address", color: "rose", confidence: 0.62 },
+          {
+            id: "server-loan-directory",
+            label: "Loan directory",
+            tag: "loan_number",
+            color: "violet",
+            confidence: 0.76,
+          },
+          {
+            id: "server-case-directory",
+            label: "Case directory",
+            tag: "case_reference",
+            color: "blue",
+            confidence: 0.7,
+          },
+          {
+            id: "server-organization-directory",
+            label: "Organization directory",
+            tag: "organization",
+            color: "cyan",
+            confidence: 0.64,
+          },
+          {
+            id: "server-payment-luhn",
+            label: "Payment card · Luhn",
+            tag: "payment_card",
+            color: "emerald",
+            confidence: 0.58,
+          },
+          {
+            id: "server-routing-checksum",
+            label: "Routing number · checksum",
+            tag: "routing_number",
+            color: "amber",
+            confidence: 0.6,
+          },
+          {
+            id: "server-ip-octets",
+            label: "IPv4 · valid octets",
+            tag: "ip_address",
+            color: "cyan",
+            confidence: 0.66,
+          },
+          {
+            id: "server-us-address",
+            label: "US postal address",
+            tag: "postal_address",
+            color: "rose",
+            confidence: 0.62,
+          },
         ].map((recognizer) => ({
           ...recognizer,
           patternId: recognizer.id,
@@ -2444,6 +2483,11 @@ This request is urgent, but approval is pending a final identity review.`;
         const recognizers = [
           ...personPatterns().map((pattern, index) =>
             demoBuiltIn(pattern, personLabels[index], "rose"),
+          ),
+          demoBuiltIn(
+            compromisePersonPattern(),
+            "Person · Compromise NLP",
+            "rose",
           ),
           demoBuiltIn(emailPattern(), "Email address", "blue"),
           demoBuiltIn(phonePattern(), "Phone number", "cyan"),
@@ -2457,8 +2501,23 @@ This request is urgent, but approval is pending a final identity review.`;
             regex: /\b80[4-9]\d{7}\b/g,
           },
           demoBuiltIn(moneyPattern(), "Currency", "emerald"),
+          demoBuiltIn(
+            compromiseMoneyPattern(),
+            "Currency · Compromise NLP",
+            "emerald",
+          ),
           ...datePatterns().map((pattern, index) =>
             demoBuiltIn(pattern, dateLabels[index], "amber"),
+          ),
+          demoBuiltIn(
+            compromiseOrganizationPattern(),
+            "Organization · Compromise NLP",
+            "cyan",
+          ),
+          demoBuiltIn(
+            compromisePlacePattern(),
+            "Place · Compromise NLP",
+            "blue",
           ),
           ...backendRecognizers,
         ];
@@ -2823,10 +2882,13 @@ This request is urgent, but approval is pending a final identity review.`;
           els.patternInput.classList.toggle("border-rose-500", !valid);
         }
 
-        function scanRecognizer(text, definition) {
+        function scanRecognizer(text, definition, recognitionContext) {
           const matches = [];
           if (definition.matcher) {
-            for (const candidate of definition.matcher(text, { text })) {
+            for (const candidate of definition.matcher(
+              text,
+              recognitionContext,
+            )) {
               const start = Number(candidate.start);
               const end = Number(candidate.end);
               if (
@@ -3013,9 +3075,7 @@ This request is urgent, but approval is pending a final identity review.`;
         async function requestServerAssist(text, sequence) {
           serverRequestController = new AbortController();
           const recognizerIds = recognizers
-            .filter(
-              (item) => item.backend && enabledRecognizerIds.has(item.id),
-            )
+            .filter((item) => item.backend && enabledRecognizerIds.has(item.id))
             .map((item) => item.id);
           try {
             const response = await fetch(serverEndpoint, {
@@ -3115,9 +3175,19 @@ This request is urgent, but approval is pending a final identity review.`;
           const started = performance.now();
           const text = els.sourceText.value;
           const enabledIds = enabledRecognizerIds;
+          const recognitionCache = new Map();
+          const recognitionContext = {
+            text,
+            memoize(key, create) {
+              if (recognitionCache.has(key)) return recognitionCache.get(key);
+              const value = create();
+              recognitionCache.set(key, value);
+              return value;
+            },
+          };
           let entities = recognizers
             .filter((item) => !item.backend && enabledIds.has(item.id))
-            .flatMap((item) => scanRecognizer(text, item));
+            .flatMap((item) => scanRecognizer(text, item, recognitionContext));
           const customRegex = parseCustomPattern();
           const draftTag = els.customTag.value.trim() || "custom";
           const matchesRegisteredPattern =
@@ -3132,13 +3202,17 @@ This request is urgent, but approval is pending a final identity review.`;
             );
           if (customRegex && !matchesRegisteredPattern) {
             entities.push(
-              ...scanRecognizer(text, {
-                tag: draftTag,
-                confidence: Number(els.confidenceSlider.value) / 100,
-                patternId: "custom-pattern",
-                source: "draft",
-                regex: customRegex,
-              }),
+              ...scanRecognizer(
+                text,
+                {
+                  tag: draftTag,
+                  confidence: Number(els.confidenceSlider.value) / 100,
+                  patternId: "custom-pattern",
+                  source: "draft",
+                  regex: customRegex,
+                },
+                recognitionContext,
+              ),
             );
           }
           if (els.resolveOverlaps.checked) entities = resolveEntities(entities);

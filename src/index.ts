@@ -1,6 +1,11 @@
 export { ConsoleNER } from "./core/ConsoleNER";
 export type { ConsoleNEROptions } from "./core/ConsoleNER";
 export {
+  compromiseMoneyPattern,
+  compromiseOrganizationPattern,
+  compromisePatterns,
+  compromisePersonPattern,
+  compromisePlacePattern,
   datePatterns,
   emailPattern,
   ipv4Pattern,
@@ -12,7 +17,15 @@ export {
   postalAddressPattern,
   routingNumberPattern,
 } from "./patterns/builtins";
-export type { BuiltInPattern, BuiltInPatternOptions } from "./patterns/builtins";
+export type {
+  BuiltInPattern,
+  BuiltInPatternOptions,
+  CompromiseBuiltInPatternOptions,
+  CompromiseBuiltInTag,
+  CompromiseEntityMetadata,
+  CompromiseLexicon,
+  CompromisePatternsOptions,
+} from "./patterns/builtins";
 export { regexPattern } from "./patterns/regexPattern";
 export type { Entity } from "./types/Entity";
 export type {

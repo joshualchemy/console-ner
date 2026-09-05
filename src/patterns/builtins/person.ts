@@ -1,5 +1,31 @@
 import type { BuiltInPattern, BuiltInPatternOptions } from "./types";
 import { builtInId, capturedPattern } from "./utilities";
+import { compromiseMatcher, type CompromiseBuiltInPatternOptions } from "./compromise";
+
+export function compromisePersonPattern(
+  options?: Omit<CompromiseBuiltInPatternOptions<"person">, "tag"> & {
+    readonly tag?: "person";
+  },
+): BuiltInPattern<"person">;
+export function compromisePersonPattern<TTag extends string>(
+  options: CompromiseBuiltInPatternOptions<TTag> & { readonly tag: TTag },
+): BuiltInPattern<TTag>;
+export function compromisePersonPattern(
+  options: CompromiseBuiltInPatternOptions<string> = {},
+): BuiltInPattern<string> {
+  return {
+    id: options.id ?? "builtin-compromise-person",
+    tag: options.tag ?? "person",
+    pattern: compromiseMatcher({
+      selection: "person",
+      ...(options.lexicon === undefined ? {} : { lexicon: options.lexicon }),
+      select: (document) => document.people(),
+      normalizedValue: (_result, value) => value.replace(/\s+/g, " ").trim(),
+    }),
+    confidence: options.confidence ?? 0.86,
+    priority: options.priority ?? 1,
+  };
+}
 
 export function personPatterns(
   options?: Omit<BuiltInPatternOptions<"person">, "tag"> & {

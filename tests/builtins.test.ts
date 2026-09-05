@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
   ConsoleNER,
+  compromisePatterns,
+  compromisePersonPattern,
   datePatterns,
   emailPattern,
   ipv4Pattern,
@@ -79,6 +81,40 @@ describe("built-in patterns", () => {
       { tag: "routing_number", normalizedValue: "021000021" },
       { tag: "ip_address", normalizedValue: "192.168.1.42" },
     ]);
+  });
+
+  it("provides contextual Compromise patterns with exact offsets and metadata", () => {
+    const text = "Later, mary met Google in Paris to discuss twelve dollars in filing fees.";
+    const ner = new ConsoleNER<"money" | "organization" | "person" | "place">()
+      .register(compromisePatterns());
+    const entities = ner.recognize(text).entities;
+
+    expect(entities.map(({ tag, value, normalizedValue }) => ({
+      tag,
+      value,
+      normalizedValue,
+    }))).toEqual([
+      { tag: "person", value: "mary", normalizedValue: "mary" },
+      { tag: "organization", value: "Google", normalizedValue: "Google" },
+      { tag: "place", value: "Paris", normalizedValue: "Paris" },
+      { tag: "money", value: "twelve dollars", normalizedValue: "12" },
+    ]);
+    expect(entities.every((entity) => text.slice(entity.start, entity.end) === entity.value))
+      .toBe(true);
+    expect(entities.every((entity) =>
+      (entity.metadata as { engine?: string } | undefined)?.engine === "compromise"
+    )).toBe(true);
+  });
+
+  it("accepts a scoped Compromise lexicon for unknown lowercase names", () => {
+    const ner = new ConsoleNER<"person">().register(
+      compromisePersonPattern({
+        lexicon: { xyloph: "FirstName", zorb: "LastName" },
+      }),
+    );
+
+    expect(ner.recognize("email xyloph zorb tomorrow").entities[0]?.value)
+      .toBe("xyloph zorb");
   });
 
   it("supports custom tags across built-in pattern sets", () => {

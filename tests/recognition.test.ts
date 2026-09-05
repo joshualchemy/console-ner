@@ -58,6 +58,25 @@ describe("registration and recognition", () => {
     expect(excluded.recognitionOptions?.excludePatternIds).toEqual(["second"]);
   });
 
+  it("memoizes shared analysis for matchers during one recognition", () => {
+    const key = {};
+    const createAnalysis = vi.fn(() => ({ ready: true }));
+    const matcher = (value: string, start: number) =>
+      (_text: string, context: Parameters<NonNullable<ReturnType<typeof regexPattern>["pattern"]>>[1]) => {
+        context.memoize(key, createAnalysis);
+        return [{ value, start, end: start + value.length }];
+      };
+    const ner = new ConsoleNER<"word">().register([
+      { id: "one", tag: "word", pattern: matcher("one", 0) },
+      { id: "two", tag: "word", pattern: matcher("two", 4) },
+    ]);
+
+    ner.recognize("one two");
+    expect(createAnalysis).toHaveBeenCalledTimes(1);
+    ner.recognize("one two");
+    expect(createAnalysis).toHaveBeenCalledTimes(2);
+  });
+
   it("handles global, non-global, insensitive regexes and never mutates lastIndex", () => {
     const regex = /hello/gi;
     regex.lastIndex = 2;
