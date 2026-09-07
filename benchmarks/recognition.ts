@@ -8,7 +8,7 @@ function makeText(length: number): string {
 
 for (const textLength of [100, 1_000, 10_000]) {
   for (const patternCount of [10, 50, 100]) {
-    const ner = new ConsoleNER<string>({ compromise: false });
+    const ner = new ConsoleNER<string>({ language: false });
     ner.register(
       Array.from({ length: patternCount }, (_, index) => ({
         id: `benchmark-${index}`,
@@ -28,7 +28,7 @@ for (const textLength of [100, 1_000, 10_000]) {
 }
 
 let validationCalls = 0;
-const validationBenchmark = new ConsoleNER<string>({ compromise: false }).register(
+const validationBenchmark = new ConsoleNER<string>({ language: false }).register(
   Array.from({ length: 100 }, (_, index) => ({
     id: `validation-${index}`,
     tag: `value-${index}`,

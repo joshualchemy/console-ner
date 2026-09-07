@@ -4,9 +4,9 @@ Deterministic named entity recognition for TypeScript. Register regular expressi
 
 ConsoleNER does not choose your HTTP client, database, or application framework. It gives you a predictable local recognition pass and a separate validation pipeline.
 
-ConsoleNER is ESM and works in modern Node.js, Bun, and browser builds. The
-base `console-ner` entry includes a browser-friendly Compromise recognizer for
-person, organization, place, and money entities by default.
+ConsoleNER is ESM and works in modern Node.js, Bun, and browser builds. Its
+built-in language recognizer provides person, organization, place, and money
+entities out of the box.
 
 ## Installation
 
@@ -15,8 +15,8 @@ npm install console-ner
 # or: bun add console-ner
 ```
 
-Compromise is installed with ConsoleNER because it powers the default
-recognizer. You can disable or omit that recognizer without changing imports.
+Everything ships through the base `console-ner` package. No separate NLP setup
+or integration entry point is required.
 
 ## Quick start
 
@@ -24,10 +24,10 @@ recognizer. You can disable or omit that recognizer without changing imports.
 import {
   ConsoleNER,
   emailPattern,
-  type CompromiseBuiltInTag,
+  type LanguageBuiltInTag,
 } from "console-ner";
 
-type Tag = CompromiseBuiltInTag | "email" | "order_id";
+type Tag = LanguageBuiltInTag | "email" | "order_id";
 
 const ner = new ConsoleNER<Tag>();
 
@@ -48,7 +48,7 @@ for (const entity of result.entities) {
 }
 ```
 
-`new ConsoleNER()` automatically installs the named `compromise` recognizer.
+`new ConsoleNER()` automatically installs the named `language` recognizer.
 It shares one parsed document across its four patterns, and recognition remains
 synchronous and local.
 
@@ -60,7 +60,7 @@ Tags are strings. Use a union to get type checking throughout your application.
 
 ```ts
 type Tag = "email" | "phone" | "document";
-const ner = new ConsoleNER<Tag>({ compromise: false });
+const ner = new ConsoleNER<Tag>({ language: false });
 
 ner.register({
   id: "email",
@@ -100,9 +100,8 @@ ner.clear();
 
 ## Built-in patterns
 
-Compromise person, organization, place, and money patterns are registered
-automatically. Regex built-ins are exported helpers that you register when
-needed.
+Language-aware person, organization, place, and money patterns are registered
+automatically. Regex built-ins are exported helpers that you register when needed.
 
 ```ts
 import {
@@ -124,10 +123,17 @@ ner.register([
 
 Other built-ins include `organizationPattern`, `paymentCardPattern`, `routingNumberPattern`, `ipv4Pattern`, and `postalAddressPattern`. Built-in options support application-specific tags, confidence, priority, and IDs.
 
-## Recognizers and the default Compromise integration
+## Built-in language recognizer
 
 A recognizer is a named group of patterns. Use one when an integration or a
 domain module should be installed, toggled, or removed as a unit.
+
+ConsoleNER exposes the group as `languageRecognizer()` and its definitions as
+`languagePatterns()`, `languagePersonPattern()`,
+`languageOrganizationPattern()`, `languagePlacePattern()`, and
+`languageMoneyPattern()`. Their default IDs use the stable
+`builtin-language-*` prefix. Public metadata uses `LanguageEntityMetadata`, so
+applications do not depend on an underlying NLP provider's types.
 
 ```ts
 import { ConsoleNER } from "console-ner";
@@ -135,20 +141,20 @@ import { ConsoleNER } from "console-ner";
 const ner = new ConsoleNER();
 
 // Person, organization, place, and money patterns are grouped under this
-// stable recognizer ID.
-ner.disableRecognizer("compromise");
-ner.enableRecognizer("compromise");
-ner.unregisterRecognizer("compromise");
+// stable ConsoleNER recognizer ID.
+ner.disableRecognizer("language");
+ner.enableRecognizer("language");
+ner.unregisterRecognizer("language");
 ```
 
-Pass `compromise: false` when an application needs an empty registry, or
-customize the default recognizer during construction:
+Pass `language: false` when an application needs an empty registry, or
+customize the built-in recognizer during construction:
 
 ```ts
-const withoutCompromise = new ConsoleNER({ compromise: false });
+const patternsOnly = new ConsoleNER({ language: false });
 
 const customized = new ConsoleNER({
-  compromise: {
+  language: {
     id: "general-language",
     lexicon: { xyloph: "FirstName", zorb: "LastName" },
   },
@@ -156,7 +162,7 @@ const customized = new ConsoleNER({
 ```
 
 Set `enabled: false` to install the default recognizer in a disabled state, or
-use `allowOverlap: true` when Compromise matches should coexist with overlapping
+use `allowOverlap: true` when language matches should coexist with overlapping
 application patterns.
 
 Applications can add their own recognizers alongside the default, or opt out
@@ -175,7 +181,7 @@ const operations = {
   ],
 } satisfies RecognizerDefinition<Tag>;
 
-const appNER = new ConsoleNER<Tag>({ compromise: false })
+const appNER = new ConsoleNER<Tag>({ language: false })
   .registerRecognizer(operations);
 ```
 
@@ -193,7 +199,7 @@ interface PhoneMetadata {
 }
 
 const phones = new ConsoleNER<"phone", undefined, PhoneMetadata>({
-  compromise: false,
+  language: false,
   contextWindow: 80,
 });
 
@@ -246,7 +252,7 @@ interface Services {
 }
 
 const orders = new ConsoleNER<"order_id", Services>({
-  compromise: false,
+  language: false,
   defaultValidatorThreshold: 1,
 });
 
@@ -285,7 +291,7 @@ Use the instance-level validator when a decision depends on multiple entities or
 type Tag = "order_id" | "document";
 
 const contextual = new ConsoleNER<Tag, Services, unknown, { linked: boolean }>({
-  compromise: false,
+  language: false,
   validator: {
     id: "link-order-document",
     runBelowConfidence: 0.95,

@@ -3,16 +3,15 @@ import type View from "compromise/view/three";
 import type { PatternMatcher, RecognitionContext } from "../../types/Pattern";
 import type { BuiltInPatternOptions } from "../../patterns/builtins/types";
 
-export type CompromiseLexicon = Readonly<Record<string, string>>;
+export type LanguageLexicon = Readonly<Record<string, string>>;
 
-export interface CompromiseBuiltInPatternOptions<TTag extends string>
+export interface LanguageBuiltInPatternOptions<TTag extends string>
   extends BuiltInPatternOptions<TTag> {
-  readonly lexicon?: CompromiseLexicon;
+  readonly lexicon?: LanguageLexicon;
 }
 
-export interface CompromiseEntityMetadata {
-  readonly engine: "compromise";
-  readonly selection: "money" | "organization" | "person" | "place";
+export interface LanguageEntityMetadata {
+  readonly category: "money" | "organization" | "person" | "place";
   readonly details?: Readonly<Record<string, unknown>>;
   readonly terms?: readonly Readonly<{
     text?: string;
@@ -20,7 +19,7 @@ export interface CompromiseEntityMetadata {
   }>[];
 }
 
-interface CompromiseJsonResult {
+interface LanguageJsonResult {
   readonly offset?: {
     readonly start?: number;
     readonly length?: number;
@@ -33,29 +32,29 @@ interface CompromiseJsonResult {
   readonly money?: Readonly<Record<string, unknown>> & { readonly num?: unknown };
 }
 
-interface CompromiseSelection {
+interface LanguageSelection {
   json(options: {
     readonly offset: true;
     readonly terms: { readonly text: true; readonly tags: true };
   }): unknown;
 }
 
-const defaultDocumentKey = Symbol("console-ner:compromise-document");
+const defaultDocumentKey = Symbol("console-ner:language-document");
 const lexiconDocumentKeys = new WeakMap<object, symbol>();
 
-function documentKey(lexicon?: CompromiseLexicon): symbol {
+function documentKey(lexicon?: LanguageLexicon): symbol {
   if (!lexicon) return defaultDocumentKey;
   const existing = lexiconDocumentKeys.get(lexicon);
   if (existing) return existing;
-  const key = Symbol("console-ner:compromise-document-with-lexicon");
+  const key = Symbol("console-ner:language-document-with-lexicon");
   lexiconDocumentKeys.set(lexicon, key);
   return key;
 }
 
-function compromiseDocument(
+function languageDocument(
   text: string,
   context: RecognitionContext,
-  lexicon?: CompromiseLexicon,
+  lexicon?: LanguageLexicon,
 ): View {
   return context.memoize(documentKey(lexicon), () =>
     nlp(text, lexicon ? { ...lexicon } : undefined),
@@ -67,18 +66,18 @@ function trimTrailingPunctuation(text: string, start: number, end: number): numb
   return end;
 }
 
-export function compromiseMatcher(options: {
-  readonly selection: CompromiseEntityMetadata["selection"];
-  readonly lexicon?: CompromiseLexicon;
-  readonly select: (document: View) => CompromiseSelection;
-  readonly normalizedValue?: (result: CompromiseJsonResult, value: string) => string;
-}): PatternMatcher<CompromiseEntityMetadata> {
+export function languageMatcher(options: {
+  readonly category: LanguageEntityMetadata["category"];
+  readonly lexicon?: LanguageLexicon;
+  readonly select: (document: View) => LanguageSelection;
+  readonly normalizedValue?: (result: LanguageJsonResult, value: string) => string;
+}): PatternMatcher<LanguageEntityMetadata> {
   return (text, context) => {
-    const view = options.select(compromiseDocument(text, context, options.lexicon));
+    const view = options.select(languageDocument(text, context, options.lexicon));
     const results = view.json({
       offset: true,
       terms: { text: true, tags: true },
-    }) as CompromiseJsonResult[];
+    }) as LanguageJsonResult[];
 
     return results.flatMap((result) => {
       const start = result.offset?.start;
@@ -88,9 +87,9 @@ export function compromiseMatcher(options: {
       if (end <= (start as number)) return [];
       const value = text.slice(start as number, end);
       const normalizedValue = options.normalizedValue?.(result, value);
-      const details = options.selection === "person"
+      const details = options.category === "person"
         ? result.person
-        : options.selection === "money"
+        : options.category === "money"
           ? result.money
           : undefined;
       return [{
@@ -99,8 +98,7 @@ export function compromiseMatcher(options: {
         end,
         ...(normalizedValue === undefined ? {} : { normalizedValue }),
         metadata: {
-          engine: "compromise" as const,
-          selection: options.selection,
+          category: options.category,
           ...(details === undefined ? {} : { details }),
           ...(result.terms === undefined ? {} : { terms: result.terms }),
         },

@@ -60,7 +60,7 @@ describe("registration and recognition", () => {
   });
 
   it("registers, disables, enables, and removes named recognizers", () => {
-    const ner = new ConsoleNER<"word">({ compromise: false }).registerRecognizer({
+    const ner = new ConsoleNER<"word">({ language: false }).registerRecognizer({
       id: "words",
       patterns: [
         { id: "word-one", tag: "word", pattern: /one/g },
@@ -86,7 +86,7 @@ describe("registration and recognition", () => {
   });
 
   it("registers pattern and recognizer batches atomically", () => {
-    const ner = new ConsoleNER<"word">({ compromise: false }).register({
+    const ner = new ConsoleNER<"word">({ language: false }).register({
       id: "existing",
       tag: "word",
       pattern: /existing/g,

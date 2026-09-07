@@ -1,8 +1,8 @@
 import type { Entity } from "../types/Entity";
 import {
-  compromiseRecognizer,
-  type CompromiseRecognizerOptions,
-} from "../integrations/compromise/recognizer";
+  languageRecognizer,
+  type LanguageRecognizerOptions,
+} from "../integrations/language/recognizer";
 import type { EntityPattern } from "../types/Pattern";
 import type { RecognitionOptions, RecognitionResult } from "../types/Recognition";
 import type { RecognizerDefinition, RecognizerInfo } from "../types/Recognizer";
@@ -30,8 +30,8 @@ export interface ConsoleNEROptions<
   readonly validationConcurrency?: number;
   readonly defaultConfidence?: number;
   readonly defaultValidatorThreshold?: number;
-  /** Configure the default Compromise recognizer, or set false to start without it. */
-  readonly compromise?: false | CompromiseRecognizerOptions;
+  /** Configure ConsoleNER's built-in language recognizer, or set false to omit it. */
+  readonly language?: false | LanguageRecognizerOptions;
   readonly validator?: GlobalValidatorDefinition<
     TTag,
     TEntityMetadata,
@@ -67,9 +67,9 @@ export class ConsoleNER<
         ? {}
         : { onValidationError: options.onValidationError }),
     });
-    if (options.compromise !== false) {
+    if (options.language !== false) {
       this.#registry.registerRecognizer(
-        compromiseRecognizer<TTag, TServices, TEntityMetadata>(options.compromise) as
+        languageRecognizer<TTag, TServices, TEntityMetadata>(options.language) as
           RecognizerDefinition<TTag, TEntityMetadata, TServices>,
       );
     }

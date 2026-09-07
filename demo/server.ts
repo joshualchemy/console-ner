@@ -102,7 +102,7 @@ function createServices(stats: RequestStats): MockServices {
 }
 
 const serverNER = new ConsoleNER<DemoTag, MockServices, DemoMetadata>({
-  compromise: false,
+  language: false,
   contextWindow: 100,
   validationConcurrency: 6,
   defaultValidatorThreshold: 1,

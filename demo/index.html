@@ -1651,24 +1651,6 @@
         class="flex items-center justify-between border-b border-slate-800/90 bg-[#090d14]/95 px-4 sm:px-5"
       >
         <div class="flex min-w-0 items-center gap-3">
-          <div
-            class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-blue-400/25 bg-blue-500/10 text-blue-300 shadow-[0_0_24px_rgba(59,130,246,.12)]"
-          >
-            <svg
-              aria-hidden="true"
-              class="h-4 w-4"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.8"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="m7 8-4 4 4 4m10-8 4 4-4 4m-3-12-4 16"
-              />
-            </svg>
-          </div>
           <div class="min-w-0">
             <h1
               class="truncate text-sm font-semibold tracking-tight text-slate-100"
@@ -2381,10 +2363,10 @@
     <script type="module">
       import {
         ConsoleNER,
-        compromiseMoneyPattern,
-        compromiseOrganizationPattern,
-        compromisePersonPattern,
-        compromisePlacePattern,
+        languageMoneyPattern,
+        languageOrganizationPattern,
+        languagePersonPattern,
+        languagePlacePattern,
         datePatterns,
         emailPattern,
         moneyPattern,
@@ -2428,9 +2410,9 @@ If the review succeeds, Maya Chen will receive confirmation on 2026-10-03. Until
           definition: pattern,
         });
 
-        const defaultCompromiseBuiltIn = (pattern, label, color) => ({
+        const defaultLanguageBuiltIn = (pattern, label, color) => ({
           ...demoBuiltIn(pattern, label, color),
-          defaultRecognizer: "compromise",
+          defaultRecognizer: "language",
         });
 
         const personLabels = [
@@ -2506,9 +2488,9 @@ If the review succeeds, Maya Chen will receive confirmation on 2026-10-03. Until
           ...personPatterns().map((pattern, index) =>
             demoBuiltIn(pattern, personLabels[index], "rose"),
           ),
-          defaultCompromiseBuiltIn(
-            compromisePersonPattern(),
-            "Person · Compromise NLP",
+          defaultLanguageBuiltIn(
+            languagePersonPattern(),
+            "Person · Language",
             "rose",
           ),
           demoBuiltIn(emailPattern(), "Email address", "blue"),
@@ -2528,22 +2510,22 @@ If the review succeeds, Maya Chen will receive confirmation on 2026-10-03. Until
             },
           },
           demoBuiltIn(moneyPattern(), "Currency", "emerald"),
-          defaultCompromiseBuiltIn(
-            compromiseMoneyPattern(),
-            "Currency · Compromise NLP",
+          defaultLanguageBuiltIn(
+            languageMoneyPattern(),
+            "Currency · Language",
             "emerald",
           ),
           ...datePatterns().map((pattern, index) =>
             demoBuiltIn(pattern, dateLabels[index], "amber"),
           ),
-          defaultCompromiseBuiltIn(
-            compromiseOrganizationPattern(),
-            "Organization · Compromise NLP",
+          defaultLanguageBuiltIn(
+            languageOrganizationPattern(),
+            "Organization · Language",
             "cyan",
           ),
-          defaultCompromiseBuiltIn(
-            compromisePlacePattern(),
-            "Place · Compromise NLP",
+          defaultLanguageBuiltIn(
+            languagePlacePattern(),
+            "Place · Language",
             "blue",
           ),
           ...backendRecognizers,
@@ -2635,19 +2617,21 @@ If the review succeeds, Maya Chen will receive confirmation on 2026-10-03. Until
 
         const localNER = new ConsoleNER({
           contextWindow: 60,
-          compromise: { allowOverlap: true },
+          language: { allowOverlap: true },
         });
 
         function registerLocalRecognizer(item) {
           if (item.backend || item.defaultRecognizer) return;
           localNER.registerRecognizer({
             id: item.id,
-            patterns: [{
-              ...item.definition,
-              id: item.patternId,
-              // Let the workbench's overlap switch decide whether candidates coexist.
-              allowOverlap: true,
-            }],
+            patterns: [
+              {
+                ...item.definition,
+                id: item.patternId,
+                // Let the workbench's overlap switch decide whether candidates coexist.
+                allowOverlap: true,
+              },
+            ],
           });
         }
 
@@ -2744,13 +2728,15 @@ If the review succeeds, Maya Chen will receive confirmation on 2026-10-03. Until
           const terms = Array.isArray(entity.metadata?.terms)
             ? entity.metadata.terms
             : [];
-          return [...new Set(
-            terms.flatMap((term) =>
-              Array.isArray(term?.tags)
-                ? term.tags.filter((tag) => typeof tag === "string" && tag)
-                : [],
+          return [
+            ...new Set(
+              terms.flatMap((term) =>
+                Array.isArray(term?.tags)
+                  ? term.tags.filter((tag) => typeof tag === "string" && tag)
+                  : [],
+              ),
             ),
-          )].sort();
+          ].sort();
         }
 
         function renderMatchedTags(entity) {
@@ -2952,7 +2938,9 @@ If the review succeeds, Maya Chen will receive confirmation on 2026-10-03. Until
             registeredId = id;
           }
 
-          const registered = recognizers.find((item) => item.id === registeredId);
+          const registered = recognizers.find(
+            (item) => item.id === registeredId,
+          );
           if (registered) setRecognizerEnabled(registered, true);
           persistRegisteredPatterns();
           renderRecognizerControls();
@@ -3241,11 +3229,13 @@ If the review succeeds, Maya Chen will receive confirmation on 2026-10-03. Until
               confidence: Number(els.confidenceSlider.value) / 100,
               allowOverlap: true,
             });
-            entities.push(...draftNER.recognize(text).entities.map((entity) => ({
-              ...entity,
-              priority: 0,
-              source: "draft",
-            })));
+            entities.push(
+              ...draftNER.recognize(text).entities.map((entity) => ({
+                ...entity,
+                priority: 0,
+                source: "draft",
+              })),
+            );
           }
           if (els.resolveOverlaps.checked) entities = resolveEntities(entities);
           else entities.sort((a, b) => a.start - b.start || a.end - b.end);
@@ -3635,7 +3625,9 @@ If the review succeeds, Maya Chen will receive confirmation on 2026-10-03. Until
               .filter(
                 (item) => item.tag === event.target.dataset.recognizerGroup,
               )
-              .forEach((item) => setRecognizerEnabled(item, event.target.checked));
+              .forEach((item) =>
+                setRecognizerEnabled(item, event.target.checked),
+              );
             renderRecognizerControls();
             syncToggleAllLabel();
             scheduleRecognition();

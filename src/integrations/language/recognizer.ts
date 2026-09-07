@@ -1,40 +1,40 @@
 import type { RecognizerDefinition } from "../../types/Recognizer";
 import {
-  compromisePatterns,
-  type CompromiseBuiltInTag,
-  type CompromisePatternsOptions,
+  languagePatterns,
+  type LanguageBuiltInTag,
+  type LanguagePatternsOptions,
 } from "./patterns";
-import type { CompromiseEntityMetadata, CompromiseLexicon } from "./matcher";
+import type { LanguageEntityMetadata, LanguageLexicon } from "./matcher";
 
-export const COMPROMISE_RECOGNIZER_ID = "compromise";
+export const LANGUAGE_RECOGNIZER_ID = "language";
 
-export interface CompromiseRecognizerOptions {
+export interface LanguageRecognizerOptions {
   readonly id?: string;
   readonly enabled?: boolean;
-  readonly lexicon?: CompromiseLexicon;
+  readonly lexicon?: LanguageLexicon;
   readonly patternIdPrefix?: string;
   readonly allowOverlap?: boolean;
 }
 
-export function compromiseRecognizer<
+export function languageRecognizer<
   TAdditionalTag extends string = never,
   TServices = undefined,
   TAdditionalMetadata = never,
 >(
-  options: CompromiseRecognizerOptions = {},
+  options: LanguageRecognizerOptions = {},
 ): RecognizerDefinition<
-  CompromiseBuiltInTag | TAdditionalTag,
-  CompromiseEntityMetadata | TAdditionalMetadata,
+  LanguageBuiltInTag | TAdditionalTag,
+  LanguageEntityMetadata | TAdditionalMetadata,
   TServices
 > {
-  const patternOptions: CompromisePatternsOptions = {
+  const patternOptions: LanguagePatternsOptions = {
     ...(options.patternIdPrefix === undefined ? {} : { id: options.patternIdPrefix }),
     ...(options.lexicon === undefined ? {} : { lexicon: options.lexicon }),
     ...(options.allowOverlap === undefined ? {} : { allowOverlap: options.allowOverlap }),
   };
   return {
-    id: options.id ?? COMPROMISE_RECOGNIZER_ID,
+    id: options.id ?? LANGUAGE_RECOGNIZER_ID,
     enabled: options.enabled ?? true,
-    patterns: compromisePatterns(patternOptions),
+    patterns: languagePatterns(patternOptions),
   };
 }

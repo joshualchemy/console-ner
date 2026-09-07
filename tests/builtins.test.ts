@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
   ConsoleNER,
-  compromisePatterns,
-  compromisePersonPattern,
+  languagePatterns,
+  languagePersonPattern,
   datePatterns,
   emailPattern,
   ipv4Pattern,
@@ -17,7 +17,7 @@ import {
 
 describe("built-in patterns", () => {
   it("recognizes and normalizes common contact and money values", () => {
-    const ner = new ConsoleNER<"email" | "money" | "phone">({ compromise: false }).register([
+    const ner = new ConsoleNER<"email" | "money" | "phone">({ language: false }).register([
       emailPattern(),
       moneyPattern(),
       phonePattern(),
@@ -35,7 +35,7 @@ describe("built-in patterns", () => {
   });
 
   it("provides the common date formats as one reusable pattern set", () => {
-    const ner = new ConsoleNER<"date">({ compromise: false }).register(datePatterns());
+    const ner = new ConsoleNER<"date">({ language: false }).register(datePatterns());
     const values = ner
       .recognize("September 12, 2026; 12 September 2026; 2026-09-03; 9/15/2026; 30.09.2026")
       .entities.map((entity) => entity.value);
@@ -50,7 +50,7 @@ describe("built-in patterns", () => {
   });
 
   it("provides honorific, contextual, and full-name person patterns", () => {
-    const ner = new ConsoleNER<"person">({ compromise: false }).register(personPatterns());
+    const ner = new ConsoleNER<"person">({ language: false }).register(personPatterns());
     const values = ner
       .recognize("Please ask Dr. José Álvarez and contact Maya. Jean-Luc Picard approved it.")
       .entities.map((entity) => entity.value);
@@ -61,7 +61,7 @@ describe("built-in patterns", () => {
   it("provides browser-safe organization, address, and validated numeric patterns", () => {
     const ner = new ConsoleNER<
       "ip_address" | "organization" | "payment_card" | "postal_address" | "routing_number"
-    >({ compromise: false }).register([
+    >({ language: false }).register([
       organizationPattern(),
       paymentCardPattern(),
       routingNumberPattern(),
@@ -84,8 +84,8 @@ describe("built-in patterns", () => {
   });
 
   it("prefers a complete postal address over person-like fragments inside it", () => {
-    const ner = new ConsoleNER<"person" | "postal_address">({ compromise: false }).register([
-      compromisePersonPattern(),
+    const ner = new ConsoleNER<"person" | "postal_address">({ language: false }).register([
+      languagePersonPattern(),
       postalAddressPattern(),
     ]);
 
@@ -96,12 +96,12 @@ describe("built-in patterns", () => {
     ]);
   });
 
-  it("provides contextual Compromise patterns with exact offsets and metadata", () => {
+  it("provides contextual language patterns with exact offsets and metadata", () => {
     const text = "Later, mary met Google in Paris to discuss twelve dollars in filing fees.";
     const ner = new ConsoleNER<"money" | "organization" | "person" | "place">({
-      compromise: false,
+      language: false,
     })
-      .register(compromisePatterns());
+      .register(languagePatterns());
     const entities = ner.recognize(text).entities;
 
     expect(entities.map(({ tag, value, normalizedValue }) => ({
@@ -117,13 +117,13 @@ describe("built-in patterns", () => {
     expect(entities.every((entity) => text.slice(entity.start, entity.end) === entity.value))
       .toBe(true);
     expect(entities.every((entity) =>
-      (entity.metadata as { engine?: string } | undefined)?.engine === "compromise"
+      (entity.metadata as { category?: string } | undefined)?.category === entity.tag
     )).toBe(true);
   });
 
-  it("accepts a scoped Compromise lexicon for unknown lowercase names", () => {
-    const ner = new ConsoleNER<"person">({ compromise: false }).register(
-      compromisePersonPattern({
+  it("accepts a scoped language lexicon for unknown lowercase names", () => {
+    const ner = new ConsoleNER<"person">({ language: false }).register(
+      languagePersonPattern({
         lexicon: { xyloph: "FirstName", zorb: "LastName" },
       }),
     );
@@ -133,7 +133,7 @@ describe("built-in patterns", () => {
   });
 
   it("supports custom tags across built-in pattern sets", () => {
-    const ner = new ConsoleNER<"calendar_date" | "person_name">({ compromise: false }).register([
+    const ner = new ConsoleNER<"calendar_date" | "person_name">({ language: false }).register([
       ...datePatterns({ tag: "calendar_date" }),
       ...personPatterns({ tag: "person_name" }),
     ]);
