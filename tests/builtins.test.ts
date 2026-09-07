@@ -1,8 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
   ConsoleNER,
-  compromisePatterns,
-  compromisePersonPattern,
   datePatterns,
   emailPattern,
   ipv4Pattern,
@@ -14,6 +12,7 @@ import {
   postalAddressPattern,
   routingNumberPattern,
 } from "../src";
+import { compromisePatterns, compromisePersonPattern } from "../src/compromise";
 
 describe("built-in patterns", () => {
   it("recognizes and normalizes common contact and money values", () => {

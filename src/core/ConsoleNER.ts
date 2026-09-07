@@ -1,6 +1,7 @@
 import type { Entity } from "../types/Entity";
 import type { EntityPattern } from "../types/Pattern";
 import type { RecognitionOptions, RecognitionResult } from "../types/Recognition";
+import type { RecognizerDefinition, RecognizerInfo } from "../types/Recognizer";
 import type { Token } from "../types/Token";
 import type {
   GlobalValidatorDefinition,
@@ -68,8 +69,31 @@ export class ConsoleNER<
       | readonly EntityPattern<TTag, TEntityMetadata, TServices>[],
   ): this {
     const definitions = Array.isArray(definition) ? definition : [definition];
-    for (const pattern of definitions) this.#registry.register(pattern);
+    this.#registry.registerMany(definitions);
     return this;
+  }
+
+  registerRecognizer(
+    recognizer: RecognizerDefinition<TTag, TEntityMetadata, TServices>,
+  ): this {
+    this.#registry.registerRecognizer(recognizer);
+    return this;
+  }
+
+  unregisterRecognizer(id: string): boolean {
+    return this.#registry.unregisterRecognizer(id);
+  }
+
+  enableRecognizer(id: string): boolean {
+    return this.#registry.setRecognizerEnabled(id, true);
+  }
+
+  disableRecognizer(id: string): boolean {
+    return this.#registry.setRecognizerEnabled(id, false);
+  }
+
+  listRecognizers(): readonly RecognizerInfo[] {
+    return this.#registry.recognizers();
   }
 
   unregisterPattern(id: string): boolean {
@@ -103,7 +127,7 @@ export class ConsoleNER<
     const excludedPatterns =
       options.excludePatternIds === undefined ? undefined : new Set(options.excludePatternIds);
     const patterns = this.#registry
-      .all()
+      .active()
       .filter(
         (pattern) =>
           (included === undefined || included.has(pattern.tag)) &&

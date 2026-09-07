@@ -4,11 +4,11 @@ export function builtInId(id: string | undefined, suffix: string): string {
   return id ? `${id}-${suffix}` : `builtin-${suffix}`;
 }
 
-export function capturedPattern(
+export function capturedPattern<TMetadata = never>(
   regex: RegExp,
   captureGroup = 1,
   accept: (value: string) => boolean = () => true,
-): PatternMatcher {
+): PatternMatcher<TMetadata> {
   return (text) => {
     const matches = [];
     regex.lastIndex = 0;

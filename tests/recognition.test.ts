@@ -59,6 +59,72 @@ describe("registration and recognition", () => {
     expect(excluded.recognitionOptions?.excludePatternIds).toEqual(["second"]);
   });
 
+  it("registers, disables, enables, and removes named recognizers", () => {
+    const ner = new ConsoleNER<"word">().registerRecognizer({
+      id: "words",
+      patterns: [
+        { id: "word-one", tag: "word", pattern: /one/g },
+        { id: "word-two", tag: "word", pattern: /two/g, enabled: false },
+      ],
+    });
+
+    expect(ner.listRecognizers()).toEqual([
+      { id: "words", enabled: true, patternIds: ["word-one", "word-two"] },
+    ]);
+    expect(ner.recognize("one two").entities.map((entity) => entity.value)).toEqual(["one"]);
+    expect(ner.disableRecognizer("words")).toBe(true);
+    expect(ner.recognize("one two").entities).toEqual([]);
+    expect(ner.enablePattern("word-two")).toBe(true);
+    expect(ner.enableRecognizer("words")).toBe(true);
+    expect(ner.recognize("one two").entities.map((entity) => entity.value)).toEqual([
+      "one",
+      "two",
+    ]);
+    expect(ner.unregisterRecognizer("words")).toBe(true);
+    expect(ner.listRecognizers()).toEqual([]);
+    expect(ner.recognize("one two").entities).toEqual([]);
+  });
+
+  it("registers pattern and recognizer batches atomically", () => {
+    const ner = new ConsoleNER<"word">().register({
+      id: "existing",
+      tag: "word",
+      pattern: /existing/g,
+    });
+
+    expect(() => ner.register([
+      { id: "would-be-added", tag: "word", pattern: /added/g },
+      { id: "existing", tag: "word", pattern: /duplicate/g },
+    ])).toThrow(/already registered/);
+    expect(() => ner.registerRecognizer({
+      id: "invalid-group",
+      patterns: [
+        { id: "another-new-pattern", tag: "word", pattern: /new/g },
+        { id: "existing", tag: "word", pattern: /duplicate/g },
+      ],
+    })).toThrow(/already registered/);
+
+    expect(ner.recognize("existing added new").entities.map((entity) => entity.value)).toEqual([
+      "existing",
+    ]);
+    expect(ner.listRecognizers()).toEqual([]);
+  });
+
+  it("allocates anonymous pattern IDs around explicit IDs", () => {
+    const ner = new ConsoleNER<"word">().register([
+      { id: "pattern-0", tag: "word", pattern: /zero/g },
+      { tag: "word", pattern: /one/g },
+    ]);
+
+    expect(ner.recognize("zero one").entities.map(({ value, patternId }) => ({
+      value,
+      patternId,
+    }))).toEqual([
+      { value: "zero", patternId: "pattern-0" },
+      { value: "one", patternId: "pattern-1" },
+    ]);
+  });
+
   it("memoizes shared analysis for matchers during one recognition", () => {
     const key = {};
     const createAnalysis = vi.fn(() => ({ ready: true }));

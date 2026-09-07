@@ -1056,6 +1056,7 @@
       .recognizer-actions {
         position: absolute;
         right: 6px;
+        z-index: 1;
         display: flex;
         align-items: center;
         gap: 4px;
@@ -2352,6 +2353,7 @@
     <script src="https://cdn.jsdelivr.net/npm/flowbite@4.0.1/dist/flowbite.min.js"></script>
     <script type="module">
       import {
+        ConsoleNER,
         compromiseMoneyPattern,
         compromiseOrganizationPattern,
         compromisePersonPattern,
@@ -2361,7 +2363,7 @@
         moneyPattern,
         personPatterns,
         phonePattern,
-      } from "../dist/index.js";
+      } from "../dist/compromise.js";
 
       (() => {
         const sampleText = `Northstar Analytics LLC - identity review case CN-2026-004218
@@ -2384,10 +2386,7 @@ Additional deadlines are 12 September 2026, 2026-09-03, 9/15/2026, and 30.09.202
           confidence: pattern.confidence,
           priority: pattern.priority ?? 0,
           patternId: pattern.id,
-          ...(pattern.pattern instanceof RegExp
-            ? { regex: pattern.pattern }
-            : { matcher: pattern.pattern }),
-          normalize: pattern.normalize,
+          definition: pattern,
         });
 
         const personLabels = [
@@ -2477,7 +2476,12 @@ Additional deadlines are 12 September 2026, 2026-09-03, 9/15/2026, and 30.09.202
             color: "violet",
             confidence: 0.98,
             patternId: "loan-number",
-            regex: /\b80[4-9]\d{7}\b/g,
+            definition: {
+              id: "loan-number",
+              tag: "loan_number",
+              pattern: /\b80[4-9]\d{7}\b/g,
+              confidence: 0.98,
+            },
           },
           demoBuiltIn(moneyPattern(), "Currency", "emerald"),
           demoBuiltIn(
@@ -2564,18 +2568,60 @@ Additional deadlines are 12 September 2026, 2026-09-03, 9/15/2026, and 30.09.202
           );
           for (const saved of savedPatterns) {
             if (!saved.id || !saved.source || !saved.tag) continue;
+            if (recognizers.some((item) => item.id === saved.id)) continue;
+            const regex = new RegExp(saved.source, saved.flags || "g");
+            const confidence = Number(saved.confidence) || 0.5;
             recognizers.push({
               id: saved.id,
               label: saved.label || saved.tag,
               tag: saved.tag,
               color: "violet",
-              confidence: Number(saved.confidence) || 0.5,
+              confidence,
               patternId: saved.patternId || saved.id,
-              regex: new RegExp(saved.source, saved.flags || "g"),
+              definition: {
+                id: saved.patternId || saved.id,
+                tag: saved.tag,
+                pattern: regex,
+                confidence,
+              },
               registered: true,
             });
           }
         } catch {}
+
+        const localNER = new ConsoleNER({ contextWindow: 60 });
+
+        function registerLocalRecognizer(item) {
+          if (item.backend) return;
+          localNER.registerRecognizer({
+            id: item.id,
+            patterns: [{
+              ...item.definition,
+              id: item.patternId,
+              // Let the workbench's overlap switch decide whether candidates coexist.
+              allowOverlap: true,
+            }],
+          });
+        }
+
+        function replaceLocalRecognizer(item) {
+          const wasEnabled = enabledRecognizerIds.has(item.id);
+          localNER.unregisterRecognizer(item.id);
+          registerLocalRecognizer(item);
+          if (!wasEnabled) localNER.disableRecognizer(item.id);
+        }
+
+        function setRecognizerEnabled(item, enabled) {
+          if (enabled) enabledRecognizerIds.add(item.id);
+          else enabledRecognizerIds.delete(item.id);
+          if (item.backend) return;
+          const updated = enabled
+            ? localNER.enableRecognizer(item.id)
+            : localNER.disableRecognizer(item.id);
+          if (!updated) console.warn(`Unknown local recognizer: ${item.id}`);
+        }
+
+        for (const item of recognizers) registerLocalRecognizer(item);
 
         let localEntities = [];
         let currentEntities = [];
@@ -2721,8 +2767,8 @@ Additional deadlines are 12 September 2026, 2026-09-03, 9/15/2026, and 30.09.202
               tag: item.tag,
               confidence: item.confidence,
               patternId: item.patternId,
-              source: item.regex.source,
-              flags: item.regex.flags,
+              source: item.definition.pattern.source,
+              flags: item.definition.pattern.flags,
             }));
           try {
             localStorage.setItem("console-ner-patterns", JSON.stringify(saved));
@@ -2793,13 +2839,18 @@ Additional deadlines are 12 September 2026, 2026-09-03, 9/15/2026, and 30.09.202
             (item) =>
               item.registered &&
               item.tag === tag &&
-              item.regex.source === regex.source &&
-              item.regex.flags === regex.flags,
+              item.definition.pattern.source === regex.source &&
+              item.definition.pattern.flags === regex.flags,
           );
           let registeredId;
           if (existing) {
             existing.confidence = confidence;
             existing.label = patternName;
+            existing.definition = {
+              ...existing.definition,
+              confidence,
+            };
+            replaceLocalRecognizer(existing);
             registeredId = existing.id;
           } else {
             const slug =
@@ -2809,20 +2860,28 @@ Additional deadlines are 12 September 2026, 2026-09-03, 9/15/2026, and 30.09.202
                 .replace(/^-|-$/g, "")
                 .slice(0, 28) || "pattern";
             const id = `${slug}-${Date.now().toString(36)}`;
-            recognizers.push({
+            const registered = {
               id,
               label: patternName,
               tag,
               color: "violet",
               confidence,
               patternId: id,
-              regex,
+              definition: {
+                id,
+                tag,
+                pattern: regex,
+                confidence,
+              },
               registered: true,
-            });
+            };
+            recognizers.push(registered);
+            registerLocalRecognizer(registered);
             registeredId = id;
           }
 
-          enabledRecognizerIds.add(registeredId);
+          const registered = recognizers.find((item) => item.id === registeredId);
+          if (registered) setRecognizerEnabled(registered, true);
           persistRegisteredPatterns();
           renderRecognizerControls();
           syncToggleAllLabel();
@@ -2859,84 +2918,6 @@ Additional deadlines are 12 September 2026, 2026-09-03, 9/15/2026, and 30.09.202
           els.patternStatus.setAttribute("aria-label", status);
           els.patternInput.setAttribute("aria-invalid", String(!valid));
           els.patternInput.classList.toggle("border-rose-500", !valid);
-        }
-
-        function scanRecognizer(text, definition, recognitionContext) {
-          const matches = [];
-          if (definition.matcher) {
-            for (const candidate of definition.matcher(
-              text,
-              recognitionContext,
-            )) {
-              const start = Number(candidate.start);
-              const end = Number(candidate.end);
-              if (
-                !Number.isInteger(start) ||
-                !Number.isInteger(end) ||
-                start < 0 ||
-                end <= start ||
-                end > text.length ||
-                text.slice(start, end) !== candidate.value
-              )
-                continue;
-              const context = {
-                text,
-                before: text.slice(Math.max(0, start - 60), start),
-                after: text.slice(end, end + 60),
-                start,
-                end,
-              };
-              matches.push({
-                id: `${definition.tag}:${start}:${end}:${definition.patternId}`,
-                tag: definition.tag,
-                value: candidate.value,
-                normalizedValue:
-                  candidate.normalizedValue ??
-                  (definition.normalize
-                    ? definition.normalize(candidate.value, context)
-                    : candidate.value),
-                start,
-                end,
-                confidence: candidate.confidence ?? definition.confidence,
-                priority: definition.priority ?? 0,
-                source: "built-in",
-                patternId: definition.patternId,
-              });
-            }
-            return matches;
-          }
-          definition.regex.lastIndex = 0;
-          let match;
-          while ((match = definition.regex.exec(text)) !== null) {
-            if (!match[0]) {
-              definition.regex.lastIndex += 1;
-              continue;
-            }
-            const captureGroup = definition.captureGroup || 0;
-            const value = match[captureGroup] || match[0];
-            if (definition.validate && !definition.validate(value, match, text))
-              continue;
-            const captureOffset = captureGroup ? match[0].indexOf(value) : 0;
-            const start = match.index + Math.max(0, captureOffset);
-            const end = start + value.length;
-            matches.push({
-              id: `${definition.tag}:${start}:${end}:${definition.patternId}`,
-              tag: definition.tag,
-              value,
-              normalizedValue: definition.normalize
-                ? definition.normalize(value)
-                : value,
-              start,
-              end,
-              confidence: definition.confidence,
-              priority: definition.priority ?? 0,
-              source:
-                definition.source ||
-                (definition.registered ? "registered" : "built-in"),
-              patternId: definition.patternId,
-            });
-          }
-          return matches;
         }
 
         function resolveEntities(entities) {
@@ -3157,20 +3138,17 @@ Additional deadlines are 12 September 2026, 2026-09-03, 9/15/2026, and 30.09.202
           hideEntityTooltip();
           const started = performance.now();
           const text = els.sourceText.value;
-          const enabledIds = enabledRecognizerIds;
-          const recognitionCache = new Map();
-          const recognitionContext = {
-            text,
-            memoize(key, create) {
-              if (recognitionCache.has(key)) return recognitionCache.get(key);
-              const value = create();
-              recognitionCache.set(key, value);
-              return value;
-            },
-          };
-          let entities = recognizers
-            .filter((item) => !item.backend && enabledIds.has(item.id))
-            .flatMap((item) => scanRecognizer(text, item, recognitionContext));
+          let entities = localNER.recognize(text).entities.map((entity) => {
+            const item = recognizers.find(
+              (candidate) =>
+                !candidate.backend && candidate.patternId === entity.patternId,
+            );
+            return {
+              ...entity,
+              priority: item?.priority ?? 0,
+              source: item?.registered ? "registered" : "built-in",
+            };
+          });
           const customRegex = parseCustomPattern();
           const draftTag = els.customTag.value.trim() || "custom";
           const matchesRegisteredPattern =
@@ -3178,25 +3156,24 @@ Additional deadlines are 12 September 2026, 2026-09-03, 9/15/2026, and 30.09.202
             recognizers.some(
               (item) =>
                 item.registered &&
-                enabledIds.has(item.id) &&
+                enabledRecognizerIds.has(item.id) &&
                 item.tag === draftTag &&
-                item.regex.source === customRegex.source &&
-                item.regex.flags === customRegex.flags,
+                item.definition.pattern.source === customRegex.source &&
+                item.definition.pattern.flags === customRegex.flags,
             );
           if (customRegex && !matchesRegisteredPattern) {
-            entities.push(
-              ...scanRecognizer(
-                text,
-                {
-                  tag: draftTag,
-                  confidence: Number(els.confidenceSlider.value) / 100,
-                  patternId: "custom-pattern",
-                  source: "draft",
-                  regex: customRegex,
-                },
-                recognitionContext,
-              ),
-            );
+            const draftNER = new ConsoleNER().register({
+              id: "custom-pattern",
+              tag: draftTag,
+              pattern: customRegex,
+              confidence: Number(els.confidenceSlider.value) / 100,
+              allowOverlap: true,
+            });
+            entities.push(...draftNER.recognize(text).entities.map((entity) => ({
+              ...entity,
+              priority: 0,
+              source: "draft",
+            })));
           }
           if (els.resolveOverlaps.checked) entities = resolveEntities(entities);
           else entities.sort((a, b) => a.start - b.start || a.end - b.end);
@@ -3569,9 +3546,10 @@ Additional deadlines are 12 September 2026, 2026-09-03, 9/15/2026, and 30.09.202
 
         document.addEventListener("change", (event) => {
           if (event.target.matches("[data-recognizer]")) {
-            if (event.target.checked)
-              enabledRecognizerIds.add(event.target.dataset.recognizer);
-            else enabledRecognizerIds.delete(event.target.dataset.recognizer);
+            const item = recognizers.find(
+              (candidate) => candidate.id === event.target.dataset.recognizer,
+            );
+            if (item) setRecognizerEnabled(item, event.target.checked);
             renderRecognizerControls();
             syncToggleAllLabel();
             scheduleRecognition();
@@ -3581,10 +3559,7 @@ Additional deadlines are 12 September 2026, 2026-09-03, 9/15/2026, and 30.09.202
               .filter(
                 (item) => item.tag === event.target.dataset.recognizerGroup,
               )
-              .forEach((item) => {
-                if (event.target.checked) enabledRecognizerIds.add(item.id);
-                else enabledRecognizerIds.delete(item.id);
-              });
+              .forEach((item) => setRecognizerEnabled(item, event.target.checked));
             renderRecognizerControls();
             syncToggleAllLabel();
             scheduleRecognition();
@@ -3617,6 +3592,7 @@ Additional deadlines are 12 September 2026, 2026-09-03, 9/15/2026, and 30.09.202
               item.id === removeButton.dataset.removePattern && item.registered,
           );
           if (index >= 0) {
+            localNER.unregisterRecognizer(recognizers[index].id);
             enabledRecognizerIds.delete(recognizers[index].id);
             recognizers.splice(index, 1);
             persistRegisteredPatterns();
@@ -3686,9 +3662,9 @@ Additional deadlines are 12 September 2026, 2026-09-03, 9/15/2026, and 30.09.202
           const shouldEnable = recognizers.some(
             (item) => !enabledRecognizerIds.has(item.id),
           );
-          enabledRecognizerIds.clear();
-          if (shouldEnable)
-            recognizers.forEach((item) => enabledRecognizerIds.add(item.id));
+          recognizers.forEach((item) =>
+            setRecognizerEnabled(item, shouldEnable),
+          );
           renderRecognizerControls();
           syncToggleAllLabel();
           scheduleRecognition();

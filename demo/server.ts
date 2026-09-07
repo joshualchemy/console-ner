@@ -198,9 +198,14 @@ const serverPatterns = [
   ),
 ] as const;
 
-serverNER.register(serverPatterns);
-const serverPatternIds = new Set(
-  serverPatterns.map((pattern) => pattern.id),
+for (const pattern of serverPatterns) {
+  serverNER.registerRecognizer({
+    id: pattern.id,
+    patterns: [pattern],
+  });
+}
+const serverRecognizerIds = new Set(
+  serverNER.listRecognizers().map((recognizer) => recognizer.id),
 );
 
 const corsHeaders = {
@@ -214,7 +219,7 @@ const liveReloadEnabled = Bun.argv.includes("--live-reload");
 const liveReloadInstance = crypto.randomUUID();
 const demoFileUrl = new URL("./index.html", import.meta.url);
 const browserBuild = await Bun.build({
-  entrypoints: [new URL("../src/index.ts", import.meta.url).pathname],
+  entrypoints: [new URL("../src/compromise.ts", import.meta.url).pathname],
   format: "esm",
   target: "browser",
 });
@@ -244,9 +249,14 @@ const server = Bun.serve({
       });
     }
     if (request.method === "GET" && url.pathname === "/api/health") {
-      return json({ ok: true, service: "console-ner-demo", mode: "mock" });
+      return json({
+        ok: true,
+        service: "console-ner-demo",
+        mode: "mock",
+        recognizers: serverNER.listRecognizers(),
+      });
     }
-    if (request.method === "GET" && url.pathname === "/dist/index.js") {
+    if (request.method === "GET" && url.pathname === "/dist/compromise.js") {
       return new Response(browserBundle, {
         headers: {
           "Cache-Control": liveReloadEnabled ? "no-store" : "no-cache",
@@ -256,29 +266,34 @@ const server = Bun.serve({
     }
     if (request.method === "POST" && url.pathname === "/api/recognize") {
       const started = performance.now();
+      let body: { text?: unknown; recognizerIds?: unknown };
       try {
-        const body = await request.json() as { text?: unknown; recognizerIds?: unknown };
-        if (typeof body.text !== "string") return json({ error: "Expected a text string" }, 400);
-        if (body.text.length > 100_000) return json({ error: "Text is limited to 100,000 characters" }, 413);
-        if (
-          body.recognizerIds !== undefined &&
-          (!Array.isArray(body.recognizerIds) ||
-            !body.recognizerIds.every((id) => typeof id === "string"))
-        ) {
-          return json({ error: "Expected recognizerIds to be an array of strings" }, 400);
-        }
+        body = await request.json() as { text?: unknown; recognizerIds?: unknown };
+      } catch {
+        return json({ error: "Invalid JSON request" }, 400);
+      }
+      if (typeof body.text !== "string") return json({ error: "Expected a text string" }, 400);
+      if (body.text.length > 100_000) return json({ error: "Text is limited to 100,000 characters" }, 413);
+      if (
+        body.recognizerIds !== undefined &&
+        (!Array.isArray(body.recognizerIds) ||
+          !body.recognizerIds.every((id) => typeof id === "string"))
+      ) {
+        return json({ error: "Expected recognizerIds to be an array of strings" }, 400);
+      }
 
-        const recognizerIds = body.recognizerIds === undefined
-          ? [...serverPatternIds]
-          : [...new Set(body.recognizerIds as string[])];
-        const unknownRecognizerIds = recognizerIds.filter((id) => !serverPatternIds.has(id));
-        if (unknownRecognizerIds.length > 0) {
-          return json({
-            error: "Unknown backend recognizer",
-            recognizerIds: unknownRecognizerIds,
-          }, 400);
-        }
+      const recognizerIds = body.recognizerIds === undefined
+        ? [...serverRecognizerIds]
+        : [...new Set(body.recognizerIds as string[])];
+      const unknownRecognizerIds = recognizerIds.filter((id) => !serverRecognizerIds.has(id));
+      if (unknownRecognizerIds.length > 0) {
+        return json({
+          error: "Unknown backend recognizer",
+          recognizerIds: unknownRecognizerIds,
+        }, 400);
+      }
 
+      try {
         const stats: RequestStats = { checks: 0 };
         const recognition = serverNER.recognize(body.text, { patternIds: recognizerIds });
         const result = await serverNER.validate(recognition, { services: createServices(stats) });
@@ -296,8 +311,9 @@ const server = Bun.serve({
           },
           service: "ConsoleNER mock validation API",
         });
-      } catch {
-        return json({ error: "Invalid JSON request" }, 400);
+      } catch (error) {
+        console.error("Demo recognition failed", error);
+        return json({ error: "Recognition failed" }, 500);
       }
     }
     if (request.method === "GET" && (url.pathname === "/" || url.pathname === "/index.html")) {

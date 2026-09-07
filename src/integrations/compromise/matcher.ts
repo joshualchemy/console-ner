@@ -1,7 +1,7 @@
 import nlp from "compromise";
 import type View from "compromise/view/three";
 import type { PatternMatcher, RecognitionContext } from "../../types/Pattern";
-import type { BuiltInPatternOptions } from "./types";
+import type { BuiltInPatternOptions } from "../../patterns/builtins/types";
 
 export type CompromiseLexicon = Readonly<Record<string, string>>;
 

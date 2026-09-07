@@ -7,7 +7,10 @@ export interface BuiltInPatternOptions<TTag extends string> {
   readonly priority?: number;
 }
 
-export type BuiltInPattern<TTag extends string> = Omit<
-  EntityPattern<TTag, unknown, never>,
-  "validator"
->;
+export type BuiltInPattern<TTag extends string, TMetadata = never> = Omit<
+  EntityPattern<TTag, TMetadata, never>,
+  "confidence" | "metadata" | "validator"
+> & {
+  /** Built-ins use a fixed score so their metadata type remains safely composable. */
+  readonly confidence?: number;
+};

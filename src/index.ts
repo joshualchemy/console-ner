@@ -1,11 +1,6 @@
 export { ConsoleNER } from "./core/ConsoleNER";
 export type { ConsoleNEROptions } from "./core/ConsoleNER";
 export {
-  compromiseMoneyPattern,
-  compromiseOrganizationPattern,
-  compromisePatterns,
-  compromisePersonPattern,
-  compromisePlacePattern,
   datePatterns,
   emailPattern,
   ipv4Pattern,
@@ -20,11 +15,6 @@ export {
 export type {
   BuiltInPattern,
   BuiltInPatternOptions,
-  CompromiseBuiltInPatternOptions,
-  CompromiseBuiltInTag,
-  CompromiseEntityMetadata,
-  CompromiseLexicon,
-  CompromisePatternsOptions,
 } from "./patterns/builtins";
 export { regexPattern } from "./patterns/regexPattern";
 export type { Entity } from "./types/Entity";
@@ -38,6 +28,7 @@ export type {
   RegexPatternOptions,
 } from "./types/Pattern";
 export type { RecognitionOptions, RecognitionResult } from "./types/Recognition";
+export type { RecognizerDefinition, RecognizerInfo } from "./types/Recognizer";
 export type { EntityToken, TextToken, Token } from "./types/Token";
 export type {
   EntityValidationResult,
