@@ -8,6 +8,9 @@ ConsoleNER is ESM and works in modern Node.js, Bun, and browser builds. Its
 built-in language recognizer provides person, organization, place, and money
 entities out of the box.
 
+<img width="1431" height="689" alt="image" src="https://github.com/user-attachments/assets/14200982-3897-4070-ba05-ec3a2a5842b8" />
+
+
 ## Installation
 
 ```sh
