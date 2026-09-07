@@ -219,6 +219,7 @@ const corsHeaders = {
 const liveReloadEnabled = Bun.argv.includes("--live-reload");
 const liveReloadInstance = crypto.randomUUID();
 const demoFileUrl = new URL("./index.html", import.meta.url);
+const logoFileUrl = new URL("./assets/console-ner-logo.png", import.meta.url);
 const browserBuild = await Bun.build({
   entrypoints: [new URL("../src/index.ts", import.meta.url).pathname],
   format: "esm",
@@ -262,6 +263,19 @@ const server = Bun.serve({
         headers: {
           "Cache-Control": liveReloadEnabled ? "no-store" : "no-cache",
           "Content-Type": "text/javascript; charset=utf-8",
+        },
+      });
+    }
+    if (
+      request.method === "GET" &&
+      url.pathname === "/assets/console-ner-logo.png"
+    ) {
+      return new Response(Bun.file(logoFileUrl), {
+        headers: {
+          "Cache-Control": liveReloadEnabled
+            ? "no-store"
+            : "public, max-age=86400",
+          "Content-Type": "image/png",
         },
       });
     }

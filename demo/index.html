@@ -109,6 +109,7 @@
       .app-grid {
         --left-width: 240px;
         --right-width: 352px;
+        position: relative;
         display: grid;
         grid-template-columns: var(--left-width) minmax(420px, 1fr) var(
             --right-width
@@ -990,6 +991,102 @@
         transform: scaleX(-1);
       }
 
+      .panel-rail-toggle {
+        position: absolute;
+        bottom: 14px;
+        z-index: 45;
+        display: inline-flex;
+        width: 32px;
+        height: 32px;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid #475569;
+        border-radius: 9px;
+        background: rgba(17, 24, 39, 0.94);
+        color: #94a3b8;
+        box-shadow:
+          0 8px 24px rgba(0, 0, 0, 0.34),
+          0 0 0 3px rgba(9, 13, 20, 0.72);
+        backdrop-filter: blur(8px);
+        transition:
+          left 180ms ease,
+          right 180ms ease,
+          transform 180ms ease,
+          border-color 120ms ease,
+          color 120ms ease,
+          background-color 120ms ease;
+      }
+
+      .panel-rail-toggle:hover,
+      .panel-rail-toggle:focus-visible {
+        border-color: #78a9ff;
+        background: #172033;
+        color: #dbeafe;
+        outline: none;
+      }
+
+      .panel-rail-toggle-left {
+        left: var(--left-width);
+        transform: translateX(-50%);
+      }
+
+      .panel-rail-toggle-right {
+        right: var(--right-width);
+        transform: translateX(50%);
+      }
+
+      .app-grid.left-collapsed .panel-rail-toggle-left {
+        left: 10px;
+        transform: translateX(0);
+      }
+
+      .app-grid.right-collapsed .panel-rail-toggle-right {
+        right: 10px;
+        transform: translateX(0);
+      }
+
+      .app-tooltip {
+        position: fixed;
+        z-index: 120;
+        width: max-content;
+        max-width: min(280px, calc(100vw - 16px));
+        border: 1px solid #475569;
+        border-radius: 7px;
+        background: #334155;
+        padding: 6px 10px;
+        color: #ffffff;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        font-size: 11px;
+        font-weight: 600;
+        line-height: 1.35;
+        pointer-events: none;
+      }
+
+      .app-tooltip::after {
+        position: absolute;
+        left: var(--app-tooltip-arrow-left, 50%);
+        width: 8px;
+        height: 8px;
+        border-right: 1px solid #475569;
+        border-bottom: 1px solid #475569;
+        background: inherit;
+        content: "";
+        transform: translateX(-50%) rotate(45deg);
+      }
+
+      .app-tooltip[data-placement="above"]::after {
+        bottom: -5px;
+      }
+
+      .app-tooltip[data-placement="below"]::after {
+        top: -5px;
+        transform: translateX(-50%) rotate(225deg);
+      }
+
+      .app-tooltip[hidden] {
+        display: none;
+      }
+
       .settings-section {
         padding: 12px;
         border-bottom: 1px solid var(--line);
@@ -1579,6 +1676,20 @@
         background-color: #334155 !important;
         color: #ffffff !important;
       }
+      html.light .panel-rail-toggle {
+        border-color: #94a3b8;
+        background: rgba(255, 255, 255, 0.96);
+        color: #475569;
+        box-shadow:
+          0 8px 20px rgba(15, 23, 42, 0.16),
+          0 0 0 3px rgba(238, 243, 249, 0.8);
+      }
+      html.light .panel-rail-toggle:hover,
+      html.light .panel-rail-toggle:focus-visible {
+        border-color: #2563eb;
+        background: #eff6ff;
+        color: #1d4ed8;
+      }
       html.light .text-emerald-300 {
         color: #047857 !important;
       }
@@ -1642,6 +1753,16 @@
         .app-grid.right-collapsed .right-column {
           display: none;
         }
+        .panel-rail-toggle-left {
+          position: fixed;
+          left: 10px;
+          transform: none;
+        }
+        .panel-rail-toggle-right {
+          position: fixed;
+          right: 10px;
+          transform: none;
+        }
       }
     </style>
   </head>
@@ -1651,6 +1772,14 @@
         class="flex items-center justify-between border-b border-slate-800/90 bg-[#090d14]/95 px-4 sm:px-5"
       >
         <div class="flex min-w-0 items-center gap-3">
+          <img
+            src="/assets/console-ner-logo.png"
+            alt=""
+            aria-hidden="true"
+            width="32"
+            height="32"
+            class="h-8 w-8 shrink-0 object-contain"
+          />
           <div class="min-w-0">
             <h1
               class="truncate text-sm font-semibold tracking-tight text-slate-100"
@@ -1658,53 +1787,13 @@
               ConsoleNER
             </h1>
           </div>
-          <button
-            id="toggleLeftColumn"
-            type="button"
-            class="header-action header-icon-action panel-toggle border border-slate-700/80 bg-slate-900/70 text-slate-400 transition hover:border-slate-600 hover:text-slate-100"
-            aria-label="Collapse settings panel"
-            aria-pressed="false"
-            title="Collapse settings panel"
-          >
-            <svg
-              aria-hidden="true"
-              class="h-3.5 w-3.5"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.8"
-            >
-              <rect x="3" y="4" width="18" height="16" rx="2" />
-              <path d="M9 4v16m4-10-3 2 3 2" />
-            </svg>
-          </button>
         </div>
         <div class="flex items-center gap-2">
-          <button
-            id="toggleRightColumn"
-            type="button"
-            class="header-action header-icon-action panel-toggle border border-slate-700/80 bg-slate-900/70 text-slate-400 transition hover:border-slate-600 hover:text-slate-100"
-            aria-label="Collapse results panel"
-            aria-pressed="false"
-            title="Collapse results panel"
-          >
-            <svg
-              aria-hidden="true"
-              class="h-3.5 w-3.5"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.8"
-            >
-              <rect x="3" y="4" width="18" height="16" rx="2" />
-              <path d="M15 4v16m-4-10 3 2-3 2" />
-            </svg>
-          </button>
           <button
             id="themeButton"
             type="button"
             class="header-action header-icon-action border border-slate-700/80 bg-slate-900/70 text-slate-400 transition hover:border-slate-600 hover:text-slate-100"
-            data-tooltip-target="theme-tooltip"
+            data-tooltip="Switch to light mode"
             aria-label="Switch to light mode"
             aria-pressed="false"
           >
@@ -1723,14 +1812,6 @@
               />
             </svg>
           </button>
-          <div
-            id="theme-tooltip"
-            role="tooltip"
-            class="tooltip invisible absolute z-50 inline-block rounded-lg bg-slate-700 px-2.5 py-1.5 text-xs font-medium text-white opacity-0 shadow-sm"
-          >
-            <span id="themeTooltipText">Switch to light mode</span>
-            <div class="tooltip-arrow" data-popper-arrow></div>
-          </div>
           <button
             id="runButton"
             type="button"
@@ -1985,7 +2066,7 @@
                   class="ml-3 mr-1 inline-flex h-2 w-2 shrink-0"
                   role="status"
                   aria-label="Valid expression"
-                  title="Valid expression"
+                  data-tooltip="Valid expression"
                 >
                   <i class="h-2 w-2 rounded-full bg-emerald-400"></i>
                 </span>
@@ -2005,7 +2086,7 @@
                 type="button"
                 class="inline-flex shrink-0 items-center justify-center rounded-lg border border-violet-400/25 bg-violet-500/10 text-violet-300 transition hover:border-violet-400/50 hover:bg-violet-500/20 focus:outline-none focus:ring-2 focus:ring-violet-500/30"
                 aria-label="Register pattern"
-                title="Register pattern"
+                data-tooltip="Register pattern"
               >
                 <svg
                   aria-hidden="true"
@@ -2063,7 +2144,7 @@
                   type="button"
                   class="header-action h-7 border border-slate-700 bg-slate-900/70 px-2 text-[9px] font-bold uppercase tracking-wide text-amber-300 hover:border-amber-400/50 hover:bg-amber-400/10"
                   aria-pressed="false"
-                  title="Show matches that need review"
+                  data-tooltip="Show matches that need review"
                 >
                   Review
                 </button>
@@ -2072,7 +2153,7 @@
                   type="button"
                   class="header-action header-icon-action h-7 w-7 border border-slate-700 bg-slate-900/70 text-slate-400 hover:border-slate-600 hover:text-slate-100"
                   aria-label="Copy filtered results as JSON"
-                  title="Copy filtered results as JSON"
+                  data-tooltip="Copy filtered results as JSON"
                 >
                   <svg
                     aria-hidden="true"
@@ -2094,7 +2175,7 @@
                   type="button"
                   class="header-action header-icon-action h-7 w-7 border border-slate-700 bg-slate-900/70 text-slate-400 hover:border-slate-600 hover:text-slate-100"
                   aria-label="Download filtered results as JSON"
-                  title="Download filtered results as JSON"
+                  data-tooltip="Download filtered results as JSON"
                 >
                   <svg
                     aria-hidden="true"
@@ -2243,10 +2324,52 @@
             <div id="resultsList" aria-live="polite"></div>
           </div>
         </aside>
+
+        <button
+          id="toggleLeftColumn"
+          type="button"
+          class="panel-rail-toggle panel-rail-toggle-left panel-toggle"
+          aria-label="Collapse settings panel"
+          aria-pressed="false"
+          data-tooltip="Collapse settings panel"
+        >
+          <svg
+            aria-hidden="true"
+            class="h-3.5 w-3.5"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+          >
+            <rect x="3" y="4" width="18" height="16" rx="2" />
+            <path d="M9 4v16m4-10-3 2 3 2" />
+          </svg>
+        </button>
+        <button
+          id="toggleRightColumn"
+          type="button"
+          class="panel-rail-toggle panel-rail-toggle-right panel-toggle"
+          aria-label="Collapse results panel"
+          aria-pressed="false"
+          data-tooltip="Collapse results panel"
+        >
+          <svg
+            aria-hidden="true"
+            class="h-3.5 w-3.5"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+          >
+            <rect x="3" y="4" width="18" height="16" rx="2" />
+            <path d="M15 4v16m-4-10 3 2-3 2" />
+          </svg>
+        </button>
       </main>
     </div>
 
     <div id="entityTooltip" role="tooltip" hidden></div>
+    <div id="appTooltip" class="app-tooltip" role="tooltip" hidden></div>
 
     <dialog id="registerDialog" class="workbench-dialog">
       <form id="registerForm">
@@ -2552,6 +2675,7 @@ If the review succeeds, Maya Chen will receive confirmation on 2026-10-03. Until
             "registerPattern",
             "sourceText",
             "entityTooltip",
+            "appTooltip",
             "registerDialog",
             "registerForm",
             "registerPatternPreview",
@@ -2664,6 +2788,8 @@ If the review succeeds, Maya Chen will receive confirmation on 2026-10-03. Until
         let activeEntityId = null;
         let activeTooltipMark = null;
         let tooltipHideTimer = null;
+        let appTooltipTarget = null;
+        let appTooltipShowTimer = null;
         let highlightScrollFrame = null;
         let currentTheme = document.documentElement.classList.contains("light")
           ? "light"
@@ -2763,14 +2889,14 @@ If the review succeeds, Maya Chen will receive confirmation on 2026-10-03. Until
               <div class="recognizer-row ${item.registered ? "has-actions" : ""}">
                 <input id="recognizer-${escapeHTML(item.id)}" data-recognizer="${escapeHTML(item.id)}" type="checkbox" ${enabledRecognizerIds.has(item.id) ? "checked" : ""} class="recognizer-checkbox rounded border-slate-600 bg-slate-800 text-blue-500 focus:ring-1 focus:ring-blue-500 focus:ring-offset-0" />
                 <label class="flex min-w-0 cursor-pointer items-center gap-1.5" for="recognizer-${escapeHTML(item.id)}">
-                  <span class="truncate text-[11px] font-medium text-slate-300" title="${escapeHTML(item.label)}">${escapeHTML(shortLabel)}</span>
+                  <span class="truncate text-[11px] font-medium text-slate-300" data-tooltip="${escapeHTML(item.label)}">${escapeHTML(shortLabel)}</span>
                   ${item.backend ? '<span class="recognizer-source-badge">API</span>' : ""}
                 </label>
                 ${
                   item.registered
                     ? `<span class="recognizer-actions">
-                  <button type="button" data-rename-pattern="${escapeHTML(item.id)}" class="inline-flex h-6 w-6 items-center justify-center rounded text-slate-500 transition hover:bg-blue-500/10 hover:text-blue-400" aria-label="Rename ${escapeHTML(item.label)} recognizer" title="Rename recognizer"><svg aria-hidden="true" class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="m14 5 5 5M4 20l4.25-1 10-10a2.12 2.12 0 0 0-3-3l-10 10L4 20Z"/></svg></button>
-                  <button type="button" data-remove-pattern="${escapeHTML(item.id)}" class="inline-flex h-6 w-6 items-center justify-center rounded text-slate-500 transition hover:bg-rose-500/10 hover:text-rose-400" aria-label="Remove ${escapeHTML(item.label)} pattern" title="Remove recognizer"><svg aria-hidden="true" class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" d="M6 6l12 12M18 6 6 18"/></svg></button>
+                  <button type="button" data-rename-pattern="${escapeHTML(item.id)}" class="inline-flex h-6 w-6 items-center justify-center rounded text-slate-500 transition hover:bg-blue-500/10 hover:text-blue-400" aria-label="Rename ${escapeHTML(item.label)} recognizer" data-tooltip="Rename recognizer"><svg aria-hidden="true" class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="m14 5 5 5M4 20l4.25-1 10-10a2.12 2.12 0 0 0-3-3l-10 10L4 20Z"/></svg></button>
+                  <button type="button" data-remove-pattern="${escapeHTML(item.id)}" class="inline-flex h-6 w-6 items-center justify-center rounded text-slate-500 transition hover:bg-rose-500/10 hover:text-rose-400" aria-label="Remove ${escapeHTML(item.label)} pattern" data-tooltip="Remove recognizer"><svg aria-hidden="true" class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" d="M6 6l12 12M18 6 6 18"/></svg></button>
                 </span>`
                     : ""
                 }
@@ -2975,7 +3101,7 @@ If the review succeeds, Maya Chen will receive confirmation on 2026-10-03. Until
           const status = valid ? "Valid expression" : "Invalid expression";
           els.patternStatus.className = "inline-flex h-2 w-2";
           els.patternStatus.innerHTML = `<i class="h-2 w-2 rounded-full ${valid ? "bg-emerald-400" : "bg-rose-400"}"></i>`;
-          els.patternStatus.title = message || status;
+          els.patternStatus.dataset.tooltip = message || status;
           els.patternStatus.setAttribute("aria-label", status);
           els.patternInput.setAttribute("aria-invalid", String(!valid));
           els.patternInput.classList.toggle("border-rose-500", !valid);
@@ -3384,9 +3510,9 @@ If the review succeeds, Maya Chen will receive confirmation on 2026-10-03. Until
               return `
               <article class="result-card ${entity.assisted ? `server-assisted assist-confidence-${confidenceLevel(entity.confidence)}` : ""} ${entity.id === activeEntityId ? "active" : ""}" data-entity-id="${escapeHTML(entity.id)}">
                 <button type="button" class="result-summary" data-result-toggle="${escapeHTML(entity.id)}" aria-expanded="${String(expanded)}" aria-controls="${detailId}" aria-label="${escapeHTML(entity.tag)}: ${escapeHTML(entity.value)}, ${percent}% confidence. ${expanded ? "Collapse" : "Expand"} details">
-                  <span class="result-confidence-dot ${confidenceBar(entity.confidence)}" title="${percent}% confidence"></span>
+                  <span class="result-confidence-dot ${confidenceBar(entity.confidence)}" data-tooltip="${percent}% confidence"></span>
                   <span class="min-w-0 flex-1">
-                    <span class="block truncate font-mono text-[13px] font-medium text-slate-100" title="${escapeHTML(entity.value)}">${escapeHTML(entity.value)}</span>
+                    <span class="block truncate font-mono text-[13px] font-medium text-slate-100" data-tooltip="${escapeHTML(entity.value)}">${escapeHTML(entity.value)}</span>
                     <span class="mt-1 flex items-center gap-1.5">
                       <span class="text-[10px] font-bold uppercase tracking-[.07em] text-slate-500">${escapeHTML(entity.tag.replace(/_/g, " "))}</span>
                       ${entity.source === "draft" ? '<span class="rounded border border-violet-400/30 bg-violet-400/10 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-violet-300">Draft</span>' : ""}
@@ -3402,8 +3528,8 @@ If the review succeeds, Maya Chen will receive confirmation on 2026-10-03. Until
                   </div>
                   <dl class="result-details-grid">
                     <dt>Range</dt><dd>[${entity.start}, ${entity.end})</dd>
-                    <dt>Normalized</dt><dd title="${escapeHTML(entity.normalizedValue)}">${escapeHTML(entity.normalizedValue)}</dd>
-                    <dt>Pattern</dt><dd title="${escapeHTML(entity.patternId)}">${escapeHTML(entity.patternId)}</dd>
+                    <dt>Normalized</dt><dd data-tooltip="${escapeHTML(entity.normalizedValue)}">${escapeHTML(entity.normalizedValue)}</dd>
+                    <dt>Pattern</dt><dd data-tooltip="${escapeHTML(entity.patternId)}">${escapeHTML(entity.patternId)}</dd>
                     <dt>Source</dt><dd>${escapeHTML(entity.source)}</dd>
                     ${tags ? `<dt>Tags</dt><dd>${tags}</dd>` : ""}
                     ${entity.assisted && entity.metadata?.evidence ? `<dt>Evidence</dt><dd>${escapeHTML(String(entity.metadata.evidence))}</dd>` : ""}
@@ -3443,6 +3569,44 @@ If the review succeeds, Maya Chen will receive confirmation on 2026-10-03. Until
           hideEntityTooltip();
         }
 
+        function redirectHighlightWheel(event) {
+          const lineHeight =
+            Number.parseFloat(getComputedStyle(els.sourceText).lineHeight) || 26;
+          const scale =
+            event.deltaMode === 1
+              ? lineHeight
+              : event.deltaMode === 2
+                ? els.sourceText.clientHeight
+                : 1;
+          const maxTop = Math.max(
+            0,
+            els.sourceText.scrollHeight - els.sourceText.clientHeight,
+          );
+          const maxLeft = Math.max(
+            0,
+            els.sourceText.scrollWidth - els.sourceText.clientWidth,
+          );
+          const nextTop = Math.min(
+            maxTop,
+            Math.max(0, els.sourceText.scrollTop + event.deltaY * scale),
+          );
+          const nextLeft = Math.min(
+            maxLeft,
+            Math.max(0, els.sourceText.scrollLeft + event.deltaX * scale),
+          );
+
+          if (
+            nextTop === els.sourceText.scrollTop &&
+            nextLeft === els.sourceText.scrollLeft
+          )
+            return;
+
+          event.preventDefault();
+          els.sourceText.scrollTop = nextTop;
+          els.sourceText.scrollLeft = nextLeft;
+          syncEditorScroll();
+        }
+
         function showEntityTooltip(mark) {
           window.clearTimeout(tooltipHideTimer);
           activeTooltipMark = mark;
@@ -3457,7 +3621,7 @@ If the review succeeds, Maya Chen will receive confirmation on 2026-10-03. Until
               <span class="entity-tooltip-tag">${escapeHTML(entity.tag.replace(/_/g, " "))}${entity.assisted ? `<i class="server-assisted-badge assist-confidence-${confidenceLevel(entity.confidence)} not-italic">Assisted</i>` : ""}</span>
               <strong class="font-mono ${confidenceColor(entity.confidence)}">${percent}% confidence</strong>
             </div>
-            <div class="entity-tooltip-value" title="${escapeHTML(entity.value)}">${escapeHTML(entity.value)}</div>
+            <div class="entity-tooltip-value" data-tooltip="${escapeHTML(entity.value)}">${escapeHTML(entity.value)}</div>
             <dl class="entity-tooltip-details">
               <dt>Range</dt><dd><code>[${entity.start}, ${entity.end})</code></dd>
               <dt>Pattern</dt><dd><code>${escapeHTML(entity.patternId)}</code></dd>
@@ -3506,6 +3670,65 @@ If the review succeeds, Maya Chen will receive confirmation on 2026-10-03. Until
           tooltipHideTimer = window.setTimeout(hideEntityTooltip, 160);
         }
 
+        function positionAppTooltip(target) {
+          if (!target?.isConnected || !target.dataset.tooltip) {
+            hideAppTooltip();
+            return;
+          }
+          appTooltipTarget = target;
+          els.appTooltip.textContent = target.dataset.tooltip;
+          els.appTooltip.hidden = false;
+          target.setAttribute("aria-describedby", "appTooltip");
+
+          const targetRect = target.getBoundingClientRect();
+          const tooltipRect = els.appTooltip.getBoundingClientRect();
+          let placement = "above";
+          let top = targetRect.top - tooltipRect.height - 9;
+          if (top < 8) {
+            placement = "below";
+            top = targetRect.bottom + 9;
+          }
+          const left = Math.min(
+            Math.max(
+              8,
+              targetRect.left + targetRect.width / 2 - tooltipRect.width / 2,
+            ),
+            window.innerWidth - tooltipRect.width - 8,
+          );
+          const arrowLeft = Math.min(
+            Math.max(12, targetRect.left + targetRect.width / 2 - left),
+            tooltipRect.width - 12,
+          );
+          els.appTooltip.dataset.placement = placement;
+          els.appTooltip.style.setProperty(
+            "--app-tooltip-arrow-left",
+            `${arrowLeft}px`,
+          );
+          els.appTooltip.style.left = `${left}px`;
+          els.appTooltip.style.top = `${top}px`;
+        }
+
+        function showAppTooltip(target, immediate = false) {
+          window.clearTimeout(appTooltipShowTimer);
+          if (appTooltipTarget && appTooltipTarget !== target)
+            hideAppTooltip();
+          if (immediate) positionAppTooltip(target);
+          else {
+            appTooltipShowTimer = window.setTimeout(
+              () => positionAppTooltip(target),
+              120,
+            );
+          }
+        }
+
+        function hideAppTooltip() {
+          window.clearTimeout(appTooltipShowTimer);
+          if (appTooltipTarget?.getAttribute("aria-describedby") === "appTooltip")
+            appTooltipTarget.removeAttribute("aria-describedby");
+          appTooltipTarget = null;
+          els.appTooltip.hidden = true;
+        }
+
         function togglePanel(side) {
           const className = `${side}-collapsed`;
           const collapsed = els.appGrid.classList.toggle(className);
@@ -3519,7 +3742,8 @@ If the review succeeds, Maya Chen will receive confirmation on 2026-10-03. Until
             "aria-label",
             `${collapsed ? "Expand" : "Collapse"} ${panelName} panel`,
           );
-          button.title = `${collapsed ? "Expand" : "Collapse"} ${panelName} panel`;
+          button.dataset.tooltip = `${collapsed ? "Expand" : "Collapse"} ${panelName} panel`;
+          hideAppTooltip();
           hideEntityTooltip();
         }
 
@@ -3596,11 +3820,11 @@ If the review succeeds, Maya Chen will receive confirmation on 2026-10-03. Until
             document.execCommand("copy");
             textarea.remove();
           }
-          els.copyResults.title = "Copied";
+          els.copyResults.dataset.tooltip = "Copied";
           els.copyResults.setAttribute("aria-label", "Results copied");
           window.clearTimeout(copyVisibleResults.timer);
           copyVisibleResults.timer = window.setTimeout(() => {
-            els.copyResults.title = "Copy filtered results as JSON";
+            els.copyResults.dataset.tooltip = "Copy filtered results as JSON";
             els.copyResults.setAttribute(
               "aria-label",
               "Copy filtered results as JSON",
@@ -3626,6 +3850,30 @@ If the review succeeds, Maya Chen will receive confirmation on 2026-10-03. Until
         renderRecognizerControls();
         syncToggleAllLabel();
         els.sourceText.value = sampleText;
+
+        document.addEventListener("pointerover", (event) => {
+          const target = event.target.closest?.("[data-tooltip]");
+          if (!target || target.contains(event.relatedTarget)) return;
+          showAppTooltip(target);
+        });
+        document.addEventListener("pointerout", (event) => {
+          const target = event.target.closest?.("[data-tooltip]");
+          if (
+            target &&
+            target === appTooltipTarget &&
+            !target.contains(event.relatedTarget)
+          )
+            hideAppTooltip();
+        });
+        document.addEventListener("focusin", (event) => {
+          const target = event.target.closest?.("[data-tooltip]");
+          if (target) showAppTooltip(target, true);
+        });
+        document.addEventListener("focusout", (event) => {
+          if (event.target === appTooltipTarget) hideAppTooltip();
+        });
+        document.addEventListener("pointerdown", hideAppTooltip);
+        window.addEventListener("resize", hideAppTooltip);
 
         document.addEventListener("change", (event) => {
           if (event.target.matches("[data-recognizer]")) {
@@ -3691,6 +3939,9 @@ If the review succeeds, Maya Chen will receive confirmation on 2026-10-03. Until
           scheduleRecognition();
         });
         els.sourceText.addEventListener("scroll", syncEditorScroll);
+        els.highlightLayer.addEventListener("wheel", redirectHighlightWheel, {
+          passive: false,
+        });
         els.highlightLayer.addEventListener("mouseover", (event) => {
           const mark = event.target.closest(".entity-mark");
           if (mark) showEntityTooltip(mark);
@@ -3817,11 +4068,11 @@ If the review succeeds, Maya Chen will receive confirmation on 2026-10-03. Until
             "aria-label",
             `Switch to ${isLight ? "dark" : "light"} mode`,
           );
+          els.themeButton.dataset.tooltip =
+            `Switch to ${isLight ? "dark" : "light"} mode`;
           els.themeButton.innerHTML = isLight
             ? '<svg aria-hidden="true" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8Z"/></svg>'
             : '<svg aria-hidden="true" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="4"/><path stroke-linecap="round" d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/></svg>';
-          document.getElementById("themeTooltipText").textContent =
-            `Switch to ${isLight ? "dark" : "light"} mode`;
           if (persist) {
             try {
               localStorage.setItem("console-ner-theme", theme);
