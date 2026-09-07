@@ -17,7 +17,7 @@ export function postalAddressPattern(
     tag: options.tag ?? "postal_address",
     regex: /\b\d{1,6}\s+(?:[NSEW]\.?(?:\s+|$))?(?:[A-Z][\p{L}'-]*\s+){1,4}(?:St(?:reet)?|Ave(?:nue)?|Blvd|Boulevard|Rd|Road|Dr|Drive|Ln|Lane)\.?,?\s+[A-Z][\p{L}'-]*(?:\s+[A-Z][\p{L}'-]*)*,\s*[A-Z]{2}\s+\d{5}(?:-\d{4})?\b/gu,
     confidence: options.confidence ?? 0.62,
-    priority: options.priority ?? 0,
+    priority: options.priority ?? 2,
     normalize: (value) => value.replace(/\s+/g, " ").trim(),
   });
 }

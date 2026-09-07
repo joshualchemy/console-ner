@@ -6,6 +6,7 @@ import {
   phonePattern,
   regexPattern,
   type MatchContext,
+  type RecognitionContext,
 } from "../src";
 
 describe("registration and recognition", () => {
@@ -62,7 +63,7 @@ describe("registration and recognition", () => {
     const key = {};
     const createAnalysis = vi.fn(() => ({ ready: true }));
     const matcher = (value: string, start: number) =>
-      (_text: string, context: Parameters<NonNullable<ReturnType<typeof regexPattern>["pattern"]>>[1]) => {
+      (_text: string, context: RecognitionContext) => {
         context.memoize(key, createAnalysis);
         return [{ value, start, end: start + value.length }];
       };

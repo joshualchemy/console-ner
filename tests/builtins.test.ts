@@ -83,6 +83,19 @@ describe("built-in patterns", () => {
     ]);
   });
 
+  it("prefers a complete postal address over person-like fragments inside it", () => {
+    const ner = new ConsoleNER<"person" | "postal_address">().register([
+      compromisePersonPattern(),
+      postalAddressPattern(),
+    ]);
+
+    expect(ner.recognize("Ship to 233 S Wacker Dr, Chicago, IL 60606.").entities.map(
+      ({ tag, value }) => ({ tag, value }),
+    )).toEqual([
+      { tag: "postal_address", value: "233 S Wacker Dr, Chicago, IL 60606" },
+    ]);
+  });
+
   it("provides contextual Compromise patterns with exact offsets and metadata", () => {
     const text = "Later, mary met Google in Paris to discuss twelve dollars in filing fees.";
     const ner = new ConsoleNER<"money" | "organization" | "person" | "place">()
