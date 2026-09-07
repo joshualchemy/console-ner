@@ -10,16 +10,6 @@ entities out of the box.
 
 <img width="1431" height="689" alt="image" src="https://github.com/user-attachments/assets/14200982-3897-4070-ba05-ec3a2a5842b8" />
 
-## Installation
-
-```sh
-npm install console-ner
-# or: bun add console-ner
-```
-
-Everything ships through the base `console-ner` package. No separate NLP setup
-or integration entry point is required.
-
 ## Quick start
 
 ```ts
