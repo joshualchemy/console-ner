@@ -7,10 +7,12 @@ import {
   emailPattern,
   ipv4Pattern,
   moneyPattern,
+  naturalDatePattern,
   organizationPattern,
   paymentCardPattern,
   personPatterns,
   phonePattern,
+  type PhoneEntityMetadata,
   postalAddressPattern,
   routingNumberPattern,
 } from "../src";
@@ -32,6 +34,76 @@ describe("built-in patterns", () => {
       { tag: "phone", normalizedValue: "+13125550148" },
       { tag: "money", normalizedValue: "248500.00" },
     ]);
+  });
+
+  it("recognizes international phone numbers with structured metadata", () => {
+    const text = "London +44 20 7946 0958; Chicago (312) 555-0148.";
+    const entities = new ConsoleNER<"phone", undefined, PhoneEntityMetadata>({
+      language: false,
+    })
+      .register(phonePattern())
+      .recognize(text).entities;
+
+    expect(entities.map(({ normalizedValue, metadata }) => ({
+      normalizedValue,
+      country: metadata?.country,
+      international: metadata?.international,
+      valid: metadata?.valid,
+    }))).toEqual([
+      {
+        normalizedValue: "+442079460958",
+        country: "GB",
+        international: "+44 20 7946 0958",
+        valid: true,
+      },
+      {
+        normalizedValue: "+13125550148",
+        country: "US",
+        international: "+1 312 555 0148",
+        valid: true,
+      },
+    ]);
+  });
+
+  it("does not reinterpret a phone-like numeric tail inside an identifier", () => {
+    const text = "Review case CN-2026-004218, then call +1 (312) 555-0148.";
+    const entities = new ConsoleNER<"phone">({ language: false })
+      .register(phonePattern())
+      .recognize(text).entities;
+
+    expect(entities.map(({ value, normalizedValue }) => ({ value, normalizedValue })))
+      .toEqual([
+        { value: "+1 (312) 555-0148", normalizedValue: "+13125550148" },
+      ]);
+  });
+
+  it("resolves natural date expressions and ranges against a stable reference", () => {
+    const referenceDate = new Date("2026-09-12T17:00:00.000Z");
+    const entities = new ConsoleNER<"date">({ language: false })
+      .register(naturalDatePattern({ referenceDate, timezone: -300 }))
+      .recognize("Meet tomorrow from 10 to 11 AM, then follow up next Friday.")
+      .entities;
+
+    expect(entities.map(({ value, normalizedValue }) => ({ value, normalizedValue })))
+      .toEqual([
+        {
+          value: "tomorrow from 10 to 11 AM",
+          normalizedValue:
+            "2026-09-13T15:00:00.000Z/2026-09-13T16:00:00.000Z",
+        },
+        { value: "next Friday", normalizedValue: "2026-09-18" },
+      ]);
+    expect(entities[0]?.metadata).toMatchObject({
+      category: "date",
+      mode: "casual",
+      resolvedStart: "2026-09-13T15:00:00.000Z",
+      resolvedEnd: "2026-09-13T16:00:00.000Z",
+    });
+  });
+
+  it("rejects an invalid natural-date reference", () => {
+    expect(() => naturalDatePattern({ referenceDate: new Date(Number.NaN) }))
+      .toThrow(/valid Date/);
   });
 
   it("provides the common date formats as one reusable pattern set", () => {
@@ -69,7 +141,9 @@ describe("built-in patterns", () => {
       postalAddressPattern(),
     ]);
     const result = ner.recognize(
-      "Northstar Analytics LLC at 233 S Wacker Dr, Chicago, IL 60606; " +
+      "Northstar Analytics LLC at 233 S Wacker Dr, Chicago, IL 60606 and " +
+      "111 Richmond St W, Toronto, ON M5H 2G4; meeting October 2, 2026 at " +
+      "1 Microsoft Way, Redmond, WA 98052; " +
       "card 4111 1111 1111 1111; routing 021000021; IP 192.168.1.42. " +
       "Reject card 4111 1111 1111 1112, routing 123456789, and IP 999.1.1.1.",
     );
@@ -77,6 +151,8 @@ describe("built-in patterns", () => {
     expect(result.entities.map(({ tag, normalizedValue }) => ({ tag, normalizedValue }))).toEqual([
       { tag: "organization", normalizedValue: "Northstar Analytics LLC" },
       { tag: "postal_address", normalizedValue: "233 S Wacker Dr, Chicago, IL 60606" },
+      { tag: "postal_address", normalizedValue: "111 Richmond St W, Toronto, ON M5H 2G4" },
+      { tag: "postal_address", normalizedValue: "1 Microsoft Way, Redmond, WA 98052" },
       { tag: "payment_card", normalizedValue: "4111111111111111" },
       { tag: "routing_number", normalizedValue: "021000021" },
       { tag: "ip_address", normalizedValue: "192.168.1.42" },

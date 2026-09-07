@@ -85,13 +85,15 @@ ner.clear();
 ## Built-in patterns
 
 Language-aware person, organization, place, and money patterns are registered
-automatically. Regex built-ins are exported helpers that you register when needed.
+automatically. Additional built-ins are exported helpers that you register when
+needed.
 
 ```ts
 import {
   datePatterns,
   emailPattern,
   moneyPattern,
+  naturalDatePattern,
   personPatterns,
   phonePattern,
 } from "console-ner";
@@ -102,10 +104,53 @@ ner.register([
   emailPattern(),
   phonePattern({ confidence: 0.9 }),
   moneyPattern(),
+  naturalDatePattern(),
 ]);
 ```
 
 Other built-ins include `organizationPattern`, `paymentCardPattern`, `routingNumberPattern`, `ipv4Pattern`, and `postalAddressPattern`. Built-in options support application-specific tags, confidence, priority, and IDs.
+
+### Enriched phone and natural-date built-ins
+
+`phonePattern` recognizes national and international phone numbers in browser or
+server builds. It defaults unprefixed numbers to the US; pass `defaultCountry`
+for another region. Matches normalize to E.164 and include country, calling
+code, national/international display formats, and validity metadata.
+
+```ts
+import {
+  ConsoleNER,
+  naturalDatePattern,
+  phonePattern,
+  type NaturalDateEntityMetadata,
+  type PhoneEntityMetadata,
+} from "console-ner";
+
+type Metadata = NaturalDateEntityMetadata | PhoneEntityMetadata;
+const enriched = new ConsoleNER<"date" | "phone", undefined, Metadata>({
+  language: false,
+}).register([
+  phonePattern({ defaultCountry: "GB" }),
+  naturalDatePattern({
+    referenceDate: new Date("2026-09-12T17:00:00.000Z"),
+    timezone: -300,
+  }),
+]);
+
+enriched.recognize(
+  "Call +44 20 7946 0958 tomorrow from 10 to 11 AM.",
+);
+```
+
+`naturalDatePattern` handles relative phrases, weekdays, times, and ranges. Its
+reference instant is captured when the pattern is created; provide explicit
+`referenceDate` and `timezone` values when reproducible timestamps matter. Set
+`strict: true` to accept only formal date expressions or `forwardDate: true` to
+prefer future dates.
+
+Both helpers are synchronous, only run when registered, and use browser-safe,
+tree-shakeable processing behind ConsoleNER's provider-neutral API. The demo
+keeps heavier structured postal-address enrichment on its optional backend.
 
 ## Built-in language recognizer
 

@@ -5,6 +5,7 @@ export {
   emailPattern,
   ipv4Pattern,
   moneyPattern,
+  naturalDatePattern,
   organizationPattern,
   paymentCardPattern,
   personPatterns,
@@ -15,6 +16,10 @@ export {
 export type {
   BuiltInPattern,
   BuiltInPatternOptions,
+  NaturalDateEntityMetadata,
+  NaturalDatePatternOptions,
+  PhoneEntityMetadata,
+  PhonePatternOptions,
 } from "./patterns/builtins";
 export { regexPattern } from "./patterns/regexPattern";
 export type { Entity } from "./types/Entity";

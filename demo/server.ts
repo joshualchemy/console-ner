@@ -1,27 +1,60 @@
 import {
   ConsoleNER,
   ipv4Pattern,
+  naturalDatePattern,
   organizationPattern,
   paymentCardPattern,
+  phonePattern,
   postalAddressPattern,
   regexPattern,
   routingNumberPattern,
   type BuiltInPattern,
   type EntityPattern,
 } from "../src/index";
+import { parseAddress } from "addresser";
+import { parsePhoneNumberFromString } from "libphonenumber-js/max/es6";
 
 type DemoTag =
   | "case_reference"
+  | "date"
   | "ip_address"
   | "loan_number"
   | "organization"
   | "payment_card"
+  | "phone"
   | "postal_address"
   | "routing_number";
+
+interface AddressMetadata {
+  readonly id: string;
+  readonly formatted: string;
+  readonly country: "CA" | "US";
+  readonly street: string;
+  readonly city: string;
+  readonly region: string;
+  readonly regionName: string;
+  readonly postalCode: string;
+}
+
+interface PhoneMetadata {
+  readonly country?: string;
+  readonly countryCallingCode: string;
+  readonly international: string;
+  readonly national: string;
+}
 
 interface DemoMetadata {
   assistance?: string;
   evidence?: string;
+  address?: AddressMetadata;
+  phone?: PhoneMetadata;
+}
+
+interface VerificationResult {
+  readonly valid: boolean;
+  readonly confidence?: number;
+  readonly normalizedValue?: string;
+  readonly metadata?: DemoMetadata;
 }
 
 interface RequestStats {
@@ -30,7 +63,7 @@ interface RequestStats {
 
 interface MockServices {
   stats: RequestStats;
-  verify(kind: DemoTag, value: string): Promise<boolean>;
+  verify(kind: DemoTag, value: string): Promise<VerificationResult>;
 }
 
 const knownLoans = new Set(["8041234567", "8058675309"]);
@@ -74,12 +107,60 @@ function isValidIp(value: string): boolean {
   return octets.length === 4 && octets.every((octet) => Number.isInteger(octet) && octet >= 0 && octet <= 255);
 }
 
-function isValidIllinoisAddress(value: string): boolean {
-  const match = value.match(/,\s*([A-Z]{2})\s+(\d{5})(?:-\d{4})?$/i);
-  if (!match) return false;
-  const state = match[1]?.toUpperCase();
-  const zip = match[2] ?? "";
-  return state === "IL" && /^(?:60|61|62)/.test(zip);
+function parsePostalAddress(value: string): VerificationResult {
+  try {
+    const parsed = parseAddress(value) as ReturnType<typeof parseAddress> & {
+      formattedAddress?: string;
+    };
+    const valid = Boolean(
+      parsed.addressLine1 &&
+      parsed.placeName &&
+      parsed.stateAbbreviation &&
+      parsed.zipCode,
+    );
+    if (!valid) return { valid: false };
+    const formatted = parsed.formattedAddress ?? value.replace(/\s+/g, " ").trim();
+    const country = /^[A-Z]\d[A-Z][ -]?\d[A-Z]\d$/i.test(parsed.zipCode)
+      ? "CA"
+      : "US";
+    return {
+      valid: true,
+      confidence: 0.98,
+      normalizedValue: formatted,
+      metadata: {
+        address: {
+          id: parsed.id,
+          formatted,
+          country,
+          street: parsed.addressLine1,
+          city: parsed.placeName,
+          region: parsed.stateAbbreviation,
+          regionName: parsed.stateName,
+          postalCode: parsed.zipCode,
+        },
+      },
+    };
+  } catch {
+    return { valid: false };
+  }
+}
+
+function parsePhone(value: string): VerificationResult {
+  const phone = parsePhoneNumberFromString(value, "US");
+  if (!phone?.isValid()) return { valid: false };
+  return {
+    valid: true,
+    confidence: 0.98,
+    normalizedValue: phone.number,
+    metadata: {
+      phone: {
+        ...(phone.country === undefined ? {} : { country: phone.country }),
+        countryCallingCode: phone.countryCallingCode,
+        international: phone.formatInternational(),
+        national: phone.formatNational(),
+      },
+    },
+  };
 }
 
 function createServices(stats: RequestStats): MockServices {
@@ -89,13 +170,17 @@ function createServices(stats: RequestStats): MockServices {
       stats.checks += 1;
       await Bun.sleep(18 + (value.length % 4) * 5);
       switch (kind) {
-        case "loan_number": return knownLoans.has(digits(value));
-        case "case_reference": return knownCases.has(value.toUpperCase());
-        case "organization": return knownOrganizations.has(value.replace(/\.$/, "").toLowerCase());
-        case "payment_card": return passesLuhn(value);
-        case "routing_number": return passesRoutingChecksum(value);
-        case "ip_address": return isValidIp(value);
-        case "postal_address": return isValidIllinoisAddress(value);
+        case "loan_number": return { valid: knownLoans.has(digits(value)) };
+        case "case_reference": return { valid: knownCases.has(value.toUpperCase()) };
+        case "organization": return {
+          valid: knownOrganizations.has(value.replace(/\.$/, "").toLowerCase()),
+        };
+        case "payment_card": return { valid: passesLuhn(value) };
+        case "routing_number": return { valid: passesRoutingChecksum(value) };
+        case "ip_address": return { valid: isValidIp(value) };
+        case "postal_address": return parsePostalAddress(value);
+        case "phone": return parsePhone(value);
+        case "date": return { valid: true, confidence: 0.96 };
       }
     },
   };
@@ -127,11 +212,24 @@ function assistedPattern(options: {
       id: `${options.id}:mock-validator`,
       runBelowConfidence: 1,
       async validate(entity, context) {
-        const valid = await context.services.verify(options.tag, entity.normalizedValue);
+        const verification = await context.services.verify(
+          options.tag,
+          entity.normalizedValue,
+        );
         return {
-          valid,
-          confidence: valid ? Math.max(.96, entity.confidence) : .05,
-          metadata: { evidence: valid ? options.evidence : "Mock validation rejected the candidate" },
+          valid: verification.valid,
+          confidence: verification.valid
+            ? Math.max(verification.confidence ?? .96, entity.confidence)
+            : .05,
+          ...(verification.normalizedValue === undefined
+            ? {}
+            : { normalizedValue: verification.normalizedValue }),
+          metadata: {
+            evidence: verification.valid
+              ? options.evidence
+              : "Mock validation rejected the candidate",
+            ...verification.metadata,
+          },
         };
       },
     },
@@ -149,11 +247,24 @@ function assistedBuiltIn(
       id: `${pattern.id}:mock-validator`,
       runBelowConfidence: 1,
       async validate(entity, context) {
-        const valid = await context.services.verify(pattern.tag, entity.normalizedValue);
+        const verification = await context.services.verify(
+          pattern.tag,
+          entity.normalizedValue,
+        );
         return {
-          valid,
-          confidence: valid ? Math.max(.96, entity.confidence) : .05,
-          metadata: { evidence: valid ? evidence : "Mock validation rejected the candidate" },
+          valid: verification.valid,
+          confidence: verification.valid
+            ? Math.max(verification.confidence ?? .96, entity.confidence)
+            : .05,
+          ...(verification.normalizedValue === undefined
+            ? {}
+            : { normalizedValue: verification.normalizedValue }),
+          metadata: {
+            evidence: verification.valid
+              ? evidence
+              : "Mock validation rejected the candidate",
+            ...verification.metadata,
+          },
         };
       },
     },
@@ -194,8 +305,21 @@ const serverPatterns = [
     "All IPv4 octets are in range",
   ),
   assistedBuiltIn(
-    postalAddressPattern({ id: "server-us-address", tag: "postal_address" }),
-    "State and ZIP combination passed mock address validation",
+    postalAddressPattern({ id: "server-postal-address", tag: "postal_address" }),
+    "Address parsed into verified street, locality, region, and postal components",
+  ),
+  assistedBuiltIn(
+    phonePattern<DemoTag>({ id: "server-phone-intelligence", tag: "phone" }),
+    "Phone number parsed and validated against international numbering metadata",
+  ),
+  assistedBuiltIn(
+    naturalDatePattern<DemoTag>({
+      id: "server-natural-date",
+      tag: "date",
+      referenceDate: new Date("2026-09-12T17:00:00.000Z"),
+      timezone: -300,
+    }),
+    "Natural date phrase resolved against the demo reference date",
   ),
 ] as const;
 

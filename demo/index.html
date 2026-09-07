@@ -2493,18 +2493,22 @@
         datePatterns,
         emailPattern,
         moneyPattern,
+        naturalDatePattern,
         personPatterns,
         phonePattern,
       } from "../dist/index.js";
 
       (() => {
+        const demoReferenceDate = new Date("2026-09-12T17:00:00.000Z");
         const sampleText = `Northstar Analytics LLC opened identity review case CN-2026-004218 in Chicago on September 12, 2026. The initial request concerns loan 8041234567 and a proposed credit limit of $248,500.00.
 
-Maya Chen submitted the documents from maya.chen@example.com and asked that updates also be sent to +1 (312) 555-0148. Dr. José Álvarez approved the first review, while Jean-Luc Picard was assigned to check the remaining records.
+Maya Chen submitted the documents from maya.chen@example.com and asked that updates also be sent to +1 (312) 555-0148. The London desk uses +44 20 7946 0958, while the Sydney team answers +61 2 9374 4000.
+
+Dr. José Álvarez approved the first review, while Jean-Luc Picard was assigned to check the remaining records. A preliminary call is tomorrow at 4:30 PM, followed by a review next Friday from 9:00 AM to 11:30 AM.
 
 The customer listed the delivery address as 233 S Wacker Dr, Chicago, IL 60606. A courier from Acme Corporation will collect the signed originals there on 12 September 2026.
 
-Google scheduled a follow-up meeting in Paris for 2026-09-18. Priya Nair will join from London, and Marcus Johnson will represent Fabrikam Systems Inc during the compliance discussion.
+Google scheduled a follow-up at 1600 Amphitheatre Pkwy, Mountain View, CA 94043 for 2026-09-18. Priya Nair will join from London, and Marcus Johnson will represent Fabrikam Systems Inc during the compliance discussion.
 
 The approved filing fee is $12.75, the insurance deposit is twenty-five dollars, and the estimated closing cost is USD 1,840. Northstar Analytics LLC asked that every amount be normalized before export.
 
@@ -2518,9 +2522,9 @@ Mary O'Connor requested a legal review in New York on 9/15/2026. Her colleague F
 
 On 30.09.2026, Contoso Bank will send a status report from Dublin. The report should mention €4,250.50 in reserves and a separate refund of £92.00 for processing delays.
 
-The final walkthrough is planned for October 2, 2026 at 1 Microsoft Way, Redmond, WA 98052. Grace Hopper and Alan Turing will review the audit trail before Northstar Analytics LLC archives the case.
+The Canadian archive is located at 111 Richmond St W, Toronto, ON M5H 2G4. Grace Hopper and Alan Turing will review its audit trail two weeks from now before Northstar Analytics LLC archives the case.
 
-If the review succeeds, Maya Chen will receive confirmation on 2026-10-03. Until then, case CN-2026-004218 remains pending, the Chicago office retains the originals, and no additional payment should be requested.`;
+The final walkthrough is planned for October 2, 2026 at 1 Microsoft Way, Redmond, WA 98052. If the review succeeds, Maya Chen will receive confirmation on 2026-10-03; until then, case CN-2026-004218 remains pending.`;
 
         const demoBuiltIn = (pattern, label, color) => ({
           id: pattern.id,
@@ -2595,11 +2599,25 @@ If the review succeeds, Maya Chen will receive confirmation on 2026-10-03. Until
             confidence: 0.66,
           },
           {
-            id: "server-us-address",
-            label: "US postal address",
+            id: "server-postal-address",
+            label: "Postal address · structured",
             tag: "postal_address",
             color: "rose",
             confidence: 0.62,
+          },
+          {
+            id: "server-phone-intelligence",
+            label: "Phone · metadata validation",
+            tag: "phone",
+            color: "cyan",
+            confidence: 0.96,
+          },
+          {
+            id: "server-natural-date",
+            label: "Date · reference resolver",
+            tag: "date",
+            color: "amber",
+            confidence: 0.88,
           },
         ].map((recognizer) => ({
           ...recognizer,
@@ -2617,7 +2635,7 @@ If the review succeeds, Maya Chen will receive confirmation on 2026-10-03. Until
             "rose",
           ),
           demoBuiltIn(emailPattern(), "Email address", "blue"),
-          demoBuiltIn(phonePattern(), "Phone number", "cyan"),
+          demoBuiltIn(phonePattern(), "Phone · international", "cyan"),
           {
             id: "loan",
             label: "Loan number",
@@ -2640,6 +2658,14 @@ If the review succeeds, Maya Chen will receive confirmation on 2026-10-03. Until
           ),
           ...datePatterns().map((pattern, index) =>
             demoBuiltIn(pattern, dateLabels[index], "amber"),
+          ),
+          demoBuiltIn(
+            naturalDatePattern({
+              referenceDate: demoReferenceDate,
+              timezone: -300,
+            }),
+            "Date · natural language",
+            "amber",
           ),
           defaultLanguageBuiltIn(
             languageOrganizationPattern(),
@@ -2872,6 +2898,48 @@ If the review succeeds, Maya Chen will receive confirmation on 2026-10-03. Until
           return `<span class="matched-tags">${tags
             .map((tag) => `<span class="matched-tag">${escapeHTML(tag)}</span>`)
             .join("")}</span>`;
+        }
+
+        function renderEnrichmentDetails(entity, useCode = false) {
+          const metadata = entity.metadata;
+          if (!metadata || typeof metadata !== "object") return "";
+          const rows = [];
+          const add = (label, value) => {
+            if (value === undefined || value === null || value === "") return;
+            const safeValue = escapeHTML(String(value));
+            rows.push(
+              `<dt>${escapeHTML(label)}</dt><dd>${useCode ? `<code>${safeValue}</code>` : safeValue}</dd>`,
+            );
+          };
+
+          const phone = metadata.phone ||
+            (metadata.category === "phone" ? metadata : null);
+          if (phone) {
+            add("Country", phone.country);
+            add("International", phone.international);
+            add("National", phone.national);
+            add("Calling code", phone.countryCallingCode);
+          }
+
+          if (metadata.category === "date") {
+            add("Resolved start", metadata.resolvedStart);
+            add("Resolved end", metadata.resolvedEnd);
+            add("Reference date", metadata.referenceDate);
+            add("Timezone offset", metadata.timezone);
+          }
+
+          const address = metadata.address;
+          if (address) {
+            add("Formatted address", address.formatted);
+            add(
+              "Locality",
+              `${address.city}, ${address.regionName} ${address.postalCode}`,
+            );
+            add("Country", address.country);
+            add("Address ID", address.id);
+          }
+
+          return rows.join("");
         }
 
         function renderRecognizerControls() {
@@ -3507,6 +3575,7 @@ If the review succeeds, Maya Chen will receive confirmation on 2026-10-03. Until
               const expanded = expandedResultIds.has(entity.id);
               const detailId = `result-detail-${index}`;
               const tags = renderMatchedTags(entity);
+              const enrichment = renderEnrichmentDetails(entity);
               return `
               <article class="result-card ${entity.assisted ? `server-assisted assist-confidence-${confidenceLevel(entity.confidence)}` : ""} ${entity.id === activeEntityId ? "active" : ""}" data-entity-id="${escapeHTML(entity.id)}">
                 <button type="button" class="result-summary" data-result-toggle="${escapeHTML(entity.id)}" aria-expanded="${String(expanded)}" aria-controls="${detailId}" aria-label="${escapeHTML(entity.tag)}: ${escapeHTML(entity.value)}, ${percent}% confidence. ${expanded ? "Collapse" : "Expand"} details">
@@ -3532,6 +3601,7 @@ If the review succeeds, Maya Chen will receive confirmation on 2026-10-03. Until
                     <dt>Pattern</dt><dd data-tooltip="${escapeHTML(entity.patternId)}">${escapeHTML(entity.patternId)}</dd>
                     <dt>Source</dt><dd>${escapeHTML(entity.source)}</dd>
                     ${tags ? `<dt>Tags</dt><dd>${tags}</dd>` : ""}
+                    ${enrichment}
                     ${entity.assisted && entity.metadata?.evidence ? `<dt>Evidence</dt><dd>${escapeHTML(String(entity.metadata.evidence))}</dd>` : ""}
                   </dl>
                 </div>
@@ -3616,6 +3686,7 @@ If the review succeeds, Maya Chen will receive confirmation on 2026-10-03. Until
           if (!entity) return;
           const percent = Math.round(entity.confidence * 100);
           const tags = renderMatchedTags(entity);
+          const enrichment = renderEnrichmentDetails(entity, true);
           els.entityTooltip.innerHTML = `
             <div class="entity-tooltip-header">
               <span class="entity-tooltip-tag">${escapeHTML(entity.tag.replace(/_/g, " "))}${entity.assisted ? `<i class="server-assisted-badge assist-confidence-${confidenceLevel(entity.confidence)} not-italic">Assisted</i>` : ""}</span>
@@ -3628,6 +3699,7 @@ If the review succeeds, Maya Chen will receive confirmation on 2026-10-03. Until
               <dt>Source</dt><dd><code>${escapeHTML(entity.source)}</code></dd>
               <dt>Normalized</dt><dd><code>${escapeHTML(entity.normalizedValue)}</code></dd>
               ${tags ? `<dt>Tags</dt><dd>${tags}</dd>` : ""}
+              ${enrichment}
               ${entity.assisted && entity.metadata?.evidence ? `<dt>Evidence</dt><dd><code>${escapeHTML(String(entity.metadata.evidence))}</code></dd>` : ""}
             </dl>`;
           els.entityTooltip.hidden = false;

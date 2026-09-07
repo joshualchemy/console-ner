@@ -2,10 +2,16 @@ export { datePatterns } from "./builtins/date";
 export { emailPattern } from "./builtins/email";
 export { ipv4Pattern } from "./builtins/ipv4";
 export { moneyPattern } from "./builtins/money";
+export { naturalDatePattern } from "./builtins/naturalDate";
+export type {
+  NaturalDateEntityMetadata,
+  NaturalDatePatternOptions,
+} from "./builtins/naturalDate";
 export { organizationPattern } from "./builtins/organization";
 export { paymentCardPattern } from "./builtins/paymentCard";
 export { personPatterns } from "./builtins/person";
 export { phonePattern } from "./builtins/phone";
+export type { PhoneEntityMetadata, PhonePatternOptions } from "./builtins/phone";
 export { postalAddressPattern } from "./builtins/postalAddress";
 export { routingNumberPattern } from "./builtins/routingNumber";
 export type { BuiltInPattern, BuiltInPatternOptions } from "./builtins/types";

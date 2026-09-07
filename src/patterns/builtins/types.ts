@@ -9,8 +9,8 @@ export interface BuiltInPatternOptions<TTag extends string> {
 
 export type BuiltInPattern<TTag extends string, TMetadata = never> = Omit<
   EntityPattern<TTag, TMetadata, never>,
-  "confidence" | "metadata" | "validator"
+  "confidence" | "validator"
 > & {
-  /** Built-ins use a fixed score so their metadata type remains safely composable. */
+  /** Built-ins use a fixed score and never require application services. */
   readonly confidence?: number;
 };
