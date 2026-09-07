@@ -1,14 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { emailPattern } from "../src";
 import {
+  ConsoleNER,
   COMPROMISE_RECOGNIZER_ID,
-  createCompromiseNER,
+  emailPattern,
   type CompromiseEntityMetadata,
-} from "../src/compromise";
+} from "../src";
 
 describe("Compromise recognizer", () => {
   it("ships as a named recognizer that can be disabled, enabled, and removed", () => {
-    const ner = createCompromiseNER();
+    const ner = new ConsoleNER();
 
     expect(ner.listRecognizers()).toEqual([{
       id: COMPROMISE_RECOGNIZER_ID,
@@ -38,10 +38,14 @@ describe("Compromise recognizer", () => {
       readonly source: "application";
     }
 
-    const empty = createCompromiseNER({ compromise: false });
+    const empty = new ConsoleNER({ compromise: false });
     expect(empty.listRecognizers()).toEqual([]);
 
-    const ner = createCompromiseNER<"email", undefined, AppMetadata>();
+    const ner = new ConsoleNER<
+      "email" | "person",
+      undefined,
+      AppMetadata | CompromiseEntityMetadata
+    >();
     ner.register({
       ...emailPattern(),
       metadata: () => ({ source: "application" }),

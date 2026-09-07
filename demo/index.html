@@ -677,6 +677,27 @@
         overflow-wrap: anywhere;
       }
 
+      .matched-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+      }
+
+      .matched-tag {
+        display: inline-flex;
+        align-items: center;
+        min-height: 20px;
+        border: 1px solid #64748b;
+        border-radius: 999px;
+        background: #263244;
+        padding: 1px 8px;
+        color: #f8fafc;
+        font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+        font-size: 10px;
+        font-weight: 600;
+        line-height: 16px;
+      }
+
       #resultsList:not(:empty) {
         overflow: hidden;
         border: 1px solid var(--line);
@@ -1341,6 +1362,12 @@
       html.light #entityTooltip code,
       html.light .result-details-grid dd {
         color: #334155;
+      }
+
+      html.light .matched-tag {
+        border-color: #94a3b8;
+        background: #f1f5f9;
+        color: #0f172a;
       }
 
       html.light .entity-tooltip-details dt,
@@ -2363,20 +2390,32 @@
         moneyPattern,
         personPatterns,
         phonePattern,
-      } from "../dist/compromise.js";
+      } from "../dist/index.js";
 
       (() => {
-        const sampleText = `Northstar Analytics LLC - identity review case CN-2026-004218
+        const sampleText = `Northstar Analytics LLC opened identity review case CN-2026-004218 in Chicago on September 12, 2026. The initial request concerns loan 8041234567 and a proposed credit limit of $248,500.00.
 
-Maya Chen opened a support request with the Chicago office on September 12, 2026. Dr. José Álvarez approved the initial review, and Jean-Luc Picard is the next person assigned to the case. Please contact Maya at maya.chen@example.com or +1 (312) 555-0148 if more information is needed.
+Maya Chen submitted the documents from maya.chen@example.com and asked that updates also be sent to +1 (312) 555-0148. Dr. José Álvarez approved the first review, while Jean-Luc Picard was assigned to check the remaining records.
 
-The customer listed the delivery address as 233 S Wacker Dr, Chicago, IL 60606. A follow-up meeting is planned with Google in Paris, while Acme Corporation will handle the records request in New York.
+The customer listed the delivery address as 233 S Wacker Dr, Chicago, IL 60606. A courier from Acme Corporation will collect the signed originals there on 12 September 2026.
 
-The approved amount is $248,500.00 and the filing fee is $12.75. The loan number is 8041234567, the payment card is 4111 1111 1111 1111, and the receiving bank routing number is 021000021.
+Google scheduled a follow-up meeting in Paris for 2026-09-18. Priya Nair will join from London, and Marcus Johnson will represent Fabrikam Systems Inc during the compliance discussion.
 
-The request originated from 192.168.1.42 and the backup service is reachable at 10.24.8.7. These values are intentionally invalid and should not be recognized: 999.1.1.1, card 4111 1111 1111 1112, and routing number 123456789.
+The approved filing fee is $12.75, the insurance deposit is twenty-five dollars, and the estimated closing cost is USD 1,840. Northstar Analytics LLC asked that every amount be normalized before export.
 
-Additional deadlines are 12 September 2026, 2026-09-03, 9/15/2026, and 30.09.2026. Mary O'Connor marked the request urgent, but final approval is still pending.`;
+Payment card 4111 1111 1111 1111 passed the checksum review, and routing number 021000021 belongs to the receiving bank. A second transfer associated with case CN-2026-001337 remains on hold.
+
+The primary request originated from 192.168.1.42, while the backup service is reachable at 10.24.8.7. Operations engineer Elena García confirmed both addresses during the September 13, 2026 incident review.
+
+These deliberately invalid values should be rejected by server assistance: 999.1.1.1, card 4111 1111 1111 1112, and routing number 123456789. The unrelated reference CN-2026-999999 is also absent from the mock case directory.
+
+Mary O'Connor requested a legal review in New York on 9/15/2026. Her colleague Fatima al-Zahra forwarded the note to legal@example.org and copied the Seattle office.
+
+On 30.09.2026, Contoso Bank will send a status report from Dublin. The report should mention €4,250.50 in reserves and a separate refund of £92.00 for processing delays.
+
+The final walkthrough is planned for October 2, 2026 at 1 Microsoft Way, Redmond, WA 98052. Grace Hopper and Alan Turing will review the audit trail before Northstar Analytics LLC archives the case.
+
+If the review succeeds, Maya Chen will receive confirmation on 2026-10-03. Until then, case CN-2026-004218 remains pending, the Chicago office retains the originals, and no additional payment should be requested.`;
 
         const demoBuiltIn = (pattern, label, color) => ({
           id: pattern.id,
@@ -2387,6 +2426,11 @@ Additional deadlines are 12 September 2026, 2026-09-03, 9/15/2026, and 30.09.202
           priority: pattern.priority ?? 0,
           patternId: pattern.id,
           definition: pattern,
+        });
+
+        const defaultCompromiseBuiltIn = (pattern, label, color) => ({
+          ...demoBuiltIn(pattern, label, color),
+          defaultRecognizer: "compromise",
         });
 
         const personLabels = [
@@ -2462,7 +2506,7 @@ Additional deadlines are 12 September 2026, 2026-09-03, 9/15/2026, and 30.09.202
           ...personPatterns().map((pattern, index) =>
             demoBuiltIn(pattern, personLabels[index], "rose"),
           ),
-          demoBuiltIn(
+          defaultCompromiseBuiltIn(
             compromisePersonPattern(),
             "Person · Compromise NLP",
             "rose",
@@ -2484,7 +2528,7 @@ Additional deadlines are 12 September 2026, 2026-09-03, 9/15/2026, and 30.09.202
             },
           },
           demoBuiltIn(moneyPattern(), "Currency", "emerald"),
-          demoBuiltIn(
+          defaultCompromiseBuiltIn(
             compromiseMoneyPattern(),
             "Currency · Compromise NLP",
             "emerald",
@@ -2492,12 +2536,12 @@ Additional deadlines are 12 September 2026, 2026-09-03, 9/15/2026, and 30.09.202
           ...datePatterns().map((pattern, index) =>
             demoBuiltIn(pattern, dateLabels[index], "amber"),
           ),
-          demoBuiltIn(
+          defaultCompromiseBuiltIn(
             compromiseOrganizationPattern(),
             "Organization · Compromise NLP",
             "cyan",
           ),
-          demoBuiltIn(
+          defaultCompromiseBuiltIn(
             compromisePlacePattern(),
             "Place · Compromise NLP",
             "blue",
@@ -2589,10 +2633,13 @@ Additional deadlines are 12 September 2026, 2026-09-03, 9/15/2026, and 30.09.202
           }
         } catch {}
 
-        const localNER = new ConsoleNER({ contextWindow: 60 });
+        const localNER = new ConsoleNER({
+          contextWindow: 60,
+          compromise: { allowOverlap: true },
+        });
 
         function registerLocalRecognizer(item) {
-          if (item.backend) return;
+          if (item.backend || item.defaultRecognizer) return;
           localNER.registerRecognizer({
             id: item.id,
             patterns: [{
@@ -2615,9 +2662,13 @@ Additional deadlines are 12 September 2026, 2026-09-03, 9/15/2026, and 30.09.202
           if (enabled) enabledRecognizerIds.add(item.id);
           else enabledRecognizerIds.delete(item.id);
           if (item.backend) return;
-          const updated = enabled
-            ? localNER.enableRecognizer(item.id)
-            : localNER.disableRecognizer(item.id);
+          const updated = item.defaultRecognizer
+            ? enabled
+              ? localNER.enablePattern(item.patternId)
+              : localNER.disablePattern(item.patternId)
+            : enabled
+              ? localNER.enableRecognizer(item.id)
+              : localNER.disableRecognizer(item.id);
           if (!updated) console.warn(`Unknown local recognizer: ${item.id}`);
         }
 
@@ -2688,6 +2739,27 @@ Additional deadlines are 12 September 2026, 2026-09-03, 9/15/2026, and 30.09.202
             : confidence >= 0.75
               ? "bg-amber-400"
               : "bg-rose-400";
+
+        function matchedTags(entity) {
+          const terms = Array.isArray(entity.metadata?.terms)
+            ? entity.metadata.terms
+            : [];
+          return [...new Set(
+            terms.flatMap((term) =>
+              Array.isArray(term?.tags)
+                ? term.tags.filter((tag) => typeof tag === "string" && tag)
+                : [],
+            ),
+          )].sort();
+        }
+
+        function renderMatchedTags(entity) {
+          const tags = matchedTags(entity);
+          if (!tags.length) return "";
+          return `<span class="matched-tags">${tags
+            .map((tag) => `<span class="matched-tag">${escapeHTML(tag)}</span>`)
+            .join("")}</span>`;
+        }
 
         function renderRecognizerControls() {
           const groups = new Map();
@@ -3315,6 +3387,7 @@ Additional deadlines are 12 September 2026, 2026-09-03, 9/15/2026, and 30.09.202
               const percent = Math.round(entity.confidence * 100);
               const expanded = expandedResultIds.has(entity.id);
               const detailId = `result-detail-${index}`;
+              const tags = renderMatchedTags(entity);
               return `
               <article class="result-card ${entity.assisted ? `server-assisted assist-confidence-${confidenceLevel(entity.confidence)}` : ""} ${entity.id === activeEntityId ? "active" : ""}" data-entity-id="${escapeHTML(entity.id)}">
                 <button type="button" class="result-summary" data-result-toggle="${escapeHTML(entity.id)}" aria-expanded="${String(expanded)}" aria-controls="${detailId}" aria-label="${escapeHTML(entity.tag)}: ${escapeHTML(entity.value)}, ${percent}% confidence. ${expanded ? "Collapse" : "Expand"} details">
@@ -3339,6 +3412,7 @@ Additional deadlines are 12 September 2026, 2026-09-03, 9/15/2026, and 30.09.202
                     <dt>Normalized</dt><dd title="${escapeHTML(entity.normalizedValue)}">${escapeHTML(entity.normalizedValue)}</dd>
                     <dt>Pattern</dt><dd title="${escapeHTML(entity.patternId)}">${escapeHTML(entity.patternId)}</dd>
                     <dt>Source</dt><dd>${escapeHTML(entity.source)}</dd>
+                    ${tags ? `<dt>Tags</dt><dd>${tags}</dd>` : ""}
                     ${entity.assisted && entity.metadata?.evidence ? `<dt>Evidence</dt><dd>${escapeHTML(String(entity.metadata.evidence))}</dd>` : ""}
                   </dl>
                 </div>
@@ -3370,6 +3444,7 @@ Additional deadlines are 12 September 2026, 2026-09-03, 9/15/2026, and 30.09.202
           );
           if (!entity) return;
           const percent = Math.round(entity.confidence * 100);
+          const tags = renderMatchedTags(entity);
           els.entityTooltip.innerHTML = `
             <div class="entity-tooltip-header">
               <span class="entity-tooltip-tag">${escapeHTML(entity.tag.replace(/_/g, " "))}${entity.assisted ? `<i class="server-assisted-badge assist-confidence-${confidenceLevel(entity.confidence)} not-italic">Assisted</i>` : ""}</span>
@@ -3381,6 +3456,7 @@ Additional deadlines are 12 September 2026, 2026-09-03, 9/15/2026, and 30.09.202
               <dt>Pattern</dt><dd><code>${escapeHTML(entity.patternId)}</code></dd>
               <dt>Source</dt><dd><code>${escapeHTML(entity.source)}</code></dd>
               <dt>Normalized</dt><dd><code>${escapeHTML(entity.normalizedValue)}</code></dd>
+              ${tags ? `<dt>Tags</dt><dd>${tags}</dd>` : ""}
               ${entity.assisted && entity.metadata?.evidence ? `<dt>Evidence</dt><dd><code>${escapeHTML(String(entity.metadata.evidence))}</code></dd>` : ""}
             </dl>`;
           els.entityTooltip.hidden = false;

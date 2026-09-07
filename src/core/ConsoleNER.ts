@@ -1,4 +1,8 @@
 import type { Entity } from "../types/Entity";
+import {
+  compromiseRecognizer,
+  type CompromiseRecognizerOptions,
+} from "../integrations/compromise/recognizer";
 import type { EntityPattern } from "../types/Pattern";
 import type { RecognitionOptions, RecognitionResult } from "../types/Recognition";
 import type { RecognizerDefinition, RecognizerInfo } from "../types/Recognizer";
@@ -26,6 +30,8 @@ export interface ConsoleNEROptions<
   readonly validationConcurrency?: number;
   readonly defaultConfidence?: number;
   readonly defaultValidatorThreshold?: number;
+  /** Configure the default Compromise recognizer, or set false to start without it. */
+  readonly compromise?: false | CompromiseRecognizerOptions;
   readonly validator?: GlobalValidatorDefinition<
     TTag,
     TEntityMetadata,
@@ -61,6 +67,12 @@ export class ConsoleNER<
         ? {}
         : { onValidationError: options.onValidationError }),
     });
+    if (options.compromise !== false) {
+      this.#registry.registerRecognizer(
+        compromiseRecognizer<TTag, TServices, TEntityMetadata>(options.compromise) as
+          RecognizerDefinition<TTag, TEntityMetadata, TServices>,
+      );
+    }
   }
 
   register(

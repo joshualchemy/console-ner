@@ -46,3 +46,4 @@ export type {
   ValidationOptions,
 } from "./types/Validation";
 export { clampConfidence } from "./utilities/scoring";
+export * from "./integrations/compromise/index";

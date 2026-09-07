@@ -49,6 +49,7 @@ function documentMatcher(text: string): PatternMatch<EntityMetadata>[] {
 
 export function createDomainNER(): ConsoleNER<AppTag, AppServices, EntityMetadata> {
   const ner = new ConsoleNER<AppTag, AppServices, EntityMetadata>({
+    compromise: false,
     contextWindow: 80,
     validationConcurrency: 6,
     validator: {

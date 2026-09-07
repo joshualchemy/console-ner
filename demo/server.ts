@@ -102,6 +102,7 @@ function createServices(stats: RequestStats): MockServices {
 }
 
 const serverNER = new ConsoleNER<DemoTag, MockServices, DemoMetadata>({
+  compromise: false,
   contextWindow: 100,
   validationConcurrency: 6,
   defaultValidatorThreshold: 1,
@@ -219,7 +220,7 @@ const liveReloadEnabled = Bun.argv.includes("--live-reload");
 const liveReloadInstance = crypto.randomUUID();
 const demoFileUrl = new URL("./index.html", import.meta.url);
 const browserBuild = await Bun.build({
-  entrypoints: [new URL("../src/compromise.ts", import.meta.url).pathname],
+  entrypoints: [new URL("../src/index.ts", import.meta.url).pathname],
   format: "esm",
   target: "browser",
 });
@@ -256,7 +257,7 @@ const server = Bun.serve({
         recognizers: serverNER.listRecognizers(),
       });
     }
-    if (request.method === "GET" && url.pathname === "/dist/compromise.js") {
+    if (request.method === "GET" && url.pathname === "/dist/index.js") {
       return new Response(browserBundle, {
         headers: {
           "Cache-Control": liveReloadEnabled ? "no-store" : "no-cache",

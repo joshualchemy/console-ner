@@ -16,16 +16,12 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
-    },
-    "./compromise": {
-      "types": "./dist/compromise.d.ts",
-      "import": "./dist/compromise.js"
     }
   },
   "scripts": {
     "start": "bun run demo/server.ts",
     "demo": "bun --hot demo/server.ts --live-reload",
-    "build": "tsup src/index.ts src/compromise.ts --format esm --dts --sourcemap --clean --external compromise",
+    "build": "tsup src/index.ts --format esm --dts --sourcemap --clean --external compromise",
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
@@ -52,7 +48,7 @@
     "typescript-eslint": "^8.42.0",
     "vitest": "^3.2.4"
   },
-  "optionalDependencies": {
+  "dependencies": {
     "compromise": "14.16.0"
   }
 }

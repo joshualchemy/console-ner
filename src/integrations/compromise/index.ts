@@ -16,7 +16,5 @@ export {
 export {
   COMPROMISE_RECOGNIZER_ID,
   compromiseRecognizer,
-  createCompromiseNER,
-  type CompromiseNEROptions,
   type CompromiseRecognizerOptions,
 } from "./recognizer";

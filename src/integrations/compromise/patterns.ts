@@ -12,6 +12,7 @@ export type CompromiseBuiltInTag = "money" | "organization" | "person" | "place"
 export interface CompromisePatternsOptions {
   readonly id?: string;
   readonly lexicon?: CompromiseLexicon;
+  readonly allowOverlap?: boolean;
 }
 
 export function compromiseMoneyPattern(
@@ -123,21 +124,25 @@ export function compromisePatterns(
       id: builtInId(options.id, "compromise-person"),
       tag: "person",
       ...(options.lexicon === undefined ? {} : { lexicon: options.lexicon }),
+      ...(options.allowOverlap === undefined ? {} : { allowOverlap: options.allowOverlap }),
     }),
     compromiseOrganizationPattern({
       id: builtInId(options.id, "compromise-organization"),
       tag: "organization",
       ...(options.lexicon === undefined ? {} : { lexicon: options.lexicon }),
+      ...(options.allowOverlap === undefined ? {} : { allowOverlap: options.allowOverlap }),
     }),
     compromisePlacePattern({
       id: builtInId(options.id, "compromise-place"),
       tag: "place",
       ...(options.lexicon === undefined ? {} : { lexicon: options.lexicon }),
+      ...(options.allowOverlap === undefined ? {} : { allowOverlap: options.allowOverlap }),
     }),
     compromiseMoneyPattern({
       id: builtInId(options.id, "compromise-money"),
       tag: "money",
       ...(options.lexicon === undefined ? {} : { lexicon: options.lexicon }),
+      ...(options.allowOverlap === undefined ? {} : { allowOverlap: options.allowOverlap }),
     }),
   ];
 }
