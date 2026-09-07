@@ -10,7 +10,6 @@ entities out of the box.
 
 <img width="1431" height="689" alt="image" src="https://github.com/user-attachments/assets/14200982-3897-4070-ba05-ec3a2a5842b8" />
 
-
 ## Installation
 
 ```sh
@@ -24,11 +23,7 @@ or integration entry point is required.
 ## Quick start
 
 ```ts
-import {
-  ConsoleNER,
-  emailPattern,
-  type LanguageBuiltInTag,
-} from "console-ner";
+import { ConsoleNER, emailPattern, type LanguageBuiltInTag } from "console-ner";
 
 type Tag = LanguageBuiltInTag | "email" | "order_id";
 
@@ -50,10 +45,6 @@ for (const entity of result.entities) {
   console.log(entity.tag, entity.value, entity.confidence);
 }
 ```
-
-`new ConsoleNER()` automatically installs the named `language` recognizer.
-It shares one parsed document across its four patterns, and recognition remains
-synchronous and local.
 
 Recognition is synchronous and never calls validators. Each entity includes its `tag`, source `value`, `normalizedValue`, zero-based `[start, end)` range, `confidence`, and validation state.
 
@@ -131,25 +122,6 @@ Other built-ins include `organizationPattern`, `paymentCardPattern`, `routingNum
 A recognizer is a named group of patterns. Use one when an integration or a
 domain module should be installed, toggled, or removed as a unit.
 
-ConsoleNER exposes the group as `languageRecognizer()` and its definitions as
-`languagePatterns()`, `languagePersonPattern()`,
-`languageOrganizationPattern()`, `languagePlacePattern()`, and
-`languageMoneyPattern()`. Their default IDs use the stable
-`builtin-language-*` prefix. Public metadata uses `LanguageEntityMetadata`, so
-applications do not depend on an underlying NLP provider's types.
-
-```ts
-import { ConsoleNER } from "console-ner";
-
-const ner = new ConsoleNER();
-
-// Person, organization, place, and money patterns are grouped under this
-// stable ConsoleNER recognizer ID.
-ner.disableRecognizer("language");
-ner.enableRecognizer("language");
-ner.unregisterRecognizer("language");
-```
-
 Pass `language: false` when an application needs an empty registry, or
 customize the built-in recognizer during construction:
 
@@ -184,8 +156,9 @@ const operations = {
   ],
 } satisfies RecognizerDefinition<Tag>;
 
-const appNER = new ConsoleNER<Tag>({ language: false })
-  .registerRecognizer(operations);
+const appNER = new ConsoleNER<Tag>({ language: false }).registerRecognizer(
+  operations,
+);
 ```
 
 Pattern IDs remain independently controllable inside a recognizer. Disabling a
@@ -360,20 +333,20 @@ Entity tokens include the complete entity object. Overlapping entities cannot bo
 
 ## API at a glance
 
-| Method                                     | Purpose                                      |
-| ------------------------------------------ | -------------------------------------------- |
-| `register(pattern)`                        | Add one or more patterns                     |
-| `registerRecognizer(recognizer)`           | Add a named group of patterns                |
-| `recognize(text, options?)`                | Find entities synchronously                  |
-| `validate(result, context?, options?)`     | Run eligible async validators                |
-| `recognizeAsync(text, context?, options?)` | Recognize, then validate                     |
-| `tokenize(result)`                         | Convert a result into text and entity tokens |
-| `enablePattern` / `disablePattern`         | Toggle a pattern                             |
-| `enableRecognizer` / `disableRecognizer`   | Toggle a recognizer and all its patterns     |
-| `unregisterPattern` / `unregisterTag`      | Remove registered patterns                   |
+| Method                                     | Purpose                                        |
+| ------------------------------------------ | ---------------------------------------------- |
+| `register(pattern)`                        | Add one or more patterns                       |
+| `registerRecognizer(recognizer)`           | Add a named group of patterns                  |
+| `recognize(text, options?)`                | Find entities synchronously                    |
+| `validate(result, context?, options?)`     | Run eligible async validators                  |
+| `recognizeAsync(text, context?, options?)` | Recognize, then validate                       |
+| `tokenize(result)`                         | Convert a result into text and entity tokens   |
+| `enablePattern` / `disablePattern`         | Toggle a pattern                               |
+| `enableRecognizer` / `disableRecognizer`   | Toggle a recognizer and all its patterns       |
+| `unregisterPattern` / `unregisterTag`      | Remove registered patterns                     |
 | `unregisterRecognizer`                     | Remove a recognizer and its remaining patterns |
-| `listRecognizers()`                        | Inspect registered recognizer IDs and state  |
-| `clear()`                                  | Remove all patterns                          |
+| `listRecognizers()`                        | Inspect registered recognizer IDs and state    |
+| `clear()`                                  | Remove all patterns                            |
 
 ## Demo and development
 
