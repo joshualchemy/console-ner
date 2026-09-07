@@ -2664,6 +2664,7 @@ If the review succeeds, Maya Chen will receive confirmation on 2026-10-03. Until
         let activeEntityId = null;
         let activeTooltipMark = null;
         let tooltipHideTimer = null;
+        let highlightScrollFrame = null;
         let currentTheme = document.documentElement.classList.contains("light")
           ? "light"
           : "dark";
@@ -3261,6 +3262,7 @@ If the review succeeds, Maya Chen will receive confirmation on 2026-10-03. Until
           if (!text) {
             els.highlightLayer.innerHTML =
               '<span class="editor-line"><span class="text-slate-600">Paste or type text here to begin recognizing entities…</span></span>';
+            settleHighlightScroll();
             return;
           }
           const nonOverlapping = resolveEntities(entities);
@@ -3286,6 +3288,7 @@ If the review succeeds, Maya Chen will receive confirmation on 2026-10-03. Until
               return `<span class="editor-line">${html || " "}</span>`;
             })
             .join("");
+          settleHighlightScroll();
         }
 
         function matchesConfidenceFilter(entity) {
@@ -3420,9 +3423,23 @@ If the review succeeds, Maya Chen will receive confirmation on 2026-10-03. Until
           scheduleRecognition.timer = window.setTimeout(recognize, 250);
         }
 
-        function syncEditorScroll() {
+        function copyEditorScrollPosition() {
           els.highlightLayer.scrollTop = els.sourceText.scrollTop;
           els.highlightLayer.scrollLeft = els.sourceText.scrollLeft;
+        }
+
+        function settleHighlightScroll() {
+          copyEditorScrollPosition();
+          if (highlightScrollFrame !== null)
+            window.cancelAnimationFrame(highlightScrollFrame);
+          highlightScrollFrame = window.requestAnimationFrame(() => {
+            highlightScrollFrame = null;
+            copyEditorScrollPosition();
+          });
+        }
+
+        function syncEditorScroll() {
+          copyEditorScrollPosition();
           hideEntityTooltip();
         }
 
